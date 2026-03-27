@@ -1,0 +1,59 @@
+# ─── Production deployment ────────────────────────────────────────────────────
+#
+# Usage:
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# This is the standalone production config. It runs only postgres and server.
+# The frontend is NOT served from a container — it is built separately and
+# deployed to /var/www/zamanla/dist, served directly by nginx.
+#
+# Run migrations after first deploy:
+#   docker compose -f docker-compose.prod.yml exec server npm run migrate
+#
+# See DEPLOYMENT.md for the full deploy flow.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:?DB_NAME is required}
+      POSTGRES_USER: ${DB_USER:?DB_USER is required}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      # Not exposed on the host — only the server container needs it.
+      # Remove this ports block entirely for maximum isolation.
+      - "127.0.0.1:9052:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 9051
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:?DB_NAME is required}
+      DB_USER: ${DB_USER:?DB_USER is required}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN is required}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
+    ports:
+      # Localhost only — nginx proxies /api/ to this
+      - "127.0.0.1:9051:9051"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # No volume mounts in production — use the built image
+
+volumes:
+  postgres_data:

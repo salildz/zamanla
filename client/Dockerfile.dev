@@ -1,0 +1,15 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+# Source is bind-mounted at runtime for hot reload.
+COPY . .
+
+EXPOSE 9050
+
+# --host 0.0.0.0 required so the dev server is reachable outside the container.
+# --port must match what is exposed above and what nginx proxies.
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "9050"]

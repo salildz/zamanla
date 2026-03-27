@@ -1,0 +1,341 @@
+import { useState, useCallback } from 'react'
+import { useParams, Link } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+import { useSession, useResults } from '../hooks/useSession.js'
+import {
+  useParticipant,
+  useJoinSession,
+  getStoredEditToken,
+  clearStoredEditToken,
+} from '../hooks/useParticipant.js'
+import { generateSessionSlots } from '../utils/slotUtils.js'
+import ParticipantEditor from '../components/availability/ParticipantEditor.jsx'
+import ResultsHeatmap from '../components/results/ResultsHeatmap.jsx'
+import BestTimesPanel from '../components/results/BestTimesPanel.jsx'
+import Button from '../components/common/Button.jsx'
+import Input from '../components/common/Input.jsx'
+import { PageLoader, InlineLoader } from '../components/common/LoadingSpinner.jsx'
+import ErrorMessage, { PageError } from '../components/common/ErrorMessage.jsx'
+import Badge from '../components/common/Badge.jsx'
+import TurnstileWidget, { isTurnstileEnabled } from '../components/common/TurnstileWidget.jsx'
+import { ToastProvider } from '../components/common/Toast.jsx'
+import { formatDateRange } from '../utils/slotUtils.js'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
+const joinSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(60, 'Name too long'),
+})
+
+function SessionHeader({ session }) {
+  const tz = session.timezone
+  return (
+    <div className="bg-white border-b border-gray-100">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <h1 className="text-xl font-bold text-gray-900">{session.title}</h1>
+              {session.isClosed && (
+                <Badge variant="danger" size="sm" dot>Closed</Badge>
+              )}
+            </div>
+            {session.description && (
+              <p className="text-sm text-gray-500 mb-2">{session.description}</p>
+            )}
+            <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                {formatDateRange(session.dateStart, session.dateEnd, tz)}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {session.dayStartTime} – {session.dayEndTime}
+                <span className="text-gray-400">({session.slotMinutes}min slots)</span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064" />
+                </svg>
+                {tz}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function JoinForm({ publicToken, session }) {
+  const [turnstileToken, setTurnstileToken] = useState(null)
+  const joinMutation = useJoinSession(publicToken)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ resolver: zodResolver(joinSchema) })
+
+  const onSubmit = (values) => {
+    if (isTurnstileEnabled() && !turnstileToken) return
+    joinMutation.mutate({
+      name: values.name,
+      ...(isTurnstileEnabled() && turnstileToken ? { turnstileToken } : {}),
+    })
+  }
+
+  if (session.isClosed) {
+    return (
+      <div className="text-center py-10">
+        <div className="inline-flex items-center justify-center w-14 h-14 bg-red-50 rounded-full mb-4">
+          <svg className="w-7 h-7 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <h3 className="text-base font-semibold text-gray-700 mb-1">Session Closed</h3>
+        <p className="text-sm text-gray-400">This session is no longer accepting responses.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="max-w-sm mx-auto py-10">
+      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-50 rounded-full mb-3">
+            <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+          <h2 className="text-lg font-bold text-gray-900">Enter your name</h2>
+          <p className="text-sm text-gray-500 mt-1">
+            To share your availability for{' '}
+            <span className="font-medium text-gray-700">{session.title}</span>
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
+          <Input
+            label="Your Name"
+            required
+            placeholder="e.g. Alice"
+            error={errors.name?.message}
+            autoFocus
+            {...register('name')}
+          />
+
+          {isTurnstileEnabled() && (
+            <TurnstileWidget
+              onVerify={setTurnstileToken}
+              onExpire={() => setTurnstileToken(null)}
+            />
+          )}
+
+          {joinMutation.isError && (
+            <ErrorMessage
+              message={joinMutation.error?.userMessage || 'Failed to join. Please try again.'}
+            />
+          )}
+
+          <Button
+            type="submit"
+            variant="primary"
+            fullWidth
+            loading={joinMutation.isPending}
+            disabled={isTurnstileEnabled() && !turnstileToken}
+          >
+            {joinMutation.isPending ? 'Joining...' : 'Continue to Availability'}
+          </Button>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function MyAvailabilityTab({ session, publicToken }) {
+  const editToken = getStoredEditToken(publicToken)
+  const { data: participant, isLoading, isError, error, refetch } = useParticipant(
+    publicToken,
+    editToken
+  )
+
+  // If editToken stored but 404 (invalid/expired), clear it and show join form
+  const isInvalidToken =
+    isError && error?.response?.status === 404
+
+  if (isInvalidToken) {
+    clearStoredEditToken(publicToken)
+    return <JoinForm publicToken={publicToken} session={session} />
+  }
+
+  if (!editToken) {
+    return <JoinForm publicToken={publicToken} session={session} />
+  }
+
+  if (isLoading) {
+    return <InlineLoader message="Loading your availability..." />
+  }
+
+  if (isError) {
+    return (
+      <div className="py-8">
+        <ErrorMessage
+          title="Could not load your availability"
+          message={error?.userMessage}
+          onRetry={refetch}
+        />
+      </div>
+    )
+  }
+
+  if (!participant) return null
+
+  return (
+    <ParticipantEditor
+      session={session}
+      participant={participant}
+      publicToken={publicToken}
+    />
+  )
+}
+
+function GroupResultsTab({ session, publicToken }) {
+  const [highlightedSlot, setHighlightedSlot] = useState(null)
+  const allSlots = generateSessionSlots(session)
+
+  const { data: results, isLoading, isError, error, refetch } = useResults(publicToken, {
+    refetchInterval: 30000,
+  })
+
+  const highlightedSlots = highlightedSlot ? new Set([highlightedSlot]) : null
+
+  if (isLoading) {
+    return <InlineLoader message="Loading group results..." />
+  }
+
+  if (isError) {
+    return (
+      <div className="py-8">
+        <ErrorMessage
+          title="Could not load results"
+          message={error?.userMessage}
+          onRetry={refetch}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex-1 min-w-0">
+        <ResultsHeatmap
+          session={session}
+          slots={allSlots}
+          results={results || []}
+          highlightedSlots={highlightedSlots}
+        />
+      </div>
+      <div className="lg:w-64 xl:w-72 shrink-0">
+        <BestTimesPanel
+          results={results || []}
+          session={session}
+          onHighlight={setHighlightedSlot}
+          highlightedSlots={highlightedSlots}
+        />
+      </div>
+    </div>
+  )
+}
+
+export default function SessionPage() {
+  const { publicToken } = useParams()
+  const [activeTab, setActiveTab] = useState('availability')
+
+  const { data: session, isLoading, isError, error, refetch } = useSession(publicToken)
+
+  if (isLoading) {
+    return <PageLoader message="Loading session..." />
+  }
+
+  if (isError) {
+    const is404 = error?.response?.status === 404
+    return (
+      <PageError
+        title={is404 ? 'Session not found' : 'Could not load session'}
+        message={
+          is404
+            ? 'This session link may be incorrect or the session may have been deleted.'
+            : error?.userMessage
+        }
+        onRetry={is404 ? undefined : refetch}
+      />
+    )
+  }
+
+  if (!session) return null
+
+  return (
+    <ToastProvider>
+      <div className="min-h-screen bg-gray-50">
+        {/* Nav */}
+        <nav className="border-b border-gray-100 bg-white sticky top-0 z-40">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <circle cx="12" cy="12" r="9" />
+                  <polyline points="12 7 12 12 15 15" />
+                </svg>
+              </div>
+              <span className="font-bold text-gray-900 text-lg">Zamanla</span>
+            </Link>
+          </div>
+        </nav>
+
+        {/* Session header */}
+        <SessionHeader session={session} />
+
+        {/* Tabs */}
+        <div className="bg-white border-b border-gray-100 sticky top-14 z-30">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="flex gap-1 -mb-px">
+              <button
+                onClick={() => setActiveTab('availability')}
+                className={`tab-button ${activeTab === 'availability' ? 'tab-button-active' : 'tab-button-inactive'}`}
+              >
+                My Availability
+              </button>
+              <button
+                onClick={() => setActiveTab('results')}
+                className={`tab-button ${activeTab === 'results' ? 'tab-button-active' : 'tab-button-inactive'}`}
+              >
+                Group Results
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+          {activeTab === 'availability' && (
+            <MyAvailabilityTab session={session} publicToken={publicToken} />
+          )}
+          {activeTab === 'results' && (
+            <GroupResultsTab session={session} publicToken={publicToken} />
+          )}
+        </div>
+      </div>
+    </ToastProvider>
+  )
+}

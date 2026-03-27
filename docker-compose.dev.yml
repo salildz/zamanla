@@ -1,0 +1,54 @@
+# ─── Server-side development deployment ──────────────────────────────────────
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+#
+# This overlay is for running a live development environment on the server,
+# accessible at zamanla-dev.yildizsalih.com via nginx.
+#
+# Differences from the base docker-compose.yml:
+#   - Ports are bound to 127.0.0.1 only (nginx proxies; no direct exposure)
+#   - Client runs Vite dev server (hot reload) instead of pre-built nginx
+#   - HMR WebSocket is configured to connect through the dev domain
+#   - Server uses NODE_ENV=development with nodemon
+#   - CORS_ORIGIN points to the dev domain
+
+services:
+  postgres:
+    ports:
+      # Localhost only on server — no external DB access
+      - "127.0.0.1:9052:5432"
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    environment:
+      NODE_ENV: development
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://zamanla-dev.yildizsalih.com}
+    ports:
+      # Localhost only — nginx proxies /api/ to this
+      - "127.0.0.1:9051:9051"
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    environment:
+      # VITE_API_URL is relative — nginx handles /api/ routing at the domain level.
+      # Vite's own proxy (localhost:9051) is the fallback only when HMR is set.
+      VITE_API_URL: /api
+      # HMR WebSocket must connect through the domain, not localhost.
+      # The browser opens wss://zamanla-dev.yildizsalih.com on port 443
+      # (Cloudflare terminates HTTPS; nginx forwards as WS on port 80).
+      HMR_HOST: ${HMR_HOST:-zamanla-dev.yildizsalih.com}
+      HMR_CLIENT_PORT: ${HMR_CLIENT_PORT:-443}
+      HMR_PROTOCOL: ${HMR_PROTOCOL:-wss}
+    ports:
+      # Localhost only — nginx proxies / to this Vite dev server
+      - "127.0.0.1:9050:9050"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - server
