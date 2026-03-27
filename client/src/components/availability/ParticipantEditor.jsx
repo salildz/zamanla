@@ -1,4 +1,6 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
+import clsx from 'clsx'
 import AvailabilityGrid from './AvailabilityGrid.jsx'
 import RecurringRuleForm from './RecurringRuleForm.jsx'
 import Button from '../common/Button.jsx'
@@ -7,6 +9,7 @@ import { useSaveAvailability } from '../../hooks/useParticipant.js'
 import { useToast } from '../common/Toast.jsx'
 
 export default function ParticipantEditor({ session, participant, publicToken }) {
+  const { t } = useTranslation()
   const toast = useToast()
   const saveMutation = useSaveAvailability(publicToken, participant?.editToken)
 
@@ -24,6 +27,7 @@ export default function ParticipantEditor({ session, participant, publicToken })
     return overrides
   })
   const [isDirty, setIsDirty] = useState(false)
+  const [rulesExpanded, setRulesExpanded] = useState(true)
 
   // All session slots
   const allSlots = useMemo(() => generateSessionSlots(session), [session])
@@ -65,10 +69,8 @@ export default function ParticipantEditor({ session, participant, publicToken })
         if (currentlyAvailable) {
           // Mark unavailable
           if (fromRule) {
-            // Override rule: mark as unavailable
             next[slotStart] = 'unavailable'
           } else {
-            // Was manual available — remove manual override (becomes unavailable)
             if (next[slotStart] === 'available') {
               delete next[slotStart]
             } else {
@@ -78,7 +80,6 @@ export default function ParticipantEditor({ session, participant, publicToken })
         } else {
           // Mark available
           if (fromRule && prev[slotStart] === 'unavailable') {
-            // Remove the override that was hiding the rule
             delete next[slotStart]
           } else {
             next[slotStart] = 'available'
@@ -98,14 +99,12 @@ export default function ParticipantEditor({ session, participant, publicToken })
         for (const slotStart of slotStarts) {
           const fromRule = ruleAvailability.has(slotStart)
           if (value) {
-            // Setting available
             if (fromRule && next[slotStart] === 'unavailable') {
               delete next[slotStart]
             } else if (!fromRule) {
               next[slotStart] = 'available'
             }
           } else {
-            // Setting unavailable
             if (fromRule) {
               next[slotStart] = 'unavailable'
             } else {
@@ -123,7 +122,6 @@ export default function ParticipantEditor({ session, participant, publicToken })
   )
 
   const handleSave = async () => {
-    // Build slots array
     const slots = allSlots
       .map((slot) => {
         const manualStatus = manualOverrides[slot.slotStart]
@@ -137,9 +135,9 @@ export default function ParticipantEditor({ session, participant, publicToken })
     try {
       await saveMutation.mutateAsync({ rules, slots })
       setIsDirty(false)
-      toast.success('Availability saved!')
+      toast.success(t('availability.toast.saved'))
     } catch (err) {
-      toast.error(err.userMessage || 'Failed to save availability.')
+      toast.error(err.userMessage || t('availability.toast.saveFailed'))
     }
   }
 
@@ -152,33 +150,34 @@ export default function ParticipantEditor({ session, participant, publicToken })
   const availableCount = effectiveAvailability.size
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Header bar */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-3">
+    // pb-20 on mobile so the sticky save bar doesn't obscure content
+    <div className="flex flex-col gap-4 pb-20 lg:pb-0">
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <h2 className="text-base font-semibold text-gray-800">
-            Your Availability
-            {participant?.name && (
-              <span className="font-normal text-gray-500 ml-1.5">— {participant.name}</span>
-            )}
+            {participant?.name
+              ? t('availability.titleWithName', { name: participant.name })
+              : t('availability.title')}
           </h2>
           <span className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full font-medium">
-            {availableCount} slot{availableCount !== 1 ? 's' : ''} marked
+            {t('availability.availableSlots', { count: availableCount })}
           </span>
           {isDirty && (
             <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-medium">
-              Unsaved changes
+              {t('availability.unsavedChanges')}
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        {/* Desktop action buttons — hidden on mobile (mobile uses sticky bar) */}
+        <div className="hidden lg:flex items-center gap-2">
           <Button
             variant="ghost"
             size="sm"
             onClick={handleClearAll}
             disabled={saveMutation.isPending}
           >
-            Clear all
+            {t('availability.clearAll')}
           </Button>
           <Button
             variant="primary"
@@ -187,21 +186,49 @@ export default function ParticipantEditor({ session, participant, publicToken })
             loading={saveMutation.isPending}
             disabled={!isDirty}
           >
-            {saveMutation.isPending ? 'Saving...' : 'Save Availability'}
+            {saveMutation.isPending ? t('availability.savingButton') : t('availability.saveButton')}
           </Button>
         </div>
       </div>
 
       {/* Instructions */}
       <p className="text-sm text-gray-500">
-        Click or drag to toggle time slots. Use recurring rules to quickly fill in weekly patterns.
+        {t('availability.instructions')}
       </p>
 
       {/* Main layout: rules panel + grid */}
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Recurring Rules Panel */}
         <div className="lg:w-52 xl:w-60 shrink-0">
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          {/* Mobile: collapsible toggle header */}
+          <button
+            type="button"
+            className="w-full lg:hidden flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 mb-1 active:bg-gray-100"
+            onClick={() => setRulesExpanded((v) => !v)}
+          >
+            <span className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-indigo-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {t('availability.rules.title')}
+              {rules.length > 0 && (
+                <span className="bg-indigo-100 text-indigo-700 text-xs px-1.5 py-0.5 rounded-full font-semibold leading-none">
+                  {rules.length}
+                </span>
+              )}
+            </span>
+            <svg
+              className={clsx('w-4 h-4 text-gray-400 transition-transform duration-200', rulesExpanded && 'rotate-180')}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <div className={clsx(
+            'bg-gray-50 border border-gray-200 rounded-lg p-4',
+            !rulesExpanded && 'hidden lg:block'
+          )}>
             <RecurringRuleForm
               rules={rules}
               onRulesChange={handleRulesChange}
@@ -210,7 +237,7 @@ export default function ParticipantEditor({ session, participant, publicToken })
           </div>
         </div>
 
-        {/* Grid */}
+        {/* Availability Grid */}
         <div className="flex-1 min-w-0">
           <AvailabilityGrid
             session={session}
@@ -223,18 +250,48 @@ export default function ParticipantEditor({ session, participant, publicToken })
         </div>
       </div>
 
-      {/* Save button (bottom, for mobile) */}
-      <div className="flex justify-end lg:hidden">
-        <Button
-          variant="primary"
-          size="md"
-          onClick={handleSave}
-          loading={saveMutation.isPending}
-          disabled={!isDirty}
-          className="w-full sm:w-auto"
-        >
-          {saveMutation.isPending ? 'Saving...' : 'Save Availability'}
-        </Button>
+      {/* Mobile sticky save bar — fixed at bottom of viewport */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white border-t border-gray-200"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      >
+        <div className="flex items-center justify-between gap-3 px-4 py-3 max-w-5xl mx-auto">
+          <div className="flex items-center gap-2 min-w-0">
+            {availableCount > 0 ? (
+              <span className="text-sm font-medium text-gray-700 truncate">
+                {t('availability.availableSlots', { count: availableCount })}
+              </span>
+            ) : (
+              <span className="text-sm text-gray-400 truncate">
+                {t('availability.noSlotsSelected')}
+              </span>
+            )}
+            {isDirty && (
+              <span className="text-xs text-amber-600 shrink-0 font-medium">
+                · {t('availability.unsaved')}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearAll}
+              disabled={saveMutation.isPending || availableCount === 0}
+            >
+              {t('availability.clearAll')}
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleSave}
+              loading={saveMutation.isPending}
+              disabled={!isDirty}
+            >
+              {saveMutation.isPending ? t('availability.savingButton') : t('availability.saveButton')}
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -1,8 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import Button from '../components/common/Button.jsx'
 
 export default function NotFoundPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -46,24 +48,21 @@ export default function NotFoundPage() {
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Page not found</h1>
-          <p className="text-gray-500 mb-8">
-            The page you're looking for doesn't exist or may have been moved.
-            If you were trying to open a session link, please double-check the URL.
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('notFound.title')}</h1>
+          <p className="text-gray-500 mb-8">{t('notFound.message')}</p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button variant="primary" size="md" onClick={() => navigate(-1)}>
-              Go back
+              {t('notFound.back')}
             </Button>
             <Link to="/">
               <Button variant="secondary" size="md">
-                Home
+                {t('notFound.home')}
               </Button>
             </Link>
             <Link to="/create">
               <Button variant="ghost" size="md">
-                Create a session
+                {t('notFound.createSession')}
               </Button>
             </Link>
           </div>
@@ -72,7 +71,7 @@ export default function NotFoundPage() {
 
       {/* Footer */}
       <div className="py-6 text-center text-sm text-gray-400">
-        Need help? Make sure you have the correct link.
+        {t('notFound.hint')}
       </div>
     </div>
   )

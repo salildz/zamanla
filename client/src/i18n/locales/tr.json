@@ -10,7 +10,9 @@
     "none": "Yok",
     "dismiss": "Kapat",
     "tryAgain": "Tekrar dene",
-    "goBack": "Geri git"
+    "goBack": "Geri git",
+    "edit": "Düzenle",
+    "slotMinutes": "{{count}} dk."
   },
   "nav": {
     "newSession": "Yeni Oturum",
@@ -31,7 +33,7 @@
       "step2Title": "Linki paylaş",
       "step2Desc": "Katılımcı linkini grubuna e-posta, Slack veya başka bir yolla gönder.",
       "step3Title": "En iyi zamanı bul",
-      "step3Desc": "Isı haritasının dolmasını izle. En uygun slotlar otomatik olarak öne çıkar."
+      "step3Desc": "Yanıtlar geldikçe müsaitlik tablosunun dolmasını izle. Ortak uygun zamanlar otomatik olarak öne çıkar."
     },
     "featuresTitle": "İhtiyacın olan her şey",
     "featuresSubtitle": "Karmaşıklık olmadan güçlü özellikler.",
@@ -125,7 +127,7 @@
       "sessionNotFoundMessage": "Bu oturum linki hatalı olabilir ya da oturum silinmiş olabilir.",
       "sessionLoadError": "Oturum yüklenemedi"
     },
-    "instructions": "Zaman slotlarını açıp kapatmak için tıkla veya sürükle. Haftalık kalıpları hızlıca doldurmak için tekrarlayan kuralları kullan."
+    "instructions": "Müsait olduğun saatleri işaretlemek için dokun ya da sürükle. Haftalık kalıpları otomatik doldurmak için tekrarlayan kuralları kullan."
   },
   "admin": {
     "breadcrumb": "Yönetici Paneli",
@@ -149,12 +151,14 @@
       "deleteMessage": "Katılımcı yanıtları dahil tüm veriler kalıcı olarak silinecek. Bu işlem geri alınamaz.",
       "deleteConfirm": "Kalıcı Olarak Sil"
     },
+    "participantCount_one": "{{count}} katılımcı",
+    "participantCount_other": "{{count}} katılımcı",
     "overview": {
       "participantsTitle": "Katılımcılar ({{count}})",
       "participantsEmpty": "Henüz katılımcı yok. Yanıt almak için aşağıdaki linki paylaş.",
-      "availableSlots_one": "{{count}} müsait slot",
-      "availableSlots_other": "{{count}} müsait slot",
-      "bestTimesPreview": "En İyi Zamanların Önizlemesi"
+      "availableSlots_one": "{{count}} müsait zaman",
+      "availableSlots_other": "{{count}} müsait zaman",
+      "bestTimesPreview": "En Uygun Zamanlara Bakış"
     },
     "results": {
       "loading": "Sonuçlar yükleniyor..."
@@ -200,29 +204,33 @@
     "title": "Müsaitliğim",
     "titleWithName": "Müsaitliğim — {{name}}",
     "unsavedChanges": "Kaydedilmemiş değişiklikler",
-    "availableSlots_one": "{{count}} slot",
-    "availableSlots_other": "{{count}} slot",
+    "availableSlots_one": "{{count}} zaman dilimi",
+    "availableSlots_other": "{{count}} zaman dilimi",
     "saveButton": "Müsaitliği Kaydet",
     "savingButton": "Kaydediliyor...",
     "clearAll": "Tümünü temizle",
-    "instructions": "Zaman slotlarını açıp kapatmak için tıkla veya sürükle. Haftalık kalıpları hızlıca doldurmak için tekrarlayan kuralları kullan.",
+    "noSlotsSelected": "Zaman seçmek için dokun",
+    "unsaved": "Kaydedilmedi",
+    "instructions": "Müsait olduğun saatleri işaretlemek için dokun ya da sürükle. Haftalık kalıpları otomatik doldurmak için tekrarlayan kuralları kullan.",
     "toast": {
       "saved": "Müsaitlik kaydedildi!",
       "saveFailed": "Müsaitlik kaydedilemedi."
     },
     "grid": {
-      "noSlots": "Bu oturum için zaman slotu yok."
+      "noSlots": "Bu oturum için zaman dilimi bulunamadı.",
+      "scrollHint": "← kaydır →"
     },
     "rules": {
       "title": "Tekrarlayan Müsaitlik",
-      "subtitle": "Eşleşen zaman slotlarını otomatik doldurmak için haftalık kalıplar belirle.",
+      "subtitle": "Programını otomatik doldurmak için gün ve saat seç.",
       "daysLabel": "Günler",
       "fromLabel": "Başlangıç",
       "toLabel": "Bitiş",
-      "applyButton": "Kuralı Uygula",
+      "applyButton": "Kural Ekle",
+      "applied": "Kural eklendi!",
       "activeRules_one": "Aktif Kurallar ({{count}})",
       "activeRules_other": "Aktif Kurallar ({{count}})",
-      "noRules": "Aktif kural yok. Müsaitliğini otomatik doldurmak için yukarıdan bir kural ekle.",
+      "noRules": "Haftalık programını hızlıca doldurmak için yukarıdan bir kural ekle.",
       "deleteRule": "Kuralı sil",
       "errors": {
         "noDays": "En az bir gün seç.",
@@ -246,21 +254,21 @@
     "participantCount_other": "{{count}} katılımcı yanıtladı",
     "lessAvailable": "Daha az müsait",
     "moreAvailable": "Daha çok müsait",
-    "noSlots": "Görüntülenecek zaman slotu yok.",
-    "noData": "Henüz müsaitlik verisi yok. İlk yanıtlayan sen ol!",
+    "noSlots": "Görüntülenecek zaman dilimi yok.",
+    "noData": "Henüz yanıt gelmedi. İlk yanıtlayan sen ol!",
     "tooltip": {
       "available": "{{available}} / {{total}} müsait",
       "noOneAvailable": "Kimse müsait değil",
       "more": "+{{count}} daha"
     },
     "bestTimes": {
-      "title": "En İyi Zamanlar",
+      "title": "En Uygun Zamanlar",
       "noResponses": "Henüz yanıt yok",
-      "topTitle": "En Uygun Zamanlar",
-      "topSubtitle": "Müsait katılımcı sayısına göre sıralanan en iyi slotlar",
-      "noOverlap": "Henüz örtüşen müsaitlik bulunamadı.",
-      "availableParticipants": "Müsait katılımcılar:",
-      "shareHint": "Yanıt almak için oturum linkini paylaş"
+      "topTitle": "Ortak Uygun Zamanlar",
+      "topSubtitle": "Müsait katılımcı sayısına göre sıralandı",
+      "noOverlap": "Henüz ortak müsait zaman bulunamadı.",
+      "availableParticipants": "Müsait olanlar:",
+      "shareHint": "Yanıt toplamak için oturum linkini paylaş"
     }
   },
   "validation": {

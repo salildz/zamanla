@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -32,14 +32,15 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 function SessionHeader({ session }) {
+  const { t } = useTranslation()
   const tz = session.timezone
   return (
     <div className="bg-white border-b border-gray-100">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
         <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <h1 className="text-xl font-bold text-gray-900">{session.title}</h1>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">{session.title}</h1>
               {session.isClosed && (
                 <Badge variant="danger" size="sm" dot>
                   <ClosedBadgeLabel />
@@ -49,22 +50,22 @@ function SessionHeader({ session }) {
             {session.description && (
               <p className="text-sm text-gray-500 mb-2">{session.description}</p>
             )}
-            <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm text-gray-500">
               <span className="flex items-center gap-1.5">
-                <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 {formatDateRange(session.dateStart, session.dateEnd, tz)}
               </span>
               <span className="flex items-center gap-1.5">
-                <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {session.dayStartTime} – {session.dayEndTime}
-                <span className="text-gray-400">({session.slotMinutes}min slots)</span>
+                <span className="text-gray-400">({t('common.slotMinutes', { count: session.slotMinutes })})</span>
               </span>
               <span className="flex items-center gap-1.5">
-                <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064" />
                 </svg>
                 {tz}
@@ -82,7 +83,7 @@ function ClosedBadgeLabel() {
   return t('session.closed')
 }
 
-function JoinForm({ publicToken, session }) {
+function JoinForm({ publicToken, session, onJoin }) {
   const { t } = useTranslation()
   const [turnstileToken, setTurnstileToken] = useState(null)
   const joinMutation = useJoinSession(publicToken)
@@ -96,10 +97,18 @@ function JoinForm({ publicToken, session }) {
 
   const onSubmit = (values) => {
     if (isTurnstileEnabled() && !turnstileToken) return
-    joinMutation.mutate({
-      name: values.name,
-      ...(isTurnstileEnabled() && turnstileToken ? { turnstileToken } : {}),
-    })
+    joinMutation.mutate(
+      {
+        name: values.name,
+        ...(isTurnstileEnabled() && turnstileToken ? { turnstileToken } : {}),
+      },
+      {
+        // Per-call onSuccess: notify the parent so it can update editToken state
+        onSuccess: (participant) => {
+          onJoin?.(participant.editToken)
+        },
+      }
+    )
   }
 
   if (session.isClosed) {
@@ -117,9 +126,9 @@ function JoinForm({ publicToken, session }) {
   }
 
   return (
-    <div className="max-w-sm mx-auto py-10">
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <div className="text-center mb-6">
+    <div className="max-w-sm mx-auto py-6 sm:py-10 px-4 sm:px-0">
+      <div className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 shadow-sm">
+        <div className="text-center mb-5 sm:mb-6">
           <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-50 rounded-full mb-3">
             <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -171,21 +180,28 @@ function JoinForm({ publicToken, session }) {
 
 function MyAvailabilityTab({ session, publicToken }) {
   const { t } = useTranslation()
-  const editToken = getStoredEditToken(publicToken)
+  // editToken must be reactive state — plain getStoredEditToken() is not reactive
+  // and would never trigger a re-render after a successful join
+  const [editToken, setEditToken] = useState(() => getStoredEditToken(publicToken))
+
   const { data: participant, isLoading, isError, error, refetch } = useParticipant(
     publicToken,
     editToken
   )
 
-  const isInvalidToken = isError && error?.response?.status === 404
+  const is404 = isError && error?.response?.status === 404
 
-  if (isInvalidToken) {
-    clearStoredEditToken(publicToken)
-    return <JoinForm publicToken={publicToken} session={session} />
-  }
+  // Clear invalid token reactively (side-effect, not during render)
+  useEffect(() => {
+    if (is404 && editToken) {
+      clearStoredEditToken(publicToken)
+      setEditToken(null)
+    }
+  }, [is404, editToken, publicToken])
 
-  if (!editToken) {
-    return <JoinForm publicToken={publicToken} session={session} />
+  // No token (first visit, or just cleared an invalid one)
+  if (!editToken || is404) {
+    return <JoinForm publicToken={publicToken} session={session} onJoin={setEditToken} />
   }
 
   if (isLoading) {
@@ -335,7 +351,7 @@ export default function SessionPage() {
         </div>
 
         {/* Content */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           {activeTab === 'availability' && (
             <MyAvailabilityTab session={session} publicToken={publicToken} />
           )}

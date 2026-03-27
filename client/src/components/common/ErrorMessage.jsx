@@ -1,7 +1,9 @@
 import clsx from 'clsx'
+import { useTranslation } from 'react-i18next'
 import Button from './Button.jsx'
 
 export default function ErrorMessage({ title, message, onRetry, className }) {
+  const { t } = useTranslation()
   return (
     <div
       className={clsx(
@@ -35,7 +37,7 @@ export default function ErrorMessage({ title, message, onRetry, className }) {
             className="mt-2 text-red-700 hover:bg-red-100"
             onClick={onRetry}
           >
-            Try again
+            {t('common.tryAgain')}
           </Button>
         )}
       </div>

@@ -22,7 +22,11 @@
   /* Availability Grid Styles */
   .availability-grid-container {
     @apply overflow-auto rounded-lg border border-gray-200;
-    max-height: 580px;
+    max-height: 560px;
+    /* Smooth scrolling on iOS */
+    -webkit-overflow-scrolling: touch;
+    /* Prevent horizontal over-scroll from bubbling to the page */
+    overscroll-behavior: contain;
   }
 
   .availability-grid-table {
@@ -37,36 +41,39 @@
 
   .grid-time-header {
     @apply sticky left-0 z-20 bg-white text-xs font-medium text-gray-500 p-1 whitespace-nowrap;
-    min-width: 56px;
-    width: 56px;
+    min-width: 48px;
+    width: 48px;
   }
 
   .grid-date-header {
     @apply sticky top-0 z-10 bg-white text-xs font-semibold text-gray-700 text-center p-1 whitespace-nowrap;
-    min-width: 76px;
-    width: 76px;
+    min-width: 52px;
+    width: 52px;
   }
 
   .grid-corner-header {
     @apply sticky left-0 top-0 z-30 bg-white;
-    min-width: 56px;
-    width: 56px;
+    min-width: 48px;
+    width: 48px;
   }
 
   .grid-time-label {
     @apply sticky left-0 bg-white text-xs text-gray-400 text-right pr-2 whitespace-nowrap select-none;
-    min-width: 56px;
-    width: 56px;
+    min-width: 48px;
+    width: 48px;
   }
 
   .grid-cell {
-    @apply h-7 cursor-pointer select-none transition-colors duration-75;
-    min-width: 76px;
-    width: 76px;
+    /* h-9 for a slightly taller, more touch-friendly tap target */
+    @apply h-9 cursor-pointer select-none transition-colors duration-75;
+    min-width: 52px;
+    width: 52px;
+    /* Prevent browser native touch handling so our drag logic fires reliably */
+    touch-action: none;
   }
 
   .grid-cell-empty {
-    @apply bg-white hover:bg-indigo-50;
+    @apply bg-white hover:bg-indigo-50 active:bg-indigo-100;
   }
 
   .grid-cell-rule {
@@ -87,14 +94,23 @@
 
   /* Results Heatmap */
   .heatmap-cell {
-    @apply h-7 cursor-pointer select-none transition-colors duration-75 relative;
-    min-width: 76px;
-    width: 76px;
+    @apply h-9 cursor-pointer select-none transition-colors duration-75 relative;
+    min-width: 52px;
+    width: 52px;
   }
 
   /* Toast notifications */
   .toast-container {
     @apply fixed bottom-4 right-4 z-50 flex flex-col gap-2;
+    /* Lift toasts above the mobile sticky save bar */
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  @media (max-width: 1024px) {
+    /* On mobile, offset toasts above the sticky save bar (~64px tall) */
+    .toast-container {
+      bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+    }
   }
 
   .toast {
@@ -115,7 +131,7 @@
 
   /* Tab styles */
   .tab-button {
-    @apply px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors;
+    @apply px-4 py-3 text-sm font-medium rounded-t-lg transition-colors;
   }
 
   .tab-button-active {
@@ -154,5 +170,12 @@
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background-color: #d1d5db;
+  }
+
+  /* On touch devices, always show edit buttons (no hover) */
+  @media (hover: none) {
+    .group .group-hover\:opacity-100 {
+      opacity: 1 !important;
+    }
   }
 }

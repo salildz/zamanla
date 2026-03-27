@@ -18,6 +18,8 @@ i18n
     },
     fallbackLng: 'en',
     supportedLngs: ['en', 'tr'],
+    // Strip region codes so 'tr-TR', 'en-US' etc. resolve to 'tr', 'en'
+    load: 'languageOnly',
     detection: {
       // Check localStorage first, then browser language
       order: ['localStorage', 'navigator'],

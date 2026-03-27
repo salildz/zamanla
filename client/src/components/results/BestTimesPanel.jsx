@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -35,18 +36,19 @@ function groupConsecutiveSlots(topSlots, tz) {
 }
 
 export default function BestTimesPanel({ results, session, onHighlight, highlightedSlots }) {
+  const { t } = useTranslation()
   const [expanded, setExpanded] = useState(null)
   const tz = session?.timezone || 'UTC'
 
   if (!results || results.length === 0) {
     return (
       <div className="bg-white border border-gray-200 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-gray-700 mb-3">Best Times</h3>
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">{t('results.bestTimes.title')}</h3>
         <div className="text-center py-6 text-gray-400 text-sm">
           <svg className="w-8 h-8 mx-auto mb-2 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          No responses yet
+          {t('results.bestTimes.noResponses')}
         </div>
       </div>
     )
@@ -61,15 +63,15 @@ export default function BestTimesPanel({ results, session, onHighlight, highligh
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
       <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
-        <h3 className="text-sm font-semibold text-gray-700">Top Available Times</h3>
+        <h3 className="text-sm font-semibold text-gray-700">{t('results.bestTimes.topTitle')}</h3>
         <p className="text-xs text-gray-500 mt-0.5">
-          Best slots ranked by number of available participants
+          {t('results.bestTimes.topSubtitle')}
         </p>
       </div>
 
       {topSlots.length === 0 ? (
         <div className="p-4 text-center text-sm text-gray-400">
-          No overlapping availability found yet.
+          {t('results.bestTimes.noOverlap')}
         </div>
       ) : (
         <ul className="divide-y divide-gray-50">
@@ -142,7 +144,7 @@ export default function BestTimesPanel({ results, session, onHighlight, highligh
                   {isExpanded && slot.participants && slot.participants.length > 0 && (
                     <div className="mt-3 ml-9">
                       <p className="text-xs font-medium text-gray-500 mb-1.5">
-                        Available participants:
+                        {t('results.bestTimes.availableParticipants')}
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         {slot.participants.map((p, i) => (
@@ -166,7 +168,7 @@ export default function BestTimesPanel({ results, session, onHighlight, highligh
 
       {totalParticipants === 0 && (
         <div className="px-4 py-2 border-t border-gray-50 text-xs text-gray-400 text-center">
-          Share the session link to get responses
+          {t('results.bestTimes.shareHint')}
         </div>
       )}
     </div>

@@ -10,7 +10,9 @@
     "none": "None",
     "dismiss": "Dismiss",
     "tryAgain": "Try again",
-    "goBack": "Go back"
+    "goBack": "Go back",
+    "edit": "Edit",
+    "slotMinutes": "{{count}}-min slots"
   },
   "nav": {
     "newSession": "New Session",
@@ -31,7 +33,7 @@
       "step2Title": "Share the link",
       "step2Desc": "Send the participant link to your group via email, Slack, or wherever you communicate.",
       "step3Title": "Find the best time",
-      "step3Desc": "Watch the heatmap fill in. The best slots rise to the top automatically."
+      "step3Desc": "Watch availability fill in as responses come in. The best shared times rise to the top."
     },
     "featuresTitle": "Everything you need",
     "featuresSubtitle": "Powerful features without the complexity.",
@@ -125,7 +127,7 @@
       "sessionNotFoundMessage": "This session link may be incorrect or the session may have been deleted.",
       "sessionLoadError": "Could not load session"
     },
-    "instructions": "Click or drag to toggle time slots. Use recurring rules to quickly fill in weekly patterns."
+    "instructions": "Tap or drag to mark your available times. Use recurring rules to auto-fill weekly patterns."
   },
   "admin": {
     "breadcrumb": "Admin Dashboard",
@@ -149,6 +151,8 @@
       "deleteMessage": "All data including participant responses will be permanently deleted. This cannot be undone.",
       "deleteConfirm": "Delete Permanently"
     },
+    "participantCount_one": "{{count}} participant",
+    "participantCount_other": "{{count}} participants",
     "overview": {
       "participantsTitle": "Participants ({{count}})",
       "participantsEmpty": "No participants yet. Share the link below to get responses.",
@@ -205,24 +209,28 @@
     "saveButton": "Save Availability",
     "savingButton": "Saving...",
     "clearAll": "Clear all",
-    "instructions": "Click or drag to toggle time slots. Use recurring rules to quickly fill in weekly patterns.",
+    "noSlotsSelected": "Tap to select times",
+    "unsaved": "Unsaved",
+    "instructions": "Tap or drag to mark your available times. Use recurring rules to auto-fill weekly patterns.",
     "toast": {
       "saved": "Availability saved!",
       "saveFailed": "Failed to save availability."
     },
     "grid": {
-      "noSlots": "No time slots available for this session."
+      "noSlots": "No time slots available for this session.",
+      "scrollHint": "← swipe to see more →"
     },
     "rules": {
       "title": "Recurring Availability",
-      "subtitle": "Set weekly patterns to auto-fill matching time slots.",
+      "subtitle": "Choose days and times to auto-fill your schedule.",
       "daysLabel": "Days",
       "fromLabel": "From",
       "toLabel": "To",
-      "applyButton": "Apply Rule",
+      "applyButton": "Add Rule",
+      "applied": "Rule added!",
       "activeRules_one": "Active Rules ({{count}})",
       "activeRules_other": "Active Rules ({{count}})",
-      "noRules": "No active rules. Add one above to auto-fill your availability.",
+      "noRules": "Add a rule above to quickly fill your weekly schedule.",
       "deleteRule": "Delete rule",
       "errors": {
         "noDays": "Select at least one day.",
@@ -247,7 +255,7 @@
     "lessAvailable": "Less available",
     "moreAvailable": "More available",
     "noSlots": "No time slots to display.",
-    "noData": "No availability data yet. Be the first to respond!",
+    "noData": "No availability submitted yet. Be the first to respond!",
     "tooltip": {
       "available": "{{available}} / {{total}} available",
       "noOneAvailable": "No one available",
@@ -256,11 +264,11 @@
     "bestTimes": {
       "title": "Best Times",
       "noResponses": "No responses yet",
-      "topTitle": "Top Available Times",
-      "topSubtitle": "Best slots ranked by number of available participants",
-      "noOverlap": "No overlapping availability found yet.",
-      "availableParticipants": "Available participants:",
-      "shareHint": "Share the session link to get responses"
+      "topTitle": "Best Shared Times",
+      "topSubtitle": "Ranked by number of available participants",
+      "noOverlap": "No common availability found yet.",
+      "availableParticipants": "Available:",
+      "shareHint": "Share the session link to collect responses"
     }
   },
   "validation": {

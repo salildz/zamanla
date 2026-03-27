@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 
 const ToastContext = createContext(null)
@@ -43,6 +44,7 @@ export function ToastProvider({ children }) {
 }
 
 function ToastItem({ toast, onClose }) {
+  const { t } = useTranslation()
   const icons = {
     success: (
       <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -83,7 +85,7 @@ function ToastItem({ toast, onClose }) {
       <button
         onClick={onClose}
         className="shrink-0 opacity-70 hover:opacity-100 transition-opacity ml-1"
-        aria-label="Dismiss"
+        aria-label={t('common.dismiss')}
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

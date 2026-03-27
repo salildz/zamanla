@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
@@ -20,11 +21,13 @@ import Badge from '../components/common/Badge.jsx'
 import { PageLoader, InlineLoader } from '../components/common/LoadingSpinner.jsx'
 import ErrorMessage, { PageError } from '../components/common/ErrorMessage.jsx'
 import { ToastProvider, useToast } from '../components/common/Toast.jsx'
+import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
 function CopyButton({ text, label, className }) {
+  const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
@@ -52,12 +55,13 @@ function CopyButton({ text, label, className }) {
           : 'text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50'
       } ${className || ''}`}
     >
-      {copied ? 'Copied!' : label || 'Copy'}
+      {copied ? t('common.copied') : (label || t('common.copy'))}
     </button>
   )
 }
 
 function InlineEditField({ value, onSave, label, multiline = false }) {
+  const { t } = useTranslation()
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(value || '')
   const inputRef = useRef(null)
@@ -110,7 +114,7 @@ function InlineEditField({ value, onSave, label, multiline = false }) {
             onClick={handleSave}
             className="text-xs text-emerald-600 hover:text-emerald-800 font-medium px-1"
           >
-            Save
+            {t('common.save')}
           </button>
           <button
             onClick={() => {
@@ -119,7 +123,7 @@ function InlineEditField({ value, onSave, label, multiline = false }) {
             }}
             className="text-xs text-gray-400 hover:text-gray-600 px-1"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       </div>
@@ -128,11 +132,13 @@ function InlineEditField({ value, onSave, label, multiline = false }) {
 
   return (
     <div className="group flex items-start gap-2">
-      <span className={multiline ? 'text-sm text-gray-600 whitespace-pre-wrap' : ''}>{value || <span className="text-gray-400 italic">None</span>}</span>
+      <span className={multiline ? 'text-sm text-gray-600 whitespace-pre-wrap' : ''}>
+        {value || <span className="text-gray-400 italic">{t('common.none')}</span>}
+      </span>
       <button
         onClick={() => setEditing(true)}
-        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-indigo-600 mt-0.5"
-        title={`Edit ${label}`}
+        className="shrink-0 opacity-0 group-hover:opacity-100 touch-device:opacity-100 transition-opacity text-gray-400 hover:text-indigo-600 mt-0.5"
+        title={t('common.edit')}
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -143,6 +149,7 @@ function InlineEditField({ value, onSave, label, multiline = false }) {
 }
 
 function ConfirmDialog({ title, message, confirmLabel = 'Confirm', danger = false, onConfirm, onCancel }) {
+  const { t } = useTranslation()
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
@@ -151,7 +158,7 @@ function ConfirmDialog({ title, message, confirmLabel = 'Confirm', danger = fals
         <p className="text-sm text-gray-500 mb-6">{message}</p>
         <div className="flex gap-3 justify-end">
           <Button variant="secondary" size="sm" onClick={onCancel}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button variant={danger ? 'danger' : 'primary'} size="sm" onClick={onConfirm}>
             {confirmLabel}
@@ -163,6 +170,7 @@ function ConfirmDialog({ title, message, confirmLabel = 'Confirm', danger = fals
 }
 
 function AdminContent({ session, adminToken }) {
+  const { t } = useTranslation()
   const toast = useToast()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('overview')
@@ -186,18 +194,18 @@ function AdminContent({ session, adminToken }) {
   const handleUpdateTitle = async (title) => {
     try {
       await updateMutation.mutateAsync({ title })
-      toast.success('Title updated.')
+      toast.success(t('admin.toast.titleUpdated'))
     } catch (err) {
-      toast.error(err.userMessage || 'Failed to update title.')
+      toast.error(err.userMessage || t('admin.toast.titleUpdateFailed'))
     }
   }
 
   const handleUpdateDescription = async (description) => {
     try {
       await updateMutation.mutateAsync({ description })
-      toast.success('Description updated.')
+      toast.success(t('admin.toast.descriptionUpdated'))
     } catch (err) {
-      toast.error(err.userMessage || 'Failed to update description.')
+      toast.error(err.userMessage || t('admin.toast.descriptionUpdateFailed'))
     }
   }
 
@@ -205,9 +213,9 @@ function AdminContent({ session, adminToken }) {
     setConfirmDialog(null)
     try {
       await closeMutation.mutateAsync()
-      toast.success('Session closed. No more responses will be accepted.')
+      toast.success(t('admin.toast.sessionClosed'))
     } catch (err) {
-      toast.error(err.userMessage || 'Failed to close session.')
+      toast.error(err.userMessage || t('admin.toast.sessionCloseFailed'))
     }
   }
 
@@ -215,10 +223,10 @@ function AdminContent({ session, adminToken }) {
     setConfirmDialog(null)
     try {
       await deleteMutation.mutateAsync()
-      toast.success('Session deleted.')
+      toast.success(t('admin.toast.sessionDeleted'))
       setTimeout(() => navigate('/'), 1500)
     } catch (err) {
-      toast.error(err.userMessage || 'Failed to delete session.')
+      toast.error(err.userMessage || t('admin.toast.sessionDeleteFailed'))
     }
   }
 
@@ -242,23 +250,29 @@ function AdminContent({ session, adminToken }) {
         a.click()
         URL.revokeObjectURL(url)
       }
-      toast.success(`Exported as ${format.toUpperCase()}.`)
+      toast.success(format === 'csv' ? t('admin.toast.exportedCsv') : t('admin.toast.exportedJson'))
     } catch (err) {
-      toast.error(err.userMessage || 'Export failed.')
+      toast.error(err.userMessage || t('admin.toast.exportFailed'))
     }
   }
 
   const participants = session.participants || []
   const highlightedSlots = highlightedSlot ? new Set([highlightedSlot]) : null
 
+  const tabs = [
+    { id: 'overview', label: t('admin.tabs.overview') },
+    { id: 'results', label: t('admin.tabs.results') },
+    { id: 'links', label: t('admin.tabs.share') },
+  ]
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Confirm dialogs */}
       {confirmDialog === 'close' && (
         <ConfirmDialog
-          title="Close this session?"
-          message="Participants will no longer be able to submit or edit their availability. This cannot be undone."
-          confirmLabel="Close Session"
+          title={t('admin.dialogs.closeTitle')}
+          message={t('admin.dialogs.closeMessage')}
+          confirmLabel={t('admin.dialogs.closeConfirm')}
           danger
           onConfirm={handleCloseSession}
           onCancel={() => setConfirmDialog(null)}
@@ -266,9 +280,9 @@ function AdminContent({ session, adminToken }) {
       )}
       {confirmDialog === 'delete' && (
         <ConfirmDialog
-          title="Delete this session?"
-          message="All data including participant responses will be permanently deleted. This cannot be undone."
-          confirmLabel="Delete Permanently"
+          title={t('admin.dialogs.deleteTitle')}
+          message={t('admin.dialogs.deleteMessage')}
+          confirmLabel={t('admin.dialogs.deleteConfirm')}
           danger
           onConfirm={handleDeleteSession}
           onCancel={() => setConfirmDialog(null)}
@@ -289,19 +303,22 @@ function AdminContent({ session, adminToken }) {
               <span className="font-bold text-gray-900 text-lg">Zamanla</span>
             </Link>
             <span className="text-gray-300 hidden sm:inline">/</span>
-            <span className="text-sm text-gray-500 hidden sm:inline">Admin Dashboard</span>
+            <span className="text-sm text-gray-500 hidden sm:inline">{t('admin.breadcrumb')}</span>
           </div>
-          <Badge variant="warning" size="sm">Admin View</Badge>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <Badge variant="warning" size="sm">{t('admin.badge')}</Badge>
+          </div>
         </div>
       </nav>
 
       {/* Session Header */}
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <h1 className="text-xl font-bold text-gray-900">
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900">
                   <InlineEditField
                     value={session.title}
                     onSave={handleUpdateTitle}
@@ -309,7 +326,7 @@ function AdminContent({ session, adminToken }) {
                   />
                 </h1>
                 {session.isClosed && (
-                  <Badge variant="danger" size="sm" dot>Closed</Badge>
+                  <Badge variant="danger" size="sm" dot>{t('session.closed')}</Badge>
                 )}
               </div>
               <div className="text-sm text-gray-500 mb-2">
@@ -320,54 +337,53 @@ function AdminContent({ session, adminToken }) {
                   multiline
                 />
               </div>
-              <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
+              <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs sm:text-sm text-gray-500">
                 <span>{formatDateRange(session.dateStart, session.dateEnd, tz)}</span>
                 <span>{session.dayStartTime} – {session.dayEndTime}</span>
                 <span>{tz}</span>
-                <span>{session.slotMinutes}min slots</span>
-                <span>{participants.length} participant{participants.length !== 1 ? 's' : ''}</span>
+                <span>{t('common.slotMinutes', { count: session.slotMinutes })}</span>
+                <span>{t('admin.participantCount', { count: participants.length })}</span>
               </div>
             </div>
-            {/* Actions */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => handleExport('csv')}
-                leftIcon={
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                }
-              >
-                Export CSV
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => handleExport('json')}
-              >
-                Export JSON
-              </Button>
-              {!session.isClosed && (
+            {/* Actions — stack on mobile, row on desktop */}
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap sm:shrink-0">
+              <div className="flex gap-2">
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="text-amber-700 border-amber-300 hover:bg-amber-50"
-                  onClick={() => setConfirmDialog('close')}
-                  loading={closeMutation.isPending}
+                  onClick={() => handleExport('csv')}
                 >
-                  Close Session
+                  {t('admin.actions.exportCsv')}
                 </Button>
-              )}
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={() => setConfirmDialog('delete')}
-                loading={deleteMutation.isPending}
-              >
-                Delete
-              </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleExport('json')}
+                >
+                  {t('admin.actions.exportJson')}
+                </Button>
+              </div>
+              <div className="flex gap-2">
+                {!session.isClosed && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="text-amber-700 border-amber-300 hover:bg-amber-50"
+                    onClick={() => setConfirmDialog('close')}
+                    loading={closeMutation.isPending}
+                  >
+                    {t('admin.actions.closeSession')}
+                  </Button>
+                )}
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => setConfirmDialog('delete')}
+                  loading={deleteMutation.isPending}
+                >
+                  {t('admin.actions.delete')}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -377,11 +393,7 @@ function AdminContent({ session, adminToken }) {
       <div className="bg-white border-b border-gray-100 sticky top-14 z-30">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="flex gap-1 -mb-px">
-            {[
-              { id: 'overview', label: 'Overview' },
-              { id: 'results', label: 'Group Results' },
-              { id: 'links', label: 'Share Links' },
-            ].map((tab) => (
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -403,12 +415,12 @@ function AdminContent({ session, adminToken }) {
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-gray-700">
-                  Participants ({participants.length})
+                  {t('admin.overview.participantsTitle', { count: participants.length })}
                 </h2>
               </div>
               {participants.length === 0 ? (
                 <div className="px-5 py-10 text-center text-gray-400 text-sm">
-                  No participants yet. Share the link below to get responses.
+                  {t('admin.overview.participantsEmpty')}
                 </div>
               ) : (
                 <ul className="divide-y divide-gray-50">
@@ -421,7 +433,9 @@ function AdminContent({ session, adminToken }) {
                         <p className="text-sm font-medium text-gray-800">{p.name}</p>
                         {p.slots && (
                           <p className="text-xs text-gray-400">
-                            {p.slots.filter((s) => s.status === 'available').length} available slots
+                            {t('admin.overview.availableSlots', {
+                              count: p.slots.filter((s) => s.status === 'available').length,
+                            })}
                           </p>
                         )}
                       </div>
@@ -434,7 +448,7 @@ function AdminContent({ session, adminToken }) {
             {/* Quick results preview */}
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-100">
-                <h2 className="text-sm font-semibold text-gray-700">Best Times Preview</h2>
+                <h2 className="text-sm font-semibold text-gray-700">{t('admin.overview.bestTimesPreview')}</h2>
               </div>
               <div className="p-4">
                 {resultsLoading ? (
@@ -455,7 +469,7 @@ function AdminContent({ session, adminToken }) {
         {activeTab === 'results' && (
           <div className="flex flex-col gap-4">
             {resultsLoading ? (
-              <InlineLoader message="Loading results..." />
+              <InlineLoader message={t('admin.results.loading')} />
             ) : (
               <div className="flex flex-col lg:flex-row gap-4">
                 <div className="flex-1 min-w-0">
@@ -489,34 +503,34 @@ function AdminContent({ session, adminToken }) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
                 <div>
-                  <p className="text-sm font-bold text-amber-800">Keep your admin link safe!</p>
+                  <p className="text-sm font-bold text-amber-800">{t('admin.share.adminWarningTitle')}</p>
                   <p className="text-xs text-amber-700 mt-0.5">
-                    Anyone with this link can manage, edit, or delete this session. There is no recovery if lost.
+                    {t('admin.share.adminWarningMessage')}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 bg-white rounded-lg border border-amber-200 px-3 py-2">
                 <code className="flex-1 text-xs text-gray-600 truncate">{adminUrl}</code>
-                <CopyButton text={adminUrl} label="Copy" />
+                <CopyButton text={adminUrl} />
               </div>
             </div>
 
             {/* Public share link */}
             <div className="bg-white border border-gray-200 rounded-xl p-5">
               <p className="text-sm font-semibold text-gray-700 mb-1">
-                Participant Link
+                {t('admin.share.participantLinkTitle')}
               </p>
               <p className="text-xs text-gray-500 mb-3">
-                Share this link with anyone you want to invite.
+                {t('admin.share.participantLinkDesc')}
               </p>
               <div className="flex items-center gap-2 bg-gray-50 rounded-lg border border-gray-200 px-3 py-2">
                 <code className="flex-1 text-xs text-gray-600 truncate">{publicUrl}</code>
-                <CopyButton text={publicUrl} label="Copy" />
+                <CopyButton text={publicUrl} />
               </div>
               <div className="mt-3">
                 <Link to={`/s/${session.publicToken}`} target="_blank">
                   <Button variant="secondary" size="sm">
-                    Open Participant View
+                    {t('admin.share.openParticipantView')}
                   </Button>
                 </Link>
               </div>
@@ -529,11 +543,12 @@ function AdminContent({ session, adminToken }) {
 }
 
 export default function AdminPage() {
+  const { t } = useTranslation()
   const { adminToken } = useParams()
   const { data: session, isLoading, isError, error, refetch } = useAdminSession(adminToken)
 
   if (isLoading) {
-    return <PageLoader message="Loading admin dashboard..." />
+    return <PageLoader message={t('admin.loading')} />
   }
 
   if (isError) {
@@ -543,16 +558,16 @@ export default function AdminPage() {
       <PageError
         title={
           is404
-            ? 'Session not found'
+            ? t('admin.errors.sessionNotFound')
             : is403
-            ? 'Access denied'
-            : 'Could not load session'
+            ? t('admin.errors.accessDenied')
+            : t('admin.errors.loadError')
         }
         message={
           is404
-            ? 'This admin link may be incorrect or the session may have been deleted.'
+            ? t('admin.errors.sessionNotFoundMessage')
             : is403
-            ? 'You do not have permission to manage this session.'
+            ? t('admin.errors.accessDeniedMessage')
             : error?.userMessage
         }
         onRetry={is404 || is403 ? undefined : refetch}

@@ -1,4 +1,5 @@
 import { useState, useCallback, memo } from 'react'
+import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 import {
   groupSlotsByDate,
@@ -11,6 +12,7 @@ import {
 
 // Tooltip for a heatmap cell
 function CellTooltip({ slot, tz }) {
+  const { t } = useTranslation()
   if (!slot) return null
   const { availableCount, totalParticipants, participants, slotStart, slotEnd } = slot
   const ratio = totalParticipants > 0 ? availableCount / totalParticipants : 0
@@ -22,7 +24,7 @@ function CellTooltip({ slot, tz }) {
           {formatSlotTime(slotStart, tz)} – {formatSlotTime(slotEnd, tz)}
         </div>
         <div className="text-gray-300 mb-1.5">
-          {availableCount} / {totalParticipants} available
+          {t('results.tooltip.available', { available: availableCount, total: totalParticipants })}
           {totalParticipants > 0 && (
             <span className="ml-1 text-emerald-400">({Math.round(ratio * 100)}%)</span>
           )}
@@ -35,12 +37,12 @@ function CellTooltip({ slot, tz }) {
               </span>
             ))}
             {participants.length > 8 && (
-              <span className="text-gray-400">+{participants.length - 8} more</span>
+              <span className="text-gray-400">{t('results.tooltip.more', { count: participants.length - 8 })}</span>
             )}
           </div>
         )}
         {(!participants || participants.length === 0) && availableCount === 0 && (
-          <span className="text-gray-400">No one available</span>
+          <span className="text-gray-400">{t('results.tooltip.noOneAvailable')}</span>
         )}
       </div>
       {/* Tooltip arrow */}
@@ -86,6 +88,7 @@ const HeatmapCell = memo(function HeatmapCell({ resultSlot, tz, isHighlighted })
 })
 
 export default function ResultsHeatmap({ session, slots, results, highlightedSlots }) {
+  const { t } = useTranslation()
   const tz = session?.timezone || 'UTC'
 
   // Build a lookup from slotStart → result
@@ -107,7 +110,7 @@ export default function ResultsHeatmap({ session, slots, results, highlightedSlo
   if (!slots || slots.length === 0) {
     return (
       <div className="flex items-center justify-center h-40 text-gray-400 text-sm">
-        No time slots to display.
+        {t('results.noSlots')}
       </div>
     )
   }
@@ -118,7 +121,7 @@ export default function ResultsHeatmap({ session, slots, results, highlightedSlo
         <svg className="w-10 h-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
-        <p className="text-sm">No availability data yet. Be the first to respond!</p>
+        <p className="text-sm">{t('results.noData')}</p>
       </div>
     )
   }
@@ -128,12 +131,11 @@ export default function ResultsHeatmap({ session, slots, results, highlightedSlo
       {/* Summary bar */}
       <div className="flex items-center gap-3 text-sm text-gray-600 flex-wrap">
         <span>
-          <span className="font-semibold text-gray-800">{totalParticipants}</span>{' '}
-          participant{totalParticipants !== 1 ? 's' : ''} responded
+          {t('results.participantCount', { count: totalParticipants })}
         </span>
         <span className="text-gray-300">|</span>
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-gray-500">Less available</span>
+          <span className="text-gray-500">{t('results.lessAvailable')}</span>
           <div className="flex gap-px">
             {[0, 0.2, 0.4, 0.6, 0.8, 1].map((r) => (
               <span
@@ -143,7 +145,7 @@ export default function ResultsHeatmap({ session, slots, results, highlightedSlo
               />
             ))}
           </div>
-          <span className="text-gray-500">More available</span>
+          <span className="text-gray-500">{t('results.moreAvailable')}</span>
         </div>
       </div>
 
