@@ -15,6 +15,9 @@ const routes = require('./src/routes');
 
 const app = express();
 
+// Trust the first proxy (nginx) so express-rate-limit can read the real client IP
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet());
 

@@ -10,14 +10,21 @@ const api = axios.create({
   timeout: 15000,
 })
 
-// Response interceptor for error normalization
+// Response interceptor: unwrap { success, data } envelope + normalize errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.data && response.data.success === true && 'data' in response.data) {
+      return { ...response, data: response.data.data }
+    }
+    return response
+  },
   (error) => {
     if (error.response) {
+      const errBody = error.response.data
       const message =
-        error.response.data?.message ||
-        error.response.data?.error ||
+        errBody?.error?.message ||
+        errBody?.message ||
+        errBody?.error ||
         `Request failed with status ${error.response.status}`
       error.userMessage = message
     } else if (error.request) {
@@ -32,22 +39,22 @@ api.interceptors.response.use(
 // Sessions
 export async function createSession(data) {
   const res = await api.post('/sessions', data)
-  return res.data
+  return res.data.session
 }
 
 export async function getSession(publicToken) {
   const res = await api.get(`/sessions/${publicToken}`)
-  return res.data
+  return res.data.session
 }
 
 export async function getAdminSession(adminToken) {
   const res = await api.get(`/sessions/admin/${adminToken}`)
-  return res.data
+  return res.data.session
 }
 
 export async function updateAdminSession(adminToken, data) {
   const res = await api.patch(`/sessions/admin/${adminToken}`, data)
-  return res.data
+  return res.data.session
 }
 
 export async function deleteSession(adminToken) {
@@ -57,7 +64,7 @@ export async function deleteSession(adminToken) {
 
 export async function closeSession(adminToken) {
   const res = await api.post(`/sessions/admin/${adminToken}/close`)
-  return res.data
+  return res.data.session
 }
 
 export async function exportSession(adminToken, format = 'json') {
@@ -71,23 +78,23 @@ export async function exportSession(adminToken, format = 'json') {
 // Participants
 export async function joinSession(publicToken, data) {
   const res = await api.post(`/sessions/${publicToken}/participants`, data)
-  return res.data
+  return res.data.participant
 }
 
 export async function getParticipant(publicToken, editToken) {
   const res = await api.get(`/sessions/${publicToken}/participants/${editToken}`)
-  return res.data
+  return { ...res.data.participant, rules: res.data.rules, slots: res.data.slots }
 }
 
 export async function saveAvailability(publicToken, editToken, data) {
   const res = await api.put(`/sessions/${publicToken}/participants/${editToken}`, data)
-  return res.data
+  return { ...res.data.participant, rules: res.data.rules, slots: res.data.slots }
 }
 
 // Results
 export async function getResults(publicToken) {
   const res = await api.get(`/sessions/${publicToken}/results`)
-  return res.data
+  return res.data.slots
 }
 
 export default api
