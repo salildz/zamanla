@@ -11,9 +11,6 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 cd "$PROJECT_DIR"
 
 echo "Stopping Zamanla dev environment..."
-docker compose \
-  -f docker-compose.yml \
-  -f docker-compose.dev.yml \
-  down
+docker compose -f docker-compose.dev.yml down
 
 echo "Dev environment stopped."

@@ -1,54 +1,81 @@
-# ─── Server-side development deployment ──────────────────────────────────────
+# ─── Server-side development deployment (standalone, not an overlay) ─────────
 #
 # Usage:
-#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+#   docker compose -f docker-compose.dev.yml up -d
+#   docker compose -f docker-compose.dev.yml down
 #
-# This overlay is for running a live development environment on the server,
-# accessible at zamanla-dev.yildizsalih.com via nginx.
+# This is a STANDALONE file — it does NOT extend docker-compose.yml.
+# Using it as an overlay causes Docker to merge port lists, creating conflicts.
 #
-# Differences from the base docker-compose.yml:
-#   - Ports are bound to 127.0.0.1 only (nginx proxies; no direct exposure)
-#   - Client runs Vite dev server (hot reload) instead of pre-built nginx
-#   - HMR WebSocket is configured to connect through the dev domain
-#   - Server uses NODE_ENV=development with nodemon
+# Differences from docker-compose.yml (local dev):
+#   - All ports bound to 127.0.0.1 only (nginx on the host proxies them)
+#   - Client runs Vite dev server with hot reload (Dockerfile.dev)
+#   - HMR WebSocket configured to connect through the dev domain
 #   - CORS_ORIGIN points to the dev domain
+#   - Source directories are volume-mounted for live reload
 
 services:
   postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-zamanla}
+      POSTGRES_USER: ${DB_USER:-zamanla}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-zamanla_dev_password}
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
     ports:
-      # Localhost only on server — no external DB access
       - "127.0.0.1:9052:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-zamanla} -d ${DB_NAME:-zamanla}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   server:
     build:
       context: ./server
       dockerfile: Dockerfile.dev
+    restart: unless-stopped
     environment:
       NODE_ENV: development
+      PORT: 9051
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-zamanla}
+      DB_USER: ${DB_USER:-zamanla}
+      DB_PASSWORD: ${DB_PASSWORD:-zamanla_dev_password}
       CORS_ORIGIN: ${CORS_ORIGIN:-https://zamanla-dev.yildizsalih.com}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
     ports:
-      # Localhost only — nginx proxies /api/ to this
       - "127.0.0.1:9051:9051"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./server:/app
+      - /app/node_modules
 
   client:
     build:
       context: ./client
       dockerfile: Dockerfile.dev
+    restart: unless-stopped
     environment:
-      # VITE_API_URL is relative — nginx handles /api/ routing at the domain level.
-      # Vite's own proxy (localhost:9051) is the fallback only when HMR is set.
+      # Relative URL — nginx routes /api/ to the backend at the domain level
       VITE_API_URL: /api
-      # HMR WebSocket must connect through the domain, not localhost.
-      # The browser opens wss://zamanla-dev.yildizsalih.com on port 443
-      # (Cloudflare terminates HTTPS; nginx forwards as WS on port 80).
+      # HMR WebSocket must connect through the public domain (not localhost).
+      # Browser opens wss://zamanla-dev.yildizsalih.com on port 443.
       HMR_HOST: ${HMR_HOST:-zamanla-dev.yildizsalih.com}
       HMR_CLIENT_PORT: ${HMR_CLIENT_PORT:-443}
       HMR_PROTOCOL: ${HMR_PROTOCOL:-wss}
     ports:
-      # Localhost only — nginx proxies / to this Vite dev server
       - "127.0.0.1:9050:9050"
     volumes:
       - ./client:/app
       - /app/node_modules
     depends_on:
       - server
+
+volumes:
+  postgres_dev_data:

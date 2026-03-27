@@ -56,7 +56,7 @@ dev-logs:
 	./scripts/logs.sh dev
 
 dev-migrate:
-	docker compose -f docker-compose.yml -f docker-compose.dev.yml exec server npm run migrate
+	docker compose -f docker-compose.dev.yml exec server npm run migrate
 
 # ─── Production ───────────────────────────────────────────────────────────────
 

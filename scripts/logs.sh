@@ -2,9 +2,9 @@
 # Tail logs for a given environment.
 #
 # Usage:
-#   ./scripts/logs.sh          # local dev (base docker-compose.yml)
-#   ./scripts/logs.sh dev      # server dev environment
-#   ./scripts/logs.sh prod     # production
+#   ./scripts/logs.sh          # local dev (docker-compose.yml)
+#   ./scripts/logs.sh dev      # server dev (docker-compose.dev.yml)
+#   ./scripts/logs.sh prod     # production (docker-compose.prod.yml)
 
 set -e
 
@@ -17,7 +17,7 @@ ENV="${1:-local}"
 
 case "$ENV" in
   dev)
-    docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f
+    docker compose -f docker-compose.dev.yml logs -f
     ;;
   prod)
     docker compose -f docker-compose.prod.yml logs -f

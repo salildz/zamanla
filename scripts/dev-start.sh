@@ -18,10 +18,7 @@ if [ ! -f .env ]; then
 fi
 
 echo "Starting Zamanla dev environment..."
-docker compose \
-  -f docker-compose.yml \
-  -f docker-compose.dev.yml \
-  up -d --build
+docker compose -f docker-compose.dev.yml up -d --build
 
 echo ""
 echo "Dev environment is up."
@@ -33,7 +30,7 @@ echo "Public URL (once nginx is configured):"
 echo "  https://zamanla-dev.yildizsalih.com"
 echo ""
 echo "Run migrations if this is a fresh database:"
-echo "  docker compose -f docker-compose.yml -f docker-compose.dev.yml exec server npm run migrate"
+echo "  docker compose -f docker-compose.dev.yml exec server npm run migrate"
 echo ""
 echo "Tail logs:"
 echo "  ./scripts/logs.sh dev"

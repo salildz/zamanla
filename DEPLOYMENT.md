@@ -115,6 +115,9 @@ HMR_PROTOCOL=wss
 make dev-migrate
 ```
 
+`docker-compose.dev.yml` is a **standalone file** (not an overlay of docker-compose.yml).
+This avoids Docker's port list merge behavior, which would create conflicting bindings.
+
 The Vite dev server runs in Docker on `127.0.0.1:9050`. nginx proxies `zamanla-dev.yildizsalih.com` to it. Hot reload (HMR) works through the domain via WebSocket.
 
 ### Updating during development
