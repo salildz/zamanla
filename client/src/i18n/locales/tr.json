@@ -1,0 +1,288 @@
+{
+  "common": {
+    "loading": "Yükleniyor...",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı!",
+    "clearAll": "Tümünü temizle",
+    "delete": "Sil",
+    "none": "Yok",
+    "dismiss": "Kapat",
+    "tryAgain": "Tekrar dene",
+    "goBack": "Geri git"
+  },
+  "nav": {
+    "newSession": "Yeni Oturum",
+    "adminDashboard": "Yönetici Paneli",
+    "newSessionPage": "Yeni Oturum"
+  },
+  "home": {
+    "badge": "Ücretsiz · Hesap gerektirmez",
+    "heroTitle": "Herkese uygun",
+    "heroTitleHighlight": "en iyi zamanı bulun",
+    "heroSubtitle": "Zamanla ile planlama çok kolay. Bir oturum oluşturun, linki paylaşın ve grubunuzun müsaitlik durumunu tek bir ısı haritasında görün.",
+    "ctaButton": "Planlama Oturumu Oluştur",
+    "ctaFooter": "Kayıt yok. Sonsuza kadar ücretsiz.",
+    "howItWorksTitle": "Nasıl çalışır?",
+    "howItWorks": {
+      "step1Title": "Oturum oluştur",
+      "step1Desc": "Başlık, tarih aralığı, zaman dilimi ve saat penceresini belirle. 30 saniye sürer.",
+      "step2Title": "Linki paylaş",
+      "step2Desc": "Katılımcı linkini grubuna e-posta, Slack veya başka bir yolla gönder.",
+      "step3Title": "En iyi zamanı bul",
+      "step3Desc": "Isı haritasının dolmasını izle. En uygun slotlar otomatik olarak öne çıkar."
+    },
+    "featuresTitle": "İhtiyacın olan her şey",
+    "featuresSubtitle": "Karmaşıklık olmadan güçlü özellikler.",
+    "features": {
+      "flexibleTitle": "Esnek Planlama",
+      "flexibleDesc": "Tarih aralığını, slot boyutunu ve günlük saatleri belirle. Her tür toplantı için uygun.",
+      "recurringTitle": "Tekrarlayan Kurallar",
+      "recurringDesc": "\"Hafta içi 09:00–17:00\" gibi haftalık uygunluk kalıpları belirle, ızgara otomatik dolsun.",
+      "groupTitle": "Grup Görünümü",
+      "groupDesc": "Gerçek zamanlı ısı haritası en fazla kişinin müsait olduğu zamanı bir bakışta gösterir.",
+      "timezoneTitle": "Saat Dilimi Farkındalığı",
+      "timezoneDesc": "Her katılımcı saatleri oturum saat diliminde görür. Bölgeler arası karışıklık olmaz.",
+      "sharingTitle": "Kolay Paylaşım",
+      "sharingDesc": "Tek bir link paylaş. Hesap gerekmez. Katılımcılar sadece isimlerini girer ve başlar.",
+      "exportTitle": "Sonuçları Dışa Aktar",
+      "exportDesc": "Müsaitlik verilerini JSON veya CSV olarak indir ve diğer araçlarda kullan."
+    },
+    "ctaSectionTitle": "Daha akıllı planlamaya hazır mısın?",
+    "ctaSectionSubtitle": "İlk oturumunu bir dakikadan kısa sürede oluştur. Ücretsiz, kayıt gerektirmez.",
+    "ctaSectionButton": "Başla — ücretsiz",
+    "footerTagline": "Basit, açık planlama — hesap gerektirmez."
+  },
+  "create": {
+    "pageTitle": "Planlama Oturumu Oluştur",
+    "pageSubtitle": "Müsaitlik anketini ayarla. Hemen paylaşabilirsin.",
+    "sectionBasicInfo": "Temel Bilgiler",
+    "sectionDateRange": "Tarih Aralığı",
+    "sectionTimeWindow": "Günlük Zaman Penceresi",
+    "titleLabel": "Oturum Başlığı",
+    "titlePlaceholder": "örn. Takım Toplantısı Saati",
+    "descriptionLabel": "Açıklama",
+    "descriptionPlaceholder": "İsteğe bağlı: toplantı veya bağlam hakkında bilgi ver",
+    "timezoneLabel": "Saat Dilimi",
+    "dateStartLabel": "Başlangıç Tarihi",
+    "dateEndLabel": "Bitiş Tarihi",
+    "dayStartLabel": "Gün Başlangıç Saati",
+    "dayEndLabel": "Gün Bitiş Saati",
+    "slotSizeLabel": "Slot Boyutu",
+    "includeWeekendsLabel": "Hafta sonlarını dahil et (Cumartesi & Pazar)",
+    "submitButton": "Oturum Oluştur",
+    "submittingButton": "Oturum oluşturuluyor...",
+    "submitFooter": "Paylaşılabilir bir link ve oturumu yönetmek için bir yönetici linki alacaksın.",
+    "turnstileWarning": "Lütfen güvenlik kontrolünü tamamla.",
+    "errorGeneric": "Oturum oluşturulamadı. Lütfen tekrar dene.",
+    "slots": {
+      "15": "15 dakika",
+      "30": "30 dakika",
+      "60": "60 dakika",
+      "90": "90 dakika",
+      "120": "2 saat"
+    },
+    "success": {
+      "title": "Oturum Oluşturuldu!",
+      "subtitle": "{{title}} paylaşıma hazır.",
+      "adminWarningTitle": "Yönetici linkini kaydet!",
+      "adminWarningMessage": "Oturumunu yönetmenin tek yolu budur. Kaybolursa kurtarma yolu yoktur.",
+      "adminDashboardButton": "Yönetici Paneline Git",
+      "shareTitle": "Bu linki katılımcılarla paylaş",
+      "viewSessionButton": "Oturum Sayfasını Görüntüle",
+      "createAnotherLink": "Başka bir oturum oluştur"
+    }
+  },
+  "session": {
+    "closed": "Kapalı",
+    "tabs": {
+      "myAvailability": "Müsaitliğim",
+      "groupResults": "Grup Sonuçları"
+    },
+    "sessionClosed": {
+      "title": "Oturum Kapatıldı",
+      "message": "Bu oturum artık yanıt kabul etmiyor."
+    },
+    "join": {
+      "title": "Adını gir",
+      "subtitle": "{{title}} için müsaitliğini paylaş",
+      "nameLabel": "Adın",
+      "namePlaceholder": "örn. Ayşe",
+      "submitButton": "Müsaitliğe Devam Et",
+      "submittingButton": "Katılınıyor...",
+      "errorGeneric": "Katılım başarısız. Lütfen tekrar dene."
+    },
+    "loading": {
+      "session": "Oturum yükleniyor...",
+      "availability": "Müsaitliğin yükleniyor...",
+      "results": "Grup sonuçları yükleniyor..."
+    },
+    "errors": {
+      "availabilityTitle": "Müsaitliğin yüklenemedi",
+      "resultsTitle": "Sonuçlar yüklenemedi",
+      "sessionNotFound": "Oturum bulunamadı",
+      "sessionNotFoundMessage": "Bu oturum linki hatalı olabilir ya da oturum silinmiş olabilir.",
+      "sessionLoadError": "Oturum yüklenemedi"
+    },
+    "instructions": "Zaman slotlarını açıp kapatmak için tıkla veya sürükle. Haftalık kalıpları hızlıca doldurmak için tekrarlayan kuralları kullan."
+  },
+  "admin": {
+    "breadcrumb": "Yönetici Paneli",
+    "badge": "Yönetici Görünümü",
+    "tabs": {
+      "overview": "Genel Bakış",
+      "results": "Grup Sonuçları",
+      "share": "Paylaşım Linkleri"
+    },
+    "actions": {
+      "exportCsv": "CSV Olarak Dışa Aktar",
+      "exportJson": "JSON Olarak Dışa Aktar",
+      "closeSession": "Oturumu Kapat",
+      "delete": "Sil"
+    },
+    "dialogs": {
+      "closeTitle": "Bu oturum kapatılsın mı?",
+      "closeMessage": "Katılımcılar artık müsaitliklerini gönderemez veya düzenleyemez. Bu işlem geri alınamaz.",
+      "closeConfirm": "Oturumu Kapat",
+      "deleteTitle": "Bu oturum silinsin mi?",
+      "deleteMessage": "Katılımcı yanıtları dahil tüm veriler kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+      "deleteConfirm": "Kalıcı Olarak Sil"
+    },
+    "overview": {
+      "participantsTitle": "Katılımcılar ({{count}})",
+      "participantsEmpty": "Henüz katılımcı yok. Yanıt almak için aşağıdaki linki paylaş.",
+      "availableSlots_one": "{{count}} müsait slot",
+      "availableSlots_other": "{{count}} müsait slot",
+      "bestTimesPreview": "En İyi Zamanların Önizlemesi"
+    },
+    "results": {
+      "loading": "Sonuçlar yükleniyor..."
+    },
+    "share": {
+      "adminWarningTitle": "Yönetici linkini güvende tut!",
+      "adminWarningMessage": "Bu linke sahip olan kişi oturumu yönetebilir, düzenleyebilir veya silebilir. Kaybolursa kurtarma yolu yoktur.",
+      "participantLinkTitle": "Katılımcı Linki",
+      "participantLinkDesc": "Bu linki davet etmek istediğin herkesle paylaş.",
+      "openParticipantView": "Katılımcı Görünümünü Aç"
+    },
+    "toast": {
+      "titleUpdated": "Başlık güncellendi.",
+      "titleUpdateFailed": "Başlık güncellenemedi.",
+      "descriptionUpdated": "Açıklama güncellendi.",
+      "descriptionUpdateFailed": "Açıklama güncellenemedi.",
+      "sessionClosed": "Oturum kapatıldı. Artık yanıt kabul edilmeyecek.",
+      "sessionCloseFailed": "Oturum kapatılamadı.",
+      "sessionDeleted": "Oturum silindi.",
+      "sessionDeleteFailed": "Oturum silinemedi.",
+      "exportedCsv": "CSV olarak dışa aktarıldı.",
+      "exportedJson": "JSON olarak dışa aktarıldı.",
+      "exportFailed": "Dışa aktarma başarısız."
+    },
+    "loading": "Yönetici paneli yükleniyor...",
+    "errors": {
+      "sessionNotFound": "Oturum bulunamadı",
+      "sessionNotFoundMessage": "Bu yönetici linki hatalı olabilir ya da oturum silinmiş olabilir.",
+      "accessDenied": "Erişim reddedildi",
+      "accessDeniedMessage": "Bu oturumu yönetme izniniz yok.",
+      "loadError": "Oturum yüklenemedi"
+    }
+  },
+  "notFound": {
+    "title": "Sayfa bulunamadı",
+    "message": "Aradığın sayfa mevcut değil veya taşınmış olabilir. Bir oturum linki açmaya çalışıyorsan URL'yi kontrol et.",
+    "back": "Geri git",
+    "home": "Ana Sayfa",
+    "createSession": "Oturum oluştur",
+    "hint": "Yardım mı lazım? Doğru linke sahip olduğundan emin ol."
+  },
+  "availability": {
+    "title": "Müsaitliğim",
+    "titleWithName": "Müsaitliğim — {{name}}",
+    "unsavedChanges": "Kaydedilmemiş değişiklikler",
+    "availableSlots_one": "{{count}} slot",
+    "availableSlots_other": "{{count}} slot",
+    "saveButton": "Müsaitliği Kaydet",
+    "savingButton": "Kaydediliyor...",
+    "clearAll": "Tümünü temizle",
+    "instructions": "Zaman slotlarını açıp kapatmak için tıkla veya sürükle. Haftalık kalıpları hızlıca doldurmak için tekrarlayan kuralları kullan.",
+    "toast": {
+      "saved": "Müsaitlik kaydedildi!",
+      "saveFailed": "Müsaitlik kaydedilemedi."
+    },
+    "grid": {
+      "noSlots": "Bu oturum için zaman slotu yok."
+    },
+    "rules": {
+      "title": "Tekrarlayan Müsaitlik",
+      "subtitle": "Eşleşen zaman slotlarını otomatik doldurmak için haftalık kalıplar belirle.",
+      "daysLabel": "Günler",
+      "fromLabel": "Başlangıç",
+      "toLabel": "Bitiş",
+      "applyButton": "Kuralı Uygula",
+      "activeRules_one": "Aktif Kurallar ({{count}})",
+      "activeRules_other": "Aktif Kurallar ({{count}})",
+      "noRules": "Aktif kural yok. Müsaitliğini otomatik doldurmak için yukarıdan bir kural ekle.",
+      "deleteRule": "Kuralı sil",
+      "errors": {
+        "noDays": "En az bir gün seç.",
+        "noTimes": "Başlangıç ve bitiş saatini gir.",
+        "invalidRange": "Başlangıç saati bitiş saatinden önce olmalıdır."
+      }
+    },
+    "legend": {
+      "title": "Gösterge",
+      "fromRule": "Tekrarlayan kuraldan",
+      "manual": "Manuel onaylandı",
+      "unavailable": "Müsait değil"
+    },
+    "days": {
+      "short": ["P", "Pt", "S", "Ç", "Pe", "C", "Ct"],
+      "full": ["Paz", "Pts", "Sal", "Çar", "Per", "Cum", "Cts"]
+    }
+  },
+  "results": {
+    "participantCount_one": "{{count}} katılımcı yanıtladı",
+    "participantCount_other": "{{count}} katılımcı yanıtladı",
+    "lessAvailable": "Daha az müsait",
+    "moreAvailable": "Daha çok müsait",
+    "noSlots": "Görüntülenecek zaman slotu yok.",
+    "noData": "Henüz müsaitlik verisi yok. İlk yanıtlayan sen ol!",
+    "tooltip": {
+      "available": "{{available}} / {{total}} müsait",
+      "noOneAvailable": "Kimse müsait değil",
+      "more": "+{{count}} daha"
+    },
+    "bestTimes": {
+      "title": "En İyi Zamanlar",
+      "noResponses": "Henüz yanıt yok",
+      "topTitle": "En Uygun Zamanlar",
+      "topSubtitle": "Müsait katılımcı sayısına göre sıralanan en iyi slotlar",
+      "noOverlap": "Henüz örtüşen müsaitlik bulunamadı.",
+      "availableParticipants": "Müsait katılımcılar:",
+      "shareHint": "Yanıt almak için oturum linkini paylaş"
+    }
+  },
+  "validation": {
+    "titleRequired": "Başlık gereklidir",
+    "titleTooLong": "Başlık çok uzun",
+    "descriptionTooLong": "Açıklama çok uzun",
+    "timezoneRequired": "Saat dilimi gereklidir",
+    "dateStartRequired": "Başlangıç tarihi gereklidir",
+    "dateEndRequired": "Bitiş tarihi gereklidir",
+    "dayStartRequired": "Gün başlangıç saati gereklidir",
+    "dayEndRequired": "Gün bitiş saati gereklidir",
+    "dateEndBeforeStart": "Bitiş tarihi başlangıç tarihinde veya sonrasında olmalıdır",
+    "dayEndBeforeStart": "Gün bitiş saati başlangıç saatinden sonra olmalıdır",
+    "nameRequired": "İsim gereklidir",
+    "nameTooLong": "İsim çok uzun"
+  },
+  "errors": {
+    "SESSION_NOT_FOUND": "Oturum bulunamadı.",
+    "PARTICIPANT_NOT_FOUND": "Katılımcı bulunamadı.",
+    "SESSION_CLOSED": "Bu oturum kapatılmış.",
+    "NOT_FOUND": "Kaynak bulunamadı.",
+    "networkError": "Ağ hatası — bağlantını kontrol et.",
+    "unknownError": "Beklenmeyen bir hata oluştu."
+  }
+}

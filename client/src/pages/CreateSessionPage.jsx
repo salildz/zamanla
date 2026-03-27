@@ -1,50 +1,24 @@
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { useMutation } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import dayjs from 'dayjs'
 import Button from '../components/common/Button.jsx'
 import Input from '../components/common/Input.jsx'
 import Select from '../components/common/Select.jsx'
 import TurnstileWidget, { isTurnstileEnabled } from '../components/common/TurnstileWidget.jsx'
+import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
 import { createSession } from '../services/api.js'
 import { getBrowserTimezone, getTimezoneOptionsWithOffset } from '../utils/timezoneUtils.js'
+import { useCreateSessionSchema } from '../hooks/useSchemas.js'
 
 const today = dayjs().format('YYYY-MM-DD')
 const twoWeeksLater = dayjs().add(14, 'day').format('YYYY-MM-DD')
 
-const schema = z
-  .object({
-    title: z.string().min(1, 'Title is required').max(120, 'Title too long'),
-    description: z.string().max(500, 'Description too long').optional(),
-    timezone: z.string().min(1, 'Timezone is required'),
-    dateStart: z.string().min(1, 'Start date is required'),
-    dateEnd: z.string().min(1, 'End date is required'),
-    slotMinutes: z.coerce.number().int().min(15).max(120),
-    dayStartTime: z.string().min(1, 'Day start time is required'),
-    dayEndTime: z.string().min(1, 'Day end time is required'),
-    includeWeekends: z.boolean(),
-  })
-  .refine((d) => d.dateEnd >= d.dateStart, {
-    message: 'End date must be on or after start date',
-    path: ['dateEnd'],
-  })
-  .refine((d) => d.dayEndTime > d.dayStartTime, {
-    message: 'Day end time must be after start time',
-    path: ['dayEndTime'],
-  })
-
-const slotOptions = [
-  { value: '15', label: '15 minutes' },
-  { value: '30', label: '30 minutes' },
-  { value: '60', label: '60 minutes' },
-  { value: '90', label: '90 minutes' },
-  { value: '120', label: '2 hours' },
-]
-
 function CopyButton({ text, label }) {
+  const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
@@ -53,7 +27,6 @@ function CopyButton({ text, label }) {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      // Fallback
       const el = document.createElement('textarea')
       el.value = text
       document.body.appendChild(el)
@@ -71,16 +44,26 @@ function CopyButton({ text, label }) {
       onClick={handleCopy}
       className="shrink-0 text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors px-2 py-1 rounded hover:bg-indigo-50"
     >
-      {copied ? 'Copied!' : label || 'Copy'}
+      {copied ? t('common.copied') : (label || t('common.copy'))}
     </button>
   )
 }
 
 export default function CreateSessionPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [turnstileToken, setTurnstileToken] = useState(null)
   const [created, setCreated] = useState(null)
   const tzOptions = getTimezoneOptionsWithOffset()
+  const schema = useCreateSessionSchema()
+
+  const slotOptions = [
+    { value: '15', label: t('create.slots.15') },
+    { value: '30', label: t('create.slots.30') },
+    { value: '60', label: t('create.slots.60') },
+    { value: '90', label: t('create.slots.90') },
+    { value: '120', label: t('create.slots.120') },
+  ]
 
   const {
     register,
@@ -130,7 +113,7 @@ export default function CreateSessionPage() {
       <div className="min-h-screen bg-gray-50 flex flex-col">
         {/* Nav */}
         <nav className="border-b border-gray-100 bg-white sticky top-0 z-40">
-          <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
+          <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2 group">
               <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
                 <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -140,6 +123,7 @@ export default function CreateSessionPage() {
               </div>
               <span className="font-bold text-gray-900 text-lg">Zamanla</span>
             </Link>
+            <LanguageSwitcher />
           </div>
         </nav>
 
@@ -152,9 +136,9 @@ export default function CreateSessionPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-1">Session Created!</h1>
+              <h1 className="text-2xl font-bold text-gray-900 mb-1">{t('create.success.title')}</h1>
               <p className="text-gray-500">
-                <span className="font-medium text-gray-700">{created.title}</span> is ready to share.
+                <span className="font-medium text-gray-700">{t('create.success.subtitle', { title: created.title })}</span>
               </p>
             </div>
 
@@ -165,20 +149,20 @@ export default function CreateSessionPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
                 <div>
-                  <p className="text-sm font-bold text-amber-800">Save your admin link!</p>
+                  <p className="text-sm font-bold text-amber-800">{t('create.success.adminWarningTitle')}</p>
                   <p className="text-xs text-amber-700 mt-0.5">
-                    This is the only way to manage your session. There is no way to recover it if lost.
+                    {t('create.success.adminWarningMessage')}
                   </p>
                 </div>
               </div>
               <div className="mt-3 flex items-center gap-2 bg-white rounded-lg border border-amber-200 px-3 py-2">
                 <span className="flex-1 text-xs text-gray-600 font-mono truncate">{adminUrl}</span>
-                <CopyButton text={adminUrl} label="Copy" />
+                <CopyButton text={adminUrl} />
               </div>
               <div className="mt-2 flex justify-center">
                 <Link to={`/admin/${created.adminToken}`}>
                   <Button variant="secondary" size="sm" className="text-amber-700 border-amber-300 hover:bg-amber-50">
-                    Go to Admin Dashboard
+                    {t('create.success.adminDashboardButton')}
                   </Button>
                 </Link>
               </div>
@@ -187,16 +171,16 @@ export default function CreateSessionPage() {
             {/* Public share link */}
             <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
               <p className="text-sm font-semibold text-gray-700 mb-2">
-                Share this link with participants
+                {t('create.success.shareTitle')}
               </p>
               <div className="flex items-center gap-2 bg-gray-50 rounded-lg border border-gray-200 px-3 py-2">
                 <span className="flex-1 text-xs text-gray-600 font-mono truncate">{publicUrl}</span>
-                <CopyButton text={publicUrl} label="Copy" />
+                <CopyButton text={publicUrl} />
               </div>
               <div className="mt-3 flex justify-center">
                 <Link to={`/s/${created.publicToken}`}>
                   <Button variant="primary" size="sm">
-                    View Session Page
+                    {t('create.success.viewSessionButton')}
                   </Button>
                 </Link>
               </div>
@@ -204,7 +188,7 @@ export default function CreateSessionPage() {
 
             <div className="text-center">
               <Link to="/create" className="text-sm text-indigo-600 hover:text-indigo-800">
-                Create another session
+                {t('create.success.createAnotherLink')}
               </Link>
             </div>
           </div>
@@ -217,27 +201,28 @@ export default function CreateSessionPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Nav */}
       <nav className="border-b border-gray-100 bg-white sticky top-0 z-40">
-        <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <circle cx="12" cy="12" r="9" />
-                <polyline points="12 7 12 12 15 15" />
-              </svg>
-            </div>
-            <span className="font-bold text-gray-900 text-lg">Zamanla</span>
-          </Link>
-          <span className="text-gray-300">/</span>
-          <span className="text-sm text-gray-500">New Session</span>
+        <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <circle cx="12" cy="12" r="9" />
+                  <polyline points="12 7 12 12 15 15" />
+                </svg>
+              </div>
+              <span className="font-bold text-gray-900 text-lg">Zamanla</span>
+            </Link>
+            <span className="text-gray-300">/</span>
+            <span className="text-sm text-gray-500">{t('nav.newSessionPage')}</span>
+          </div>
+          <LanguageSwitcher />
         </div>
       </nav>
 
       <div className="max-w-2xl mx-auto px-4 py-10">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Create a Scheduling Session</h1>
-          <p className="text-gray-500 mt-1">
-            Set up your availability poll. You can share it right away.
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('create.pageTitle')}</h1>
+          <p className="text-gray-500 mt-1">{t('create.pageSubtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -245,22 +230,22 @@ export default function CreateSessionPage() {
             {/* Basic Info */}
             <div className="px-6 py-5">
               <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">
-                Basic Info
+                {t('create.sectionBasicInfo')}
               </h2>
               <div className="flex flex-col gap-4">
                 <Input
-                  label="Session Title"
+                  label={t('create.titleLabel')}
                   required
-                  placeholder="e.g. Team Standup Time"
+                  placeholder={t('create.titlePlaceholder')}
                   error={errors.title?.message}
                   {...register('title')}
                 />
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-gray-700">Description</label>
+                  <label className="text-sm font-medium text-gray-700">{t('create.descriptionLabel')}</label>
                   <textarea
                     className="w-full rounded-md border border-gray-300 bg-white text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-gray-400 resize-none"
                     rows={3}
-                    placeholder="Optional: describe the meeting or any context"
+                    placeholder={t('create.descriptionPlaceholder')}
                     {...register('description')}
                   />
                   {errors.description && (
@@ -273,26 +258,26 @@ export default function CreateSessionPage() {
             {/* Date & Time */}
             <div className="px-6 py-5">
               <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">
-                Date Range
+                {t('create.sectionDateRange')}
               </h2>
               <div className="flex flex-col gap-4">
                 <Select
-                  label="Timezone"
+                  label={t('create.timezoneLabel')}
                   required
-                  options={tzOptions.map((t) => ({ value: t.value, label: t.displayLabel }))}
+                  options={tzOptions.map((tz) => ({ value: tz.value, label: tz.displayLabel }))}
                   error={errors.timezone?.message}
                   {...register('timezone')}
                 />
                 <div className="grid grid-cols-2 gap-3">
                   <Input
-                    label="Start Date"
+                    label={t('create.dateStartLabel')}
                     type="date"
                     required
                     error={errors.dateStart?.message}
                     {...register('dateStart')}
                   />
                   <Input
-                    label="End Date"
+                    label={t('create.dateEndLabel')}
                     type="date"
                     required
                     error={errors.dateEnd?.message}
@@ -305,19 +290,19 @@ export default function CreateSessionPage() {
             {/* Time Settings */}
             <div className="px-6 py-5">
               <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">
-                Daily Time Window
+                {t('create.sectionTimeWindow')}
               </h2>
               <div className="flex flex-col gap-4">
                 <div className="grid grid-cols-2 gap-3">
                   <Input
-                    label="Day Start Time"
+                    label={t('create.dayStartLabel')}
                     type="time"
                     required
                     error={errors.dayStartTime?.message}
                     {...register('dayStartTime')}
                   />
                   <Input
-                    label="Day End Time"
+                    label={t('create.dayEndLabel')}
                     type="time"
                     required
                     error={errors.dayEndTime?.message}
@@ -325,7 +310,7 @@ export default function CreateSessionPage() {
                   />
                 </div>
                 <Select
-                  label="Slot Size"
+                  label={t('create.slotSizeLabel')}
                   required
                   options={slotOptions}
                   error={errors.slotMinutes?.message}
@@ -339,7 +324,7 @@ export default function CreateSessionPage() {
                     {...register('includeWeekends')}
                   />
                   <label htmlFor="includeWeekends" className="text-sm text-gray-700">
-                    Include weekends (Saturday & Sunday)
+                    {t('create.includeWeekendsLabel')}
                   </label>
                 </div>
               </div>
@@ -354,7 +339,7 @@ export default function CreateSessionPage() {
                 />
                 {mutation.isPending === false && isTurnstileEnabled() && !turnstileToken && (
                   <p className="text-xs text-amber-600 mt-1">
-                    Please complete the security check.
+                    {t('create.turnstileWarning')}
                   </p>
                 )}
               </div>
@@ -364,7 +349,7 @@ export default function CreateSessionPage() {
             <div className="px-6 py-5 bg-gray-50 flex flex-col gap-3">
               {mutation.isError && (
                 <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-sm text-red-700">
-                  {mutation.error?.userMessage || 'Failed to create session. Please try again.'}
+                  {mutation.error?.userMessage || t('create.errorGeneric')}
                 </div>
               )}
               <Button
@@ -375,10 +360,10 @@ export default function CreateSessionPage() {
                 loading={mutation.isPending}
                 disabled={isTurnstileEnabled() && !turnstileToken}
               >
-                {mutation.isPending ? 'Creating session...' : 'Create Session'}
+                {mutation.isPending ? t('create.submittingButton') : t('create.submitButton')}
               </Button>
               <p className="text-xs text-center text-gray-400">
-                You'll get a shareable link and an admin link to manage the session.
+                {t('create.submitFooter')}
               </p>
             </div>
           </div>

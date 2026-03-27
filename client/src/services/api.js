@@ -21,15 +21,16 @@ api.interceptors.response.use(
   (error) => {
     if (error.response) {
       const errBody = error.response.data
-      const message =
+      error.serverCode = errBody?.error?.code || null
+      error.userMessage =
         errBody?.error?.message ||
         errBody?.message ||
-        errBody?.error ||
         `Request failed with status ${error.response.status}`
-      error.userMessage = message
     } else if (error.request) {
+      error.serverCode = 'NETWORK_ERROR'
       error.userMessage = 'Network error — please check your connection.'
     } else {
+      error.serverCode = null
       error.userMessage = error.message || 'An unexpected error occurred.'
     }
     return Promise.reject(error)

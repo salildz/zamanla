@@ -1,0 +1,288 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "clearAll": "Clear all",
+    "delete": "Delete",
+    "none": "None",
+    "dismiss": "Dismiss",
+    "tryAgain": "Try again",
+    "goBack": "Go back"
+  },
+  "nav": {
+    "newSession": "New Session",
+    "adminDashboard": "Admin Dashboard",
+    "newSessionPage": "New Session"
+  },
+  "home": {
+    "badge": "Free to use · No account required",
+    "heroTitle": "Find the best time",
+    "heroTitleHighlight": "that works for everyone",
+    "heroSubtitle": "Zamanla makes scheduling easy. Create a session, share a link, and see when your group is available — all in one heatmap view.",
+    "ctaButton": "Create a Scheduling Session",
+    "ctaFooter": "No registration. Free forever.",
+    "howItWorksTitle": "How it works",
+    "howItWorks": {
+      "step1Title": "Create a session",
+      "step1Desc": "Set your title, date range, time window, and timezone. Takes 30 seconds.",
+      "step2Title": "Share the link",
+      "step2Desc": "Send the participant link to your group via email, Slack, or wherever you communicate.",
+      "step3Title": "Find the best time",
+      "step3Desc": "Watch the heatmap fill in. The best slots rise to the top automatically."
+    },
+    "featuresTitle": "Everything you need",
+    "featuresSubtitle": "Powerful features without the complexity.",
+    "features": {
+      "flexibleTitle": "Flexible Scheduling",
+      "flexibleDesc": "Define your date range, slot size, and daily hours. Works for any type of meeting.",
+      "recurringTitle": "Recurring Rules",
+      "recurringDesc": "Set weekly availability patterns like \"weekdays 9am–5pm\" and let the grid fill itself.",
+      "groupTitle": "Group Overview",
+      "groupDesc": "A real-time heatmap shows when the most people are available at a glance.",
+      "timezoneTitle": "Timezone Aware",
+      "timezoneDesc": "Every participant sees times in the session timezone. No confusion across regions.",
+      "sharingTitle": "Simple Sharing",
+      "sharingDesc": "Share a single link. No accounts needed. Participants just enter their name and go.",
+      "exportTitle": "Export Results",
+      "exportDesc": "Download availability data as JSON or CSV for use in other tools."
+    },
+    "ctaSectionTitle": "Ready to schedule smarter?",
+    "ctaSectionSubtitle": "Create your first session in under a minute. Free, no signup required.",
+    "ctaSectionButton": "Get Started — it's free",
+    "footerTagline": "Simple, open scheduling — no account required."
+  },
+  "create": {
+    "pageTitle": "Create a Scheduling Session",
+    "pageSubtitle": "Set up your availability poll. You can share it right away.",
+    "sectionBasicInfo": "Basic Info",
+    "sectionDateRange": "Date Range",
+    "sectionTimeWindow": "Daily Time Window",
+    "titleLabel": "Session Title",
+    "titlePlaceholder": "e.g. Team Standup Time",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Optional: describe the meeting or any context",
+    "timezoneLabel": "Timezone",
+    "dateStartLabel": "Start Date",
+    "dateEndLabel": "End Date",
+    "dayStartLabel": "Day Start Time",
+    "dayEndLabel": "Day End Time",
+    "slotSizeLabel": "Slot Size",
+    "includeWeekendsLabel": "Include weekends (Saturday & Sunday)",
+    "submitButton": "Create Session",
+    "submittingButton": "Creating session...",
+    "submitFooter": "You'll get a shareable link and an admin link to manage the session.",
+    "turnstileWarning": "Please complete the security check.",
+    "errorGeneric": "Failed to create session. Please try again.",
+    "slots": {
+      "15": "15 minutes",
+      "30": "30 minutes",
+      "60": "60 minutes",
+      "90": "90 minutes",
+      "120": "2 hours"
+    },
+    "success": {
+      "title": "Session Created!",
+      "subtitle": "{{title}} is ready to share.",
+      "adminWarningTitle": "Save your admin link!",
+      "adminWarningMessage": "This is the only way to manage your session. There is no way to recover it if lost.",
+      "adminDashboardButton": "Go to Admin Dashboard",
+      "shareTitle": "Share this link with participants",
+      "viewSessionButton": "View Session Page",
+      "createAnotherLink": "Create another session"
+    }
+  },
+  "session": {
+    "closed": "Closed",
+    "tabs": {
+      "myAvailability": "My Availability",
+      "groupResults": "Group Results"
+    },
+    "sessionClosed": {
+      "title": "Session Closed",
+      "message": "This session is no longer accepting responses."
+    },
+    "join": {
+      "title": "Enter your name",
+      "subtitle": "To share your availability for {{title}}",
+      "nameLabel": "Your Name",
+      "namePlaceholder": "e.g. Alice",
+      "submitButton": "Continue to Availability",
+      "submittingButton": "Joining...",
+      "errorGeneric": "Failed to join. Please try again."
+    },
+    "loading": {
+      "session": "Loading session...",
+      "availability": "Loading your availability...",
+      "results": "Loading group results..."
+    },
+    "errors": {
+      "availabilityTitle": "Could not load your availability",
+      "resultsTitle": "Could not load results",
+      "sessionNotFound": "Session not found",
+      "sessionNotFoundMessage": "This session link may be incorrect or the session may have been deleted.",
+      "sessionLoadError": "Could not load session"
+    },
+    "instructions": "Click or drag to toggle time slots. Use recurring rules to quickly fill in weekly patterns."
+  },
+  "admin": {
+    "breadcrumb": "Admin Dashboard",
+    "badge": "Admin View",
+    "tabs": {
+      "overview": "Overview",
+      "results": "Group Results",
+      "share": "Share Links"
+    },
+    "actions": {
+      "exportCsv": "Export CSV",
+      "exportJson": "Export JSON",
+      "closeSession": "Close Session",
+      "delete": "Delete"
+    },
+    "dialogs": {
+      "closeTitle": "Close this session?",
+      "closeMessage": "Participants will no longer be able to submit or edit their availability. This cannot be undone.",
+      "closeConfirm": "Close Session",
+      "deleteTitle": "Delete this session?",
+      "deleteMessage": "All data including participant responses will be permanently deleted. This cannot be undone.",
+      "deleteConfirm": "Delete Permanently"
+    },
+    "overview": {
+      "participantsTitle": "Participants ({{count}})",
+      "participantsEmpty": "No participants yet. Share the link below to get responses.",
+      "availableSlots_one": "{{count}} available slot",
+      "availableSlots_other": "{{count}} available slots",
+      "bestTimesPreview": "Best Times Preview"
+    },
+    "results": {
+      "loading": "Loading results..."
+    },
+    "share": {
+      "adminWarningTitle": "Keep your admin link safe!",
+      "adminWarningMessage": "Anyone with this link can manage, edit, or delete this session. There is no recovery if lost.",
+      "participantLinkTitle": "Participant Link",
+      "participantLinkDesc": "Share this link with anyone you want to invite.",
+      "openParticipantView": "Open Participant View"
+    },
+    "toast": {
+      "titleUpdated": "Title updated.",
+      "titleUpdateFailed": "Failed to update title.",
+      "descriptionUpdated": "Description updated.",
+      "descriptionUpdateFailed": "Failed to update description.",
+      "sessionClosed": "Session closed. No more responses will be accepted.",
+      "sessionCloseFailed": "Failed to close session.",
+      "sessionDeleted": "Session deleted.",
+      "sessionDeleteFailed": "Failed to delete session.",
+      "exportedCsv": "Exported as CSV.",
+      "exportedJson": "Exported as JSON.",
+      "exportFailed": "Export failed."
+    },
+    "loading": "Loading admin dashboard...",
+    "errors": {
+      "sessionNotFound": "Session not found",
+      "sessionNotFoundMessage": "This admin link may be incorrect or the session may have been deleted.",
+      "accessDenied": "Access denied",
+      "accessDeniedMessage": "You do not have permission to manage this session.",
+      "loadError": "Could not load session"
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "message": "The page you're looking for doesn't exist or may have been moved. If you were trying to open a session link, please double-check the URL.",
+    "back": "Go back",
+    "home": "Home",
+    "createSession": "Create a session",
+    "hint": "Need help? Make sure you have the correct link."
+  },
+  "availability": {
+    "title": "Your Availability",
+    "titleWithName": "Your Availability — {{name}}",
+    "unsavedChanges": "Unsaved changes",
+    "availableSlots_one": "{{count}} slot",
+    "availableSlots_other": "{{count}} slots",
+    "saveButton": "Save Availability",
+    "savingButton": "Saving...",
+    "clearAll": "Clear all",
+    "instructions": "Click or drag to toggle time slots. Use recurring rules to quickly fill in weekly patterns.",
+    "toast": {
+      "saved": "Availability saved!",
+      "saveFailed": "Failed to save availability."
+    },
+    "grid": {
+      "noSlots": "No time slots available for this session."
+    },
+    "rules": {
+      "title": "Recurring Availability",
+      "subtitle": "Set weekly patterns to auto-fill matching time slots.",
+      "daysLabel": "Days",
+      "fromLabel": "From",
+      "toLabel": "To",
+      "applyButton": "Apply Rule",
+      "activeRules_one": "Active Rules ({{count}})",
+      "activeRules_other": "Active Rules ({{count}})",
+      "noRules": "No active rules. Add one above to auto-fill your availability.",
+      "deleteRule": "Delete rule",
+      "errors": {
+        "noDays": "Select at least one day.",
+        "noTimes": "Enter both start and end time.",
+        "invalidRange": "Start time must be before end time."
+      }
+    },
+    "legend": {
+      "title": "Legend",
+      "fromRule": "From recurring rule",
+      "manual": "Manually confirmed",
+      "unavailable": "Not available"
+    },
+    "days": {
+      "short": ["S", "M", "T", "W", "T", "F", "S"],
+      "full": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    }
+  },
+  "results": {
+    "participantCount_one": "{{count}} participant responded",
+    "participantCount_other": "{{count}} participants responded",
+    "lessAvailable": "Less available",
+    "moreAvailable": "More available",
+    "noSlots": "No time slots to display.",
+    "noData": "No availability data yet. Be the first to respond!",
+    "tooltip": {
+      "available": "{{available}} / {{total}} available",
+      "noOneAvailable": "No one available",
+      "more": "+{{count}} more"
+    },
+    "bestTimes": {
+      "title": "Best Times",
+      "noResponses": "No responses yet",
+      "topTitle": "Top Available Times",
+      "topSubtitle": "Best slots ranked by number of available participants",
+      "noOverlap": "No overlapping availability found yet.",
+      "availableParticipants": "Available participants:",
+      "shareHint": "Share the session link to get responses"
+    }
+  },
+  "validation": {
+    "titleRequired": "Title is required",
+    "titleTooLong": "Title too long",
+    "descriptionTooLong": "Description too long",
+    "timezoneRequired": "Timezone is required",
+    "dateStartRequired": "Start date is required",
+    "dateEndRequired": "End date is required",
+    "dayStartRequired": "Day start time is required",
+    "dayEndRequired": "Day end time is required",
+    "dateEndBeforeStart": "End date must be on or after start date",
+    "dayEndBeforeStart": "Day end time must be after start time",
+    "nameRequired": "Name is required",
+    "nameTooLong": "Name too long"
+  },
+  "errors": {
+    "SESSION_NOT_FOUND": "Session not found.",
+    "PARTICIPANT_NOT_FOUND": "Participant not found.",
+    "SESSION_CLOSED": "This session is closed.",
+    "NOT_FOUND": "Resource not found.",
+    "networkError": "Network error — please check your connection.",
+    "unknownError": "An unexpected error occurred."
+  }
+}
