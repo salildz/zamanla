@@ -3,7 +3,10 @@
 const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT || '9051', 10),
-  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:9050',
+  // Supports comma-separated origins: "https://a.com,https://b.com"
+  corsOrigin: process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean)
+    : ['http://localhost:9050'],
 
   db: {
     host: process.env.DB_HOST || 'localhost',
