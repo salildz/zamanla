@@ -7,6 +7,35 @@ const { sendSuccess, sendError } = require('../utils/response');
 const { AppError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
 
+// PostgreSQL TIME fields come back as "HH:MM:SS" — normalize to "HH:MM"
+function normalizeTime(t) {
+  if (!t) return t;
+  return String(t).substring(0, 5);
+}
+
+function formatSession(session, includeAdmin = false) {
+  const base = {
+    id: session.id,
+    publicToken: session.public_token,
+    title: session.title,
+    description: session.description,
+    timezone: session.timezone,
+    dateStart: session.date_start,
+    dateEnd: session.date_end,
+    slotMinutes: session.slot_minutes,
+    dayStartTime: normalizeTime(session.day_start_time),
+    dayEndTime: normalizeTime(session.day_end_time),
+    includeWeekends: session.include_weekends,
+    isClosed: session.is_closed,
+    createdAt: session.created_at,
+    updatedAt: session.updated_at,
+  };
+  if (includeAdmin) {
+    base.adminToken = session.admin_token;
+  }
+  return base;
+}
+
 /**
  * POST /api/sessions
  * Create a new scheduling session.
@@ -18,25 +47,7 @@ async function createSession(req, res) {
 
   logger.info('Session created', { sessionId: session.id, publicToken: session.public_token });
 
-  return sendSuccess(res, {
-    session: {
-      id: session.id,
-      publicToken: session.public_token,
-      adminToken: session.admin_token,
-      title: session.title,
-      description: session.description,
-      timezone: session.timezone,
-      dateStart: session.date_start,
-      dateEnd: session.date_end,
-      slotMinutes: session.slot_minutes,
-      dayStartTime: session.day_start_time,
-      dayEndTime: session.day_end_time,
-      includeWeekends: session.include_weekends,
-      isClosed: session.is_closed,
-      createdAt: session.created_at,
-      updatedAt: session.updated_at,
-    },
-  }, 201);
+  return sendSuccess(res, { session: formatSession(session, true) }, 201);
 }
 
 /**
@@ -47,24 +58,7 @@ async function getSession(req, res) {
   const { publicToken } = req.params;
   const session = await sessionService.getSessionByPublicToken(publicToken);
 
-  return sendSuccess(res, {
-    session: {
-      id: session.id,
-      publicToken: session.public_token,
-      title: session.title,
-      description: session.description,
-      timezone: session.timezone,
-      dateStart: session.date_start,
-      dateEnd: session.date_end,
-      slotMinutes: session.slot_minutes,
-      dayStartTime: session.day_start_time,
-      dayEndTime: session.day_end_time,
-      includeWeekends: session.include_weekends,
-      isClosed: session.is_closed,
-      createdAt: session.created_at,
-      updatedAt: session.updated_at,
-    },
-  });
+  return sendSuccess(res, { session: formatSession(session) });
 }
 
 /**
@@ -74,26 +68,7 @@ async function getSession(req, res) {
 async function getSessionAdmin(req, res) {
   const { adminToken } = req.params;
   const session = await sessionService.getSessionByAdminToken(adminToken);
-
-  return sendSuccess(res, {
-    session: {
-      id: session.id,
-      publicToken: session.public_token,
-      adminToken: session.admin_token,
-      title: session.title,
-      description: session.description,
-      timezone: session.timezone,
-      dateStart: session.date_start,
-      dateEnd: session.date_end,
-      slotMinutes: session.slot_minutes,
-      dayStartTime: session.day_start_time,
-      dayEndTime: session.day_end_time,
-      includeWeekends: session.include_weekends,
-      isClosed: session.is_closed,
-      createdAt: session.created_at,
-      updatedAt: session.updated_at,
-    },
-  });
+  return sendSuccess(res, { session: formatSession(session, true) });
 }
 
 /**
@@ -106,25 +81,7 @@ async function updateSession(req, res) {
 
   const session = await sessionService.updateSession(adminToken, parsed);
 
-  return sendSuccess(res, {
-    session: {
-      id: session.id,
-      publicToken: session.public_token,
-      adminToken: session.admin_token,
-      title: session.title,
-      description: session.description,
-      timezone: session.timezone,
-      dateStart: session.date_start,
-      dateEnd: session.date_end,
-      slotMinutes: session.slot_minutes,
-      dayStartTime: session.day_start_time,
-      dayEndTime: session.day_end_time,
-      includeWeekends: session.include_weekends,
-      isClosed: session.is_closed,
-      createdAt: session.created_at,
-      updatedAt: session.updated_at,
-    },
-  });
+  return sendSuccess(res, { session: formatSession(session, true) });
 }
 
 /**
@@ -145,14 +102,7 @@ async function closeSession(req, res) {
   const { adminToken } = req.params;
   const session = await sessionService.closeSession(adminToken);
 
-  return sendSuccess(res, {
-    session: {
-      id: session.id,
-      publicToken: session.public_token,
-      isClosed: session.is_closed,
-      updatedAt: session.updated_at,
-    },
-  });
+  return sendSuccess(res, { session: formatSession(session, true) });
 }
 
 /**
@@ -175,7 +125,7 @@ async function exportSession(req, res) {
       const fields = [
         { label: 'Slot Start', value: 'slotStart' },
         { label: 'Slot End', value: 'slotEnd' },
-        { label: 'Available Count', value: 'count' },
+        { label: 'Available Count', value: 'availableCount' },
         { label: 'Participants', value: (row) => row.participants.map((p) => p.name).join(', ') },
       ];
       const parser = new Parser({ fields });

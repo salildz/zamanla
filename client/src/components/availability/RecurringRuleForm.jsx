@@ -1,10 +1,24 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 import Button from '../common/Button.jsx'
 
 function generateRuleId() {
   return `rule_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
+}
+
+function generateTimeOptions(dayStartTime, dayEndTime, slotMinutes) {
+  const [sh, sm] = dayStartTime.split(':').map(Number)
+  const [eh, em] = dayEndTime.split(':').map(Number)
+  const startMinutes = sh * 60 + sm
+  const endMinutes = eh * 60 + em
+  const options = []
+  for (let m = startMinutes; m <= endMinutes; m += slotMinutes) {
+    const h = Math.floor(m / 60)
+    const min = m % 60
+    options.push(`${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`)
+  }
+  return options
 }
 
 function formatRuleLabel(rule, fullDays) {
@@ -18,9 +32,24 @@ function formatRuleLabel(rule, fullDays) {
 
 export default function RecurringRuleForm({ rules, onRulesChange, session }) {
   const { t } = useTranslation()
+  // Normalize to HH:MM — PostgreSQL TIME fields may include seconds ("09:00:00")
+  const defaultStart = (session?.dayStartTime || '09:00').substring(0, 5)
+  const defaultEnd = (session?.dayEndTime || '17:00').substring(0, 5)
+  const slotMinutes = session?.slotMinutes || 30
+
+  // Generate time options aligned to the session's slot interval
+  const allTimeOptions = useMemo(
+    () => generateTimeOptions(defaultStart, defaultEnd, slotMinutes),
+    [defaultStart, defaultEnd, slotMinutes]
+  )
+  // startTime can't be the last option (would create zero-length range)
+  const startTimeOptions = allTimeOptions.slice(0, -1)
+  // endTime can't be the first option
+  const endTimeOptions = allTimeOptions.slice(1)
+
   const [selectedDays, setSelectedDays] = useState([1, 2, 3, 4, 5]) // Mon–Fri default
-  const [startTime, setStartTime] = useState(session?.dayStartTime || '09:00')
-  const [endTime, setEndTime] = useState(session?.dayEndTime || '17:00')
+  const [startTime, setStartTime] = useState(defaultStart)
+  const [endTime, setEndTime] = useState(defaultEnd)
   const [error, setError] = useState('')
   const [justApplied, setJustApplied] = useState(false)
 
@@ -65,8 +94,8 @@ export default function RecurringRuleForm({ rules, onRulesChange, session }) {
 
     // Reset form so it's ready for another rule immediately
     setSelectedDays([1, 2, 3, 4, 5])
-    setStartTime(session?.dayStartTime || '09:00')
-    setEndTime(session?.dayEndTime || '17:00')
+    setStartTime(defaultStart)
+    setEndTime(defaultEnd)
     setError('')
 
     // Brief success confirmation
@@ -117,25 +146,37 @@ export default function RecurringRuleForm({ rules, onRulesChange, session }) {
         <div className="grid grid-cols-2 gap-2 mb-3">
           <div>
             <label className="text-xs font-medium text-gray-600 block mb-1">{t('availability.rules.fromLabel')}</label>
-            <input
-              type="time"
+            <select
               value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              min={session?.dayStartTime}
-              max={session?.dayEndTime}
+              onChange={(e) => {
+                const newStart = e.target.value
+                setStartTime(newStart)
+                // If endTime is now <= startTime, advance it by one slot
+                if (endTime <= newStart) {
+                  const idx = allTimeOptions.indexOf(newStart)
+                  setEndTime(allTimeOptions[idx + 1] || defaultEnd)
+                }
+              }}
               className="w-full rounded-md border border-gray-300 bg-white text-sm px-2 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+            >
+              {startTimeOptions.map((time) => (
+                <option key={time} value={time}>{time}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="text-xs font-medium text-gray-600 block mb-1">{t('availability.rules.toLabel')}</label>
-            <input
-              type="time"
+            <select
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              min={session?.dayStartTime}
-              max={session?.dayEndTime}
               className="w-full rounded-md border border-gray-300 bg-white text-sm px-2 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+            >
+              {endTimeOptions
+                .filter((time) => time > startTime)
+                .map((time) => (
+                  <option key={time} value={time}>{time}</option>
+                ))}
+            </select>
           </div>
         </div>
 

@@ -7,10 +7,12 @@
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
 
   body {
     @apply bg-gray-50 text-gray-900;
+    text-rendering: optimizeLegibility;
   }
 
   * {
@@ -22,7 +24,7 @@
   /* Availability Grid Styles */
   .availability-grid-container {
     @apply overflow-auto rounded-lg border border-gray-200;
-    max-height: 560px;
+    max-height: min(560px, 70vh);
     /* Smooth scrolling on iOS */
     -webkit-overflow-scrolling: touch;
     /* Prevent horizontal over-scroll from bubbling to the page */
@@ -68,7 +70,12 @@
     @apply h-9 cursor-pointer select-none transition-colors duration-75;
     min-width: 52px;
     width: 52px;
-    /* Prevent browser native touch handling so our drag logic fires reliably */
+    /* Default: allow touch scroll so the grid is navigable */
+    touch-action: pan-x pan-y;
+  }
+
+  /* Selection mode: disable native scroll so drag-to-select works reliably */
+  .grid-cell-selecting {
     touch-action: none;
   }
 
@@ -82,6 +89,21 @@
 
   .grid-cell-manual {
     @apply bg-indigo-400 hover:bg-indigo-500;
+  }
+
+  .grid-cell-manual-unavailable {
+    @apply bg-rose-50 hover:bg-rose-100;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgba(244, 63, 94, 0.12),
+      rgba(244, 63, 94, 0.12) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+  }
+
+  .grid-cell:focus-visible {
+    @apply outline-none ring-2 ring-indigo-400 ring-offset-1;
   }
 
   .grid-cell-dragging-add {
@@ -131,21 +153,25 @@
 
   /* Tab styles */
   .tab-button {
-    @apply px-4 py-3 text-sm font-medium rounded-t-lg transition-colors;
+    @apply inline-flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-colors min-h-[44px];
   }
 
   .tab-button-active {
-    @apply bg-white text-indigo-600 border-b-2 border-indigo-600 shadow-sm;
+    @apply bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-sm;
   }
 
   .tab-button-inactive {
-    @apply text-gray-500 hover:text-gray-700 hover:bg-gray-100;
+    @apply text-gray-500 border border-transparent hover:text-gray-700 hover:bg-gray-100;
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   /* Scrollbar styling */

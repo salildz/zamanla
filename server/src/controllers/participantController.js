@@ -64,16 +64,16 @@ async function getParticipant(req, res) {
       dateStart: session.date_start,
       dateEnd: session.date_end,
       slotMinutes: session.slot_minutes,
-      dayStartTime: session.day_start_time,
-      dayEndTime: session.day_end_time,
+      dayStartTime: String(session.day_start_time).substring(0, 5),
+      dayEndTime: String(session.day_end_time).substring(0, 5),
       includeWeekends: session.include_weekends,
       isClosed: session.is_closed,
     },
     rules: rules.map((r) => ({
       id: r.id,
       weekdays: r.weekdays,
-      startTime: r.start_time,
-      endTime: r.end_time,
+      startTime: String(r.start_time).substring(0, 5),
+      endTime: String(r.end_time).substring(0, 5),
     })),
     slots: slots.map((s) => ({
       id: s.id,
@@ -119,8 +119,8 @@ async function updateParticipant(req, res) {
     rules: rules.map((r) => ({
       id: r.id,
       weekdays: r.weekdays,
-      startTime: r.start_time,
-      endTime: r.end_time,
+      startTime: String(r.start_time).substring(0, 5),
+      endTime: String(r.end_time).substring(0, 5),
     })),
     slots: slots.map((s) => ({
       id: s.id,

@@ -20,8 +20,9 @@ const ruleSchema = z.object({
 
 const slotOverrideSchema = z.object({
   slotStart: z.string().datetime({ message: 'slotStart must be an ISO 8601 datetime' }),
+  slotEnd: z.string().datetime({ message: 'slotEnd must be an ISO 8601 datetime' }).optional(),
   status: z.enum(['available', 'unavailable']).default('available'),
-  sourceType: z.enum(['manual', 'rule_derived']).default('manual'),
+  sourceType: z.literal('manual').default('manual'),
 });
 
 const createParticipantSchema = z.object({

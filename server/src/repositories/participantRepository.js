@@ -49,6 +49,17 @@ async function findBySessionId(sessionId) {
 }
 
 /**
+ * Count participants in a session.
+ */
+async function countBySessionId(sessionId) {
+  const { rows } = await db.query(
+    'SELECT COUNT(*)::int AS count FROM participants WHERE session_id = $1',
+    [sessionId]
+  );
+  return rows[0]?.count || 0;
+}
+
+/**
  * Update participant name.
  */
 async function updateParticipantName(id, name) {
@@ -64,5 +75,6 @@ module.exports = {
   findByEditToken,
   findByEditTokenAndSession,
   findBySessionId,
+  countBySessionId,
   updateParticipantName,
 };

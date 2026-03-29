@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -89,7 +89,7 @@ function InlineEditField({ value, onSave, label, multiline = false }) {
 
   if (editing) {
     return (
-      <div className="flex items-start gap-2">
+      <div className="flex flex-col gap-2">
         {multiline ? (
           <textarea
             ref={inputRef}
@@ -97,7 +97,7 @@ function InlineEditField({ value, onSave, label, multiline = false }) {
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={handleKeyDown}
             rows={3}
-            className="flex-1 rounded-md border border-indigo-400 text-sm px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            className="w-full rounded-md border border-indigo-400 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
           />
         ) : (
           <input
@@ -106,13 +106,13 @@ function InlineEditField({ value, onSave, label, multiline = false }) {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 rounded-md border border-indigo-400 text-sm px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full rounded-md border border-indigo-400 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         )}
-        <div className="flex gap-1 mt-0.5">
+        <div className="flex gap-2">
           <button
             onClick={handleSave}
-            className="text-xs text-emerald-600 hover:text-emerald-800 font-medium px-1"
+            className="text-xs text-white bg-emerald-600 hover:bg-emerald-700 font-medium px-3 py-1.5 rounded-md"
           >
             {t('common.save')}
           </button>
@@ -121,7 +121,7 @@ function InlineEditField({ value, onSave, label, multiline = false }) {
               setDraft(value || '')
               setEditing(false)
             }}
-            className="text-xs text-gray-400 hover:text-gray-600 px-1"
+            className="text-xs text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-md"
           >
             {t('common.cancel')}
           </button>
@@ -256,13 +256,51 @@ function AdminContent({ session, adminToken }) {
     }
   }
 
-  const participants = session.participants || []
+  // Derive participant list from results (session API doesn't include participants)
+  const participants = useMemo(() => {
+    if (!results || results.length === 0) return []
+    const map = new Map()
+    for (const slot of results) {
+      for (const p of slot.participants || []) {
+        if (!map.has(p.id)) {
+          map.set(p.id, { id: p.id, name: p.name, availableCount: 0 })
+        }
+        map.get(p.id).availableCount++
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => b.availableCount - a.availableCount)
+  }, [results])
+
   const highlightedSlots = highlightedSlot ? new Set([highlightedSlot]) : null
 
   const tabs = [
-    { id: 'overview', label: t('admin.tabs.overview') },
-    { id: 'results', label: t('admin.tabs.results') },
-    { id: 'links', label: t('admin.tabs.share') },
+    {
+      id: 'overview',
+      label: t('admin.tabs.overview'),
+      icon: (
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 13h8V3H3v10zm10 8h8v-6h-8v6zm0-8h8V3h-8v10zM3 21h8v-6H3v6z" />
+        </svg>
+      ),
+    },
+    {
+      id: 'results',
+      label: t('admin.tabs.results'),
+      icon: (
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 13h4v8H3v-8zm7-6h4v14h-4V7zm7 3h4v11h-4V10z" />
+        </svg>
+      ),
+    },
+    {
+      id: 'links',
+      label: t('admin.tabs.share'),
+      icon: (
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.5-1.5m-1.672-3.328a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.5 1.5" />
+        </svg>
+      ),
+    },
   ]
 
   return (
@@ -345,23 +383,34 @@ function AdminContent({ session, adminToken }) {
                 <span>{t('admin.participantCount', { count: participants.length })}</span>
               </div>
             </div>
-            {/* Actions — stack on mobile, row on desktop */}
-            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap sm:shrink-0">
+            {/* Actions */}
+            <div className="flex items-center gap-2 flex-wrap sm:shrink-0">
+              {/* Export buttons — full label on sm+, icon-only on mobile */}
               <div className="flex gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
+                <button
+                  type="button"
                   onClick={() => handleExport('csv')}
+                  title={t('admin.actions.exportCsv')}
+                  className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100"
                 >
-                  {t('admin.actions.exportCsv')}
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
+                  <svg className="w-4 h-4 shrink-0 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                  <span className="hidden sm:inline">{t('admin.actions.exportCsv')}</span>
+                  <span className="sm:hidden">CSV</span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => handleExport('json')}
+                  title={t('admin.actions.exportJson')}
+                  className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100"
                 >
-                  {t('admin.actions.exportJson')}
-                </Button>
+                  <svg className="w-4 h-4 shrink-0 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                  <span className="hidden sm:inline">{t('admin.actions.exportJson')}</span>
+                  <span className="sm:hidden">JSON</span>
+                </button>
               </div>
               <div className="flex gap-2">
                 {!session.isClosed && (
@@ -392,14 +441,18 @@ function AdminContent({ session, adminToken }) {
       {/* Tabs */}
       <div className="bg-white border-b border-gray-100 sticky top-14 z-30">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="flex gap-1 -mb-px">
+          <div className="grid grid-cols-3 gap-2 py-1">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
+                aria-pressed={activeTab === tab.id}
                 className={`tab-button ${activeTab === tab.id ? 'tab-button-active' : 'tab-button-inactive'}`}
               >
-                {tab.label}
+                <span className="inline-flex items-center gap-1.5">
+                  {tab.icon}
+                  <span className="truncate">{tab.label}</span>
+                </span>
               </button>
             ))}
           </div>
@@ -431,13 +484,9 @@ function AdminContent({ session, adminToken }) {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-800">{p.name}</p>
-                        {p.slots && (
-                          <p className="text-xs text-gray-400">
-                            {t('admin.overview.availableSlots', {
-                              count: p.slots.filter((s) => s.status === 'available').length,
-                            })}
-                          </p>
-                        )}
+                        <p className="text-xs text-gray-400">
+                          {t('admin.overview.availableSlots', { count: p.availableCount })}
+                        </p>
                       </div>
                     </li>
                   ))}

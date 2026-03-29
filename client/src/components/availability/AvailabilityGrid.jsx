@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, memo } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 import {
@@ -9,32 +9,41 @@ import {
   formatSlotTime,
 } from '../../utils/slotUtils.js'
 
-// A single grid cell — memoized to prevent re-renders during drag
+// A single grid cell — memoized to prevent re-renders during drag.
+// Handlers are passed as stable refs so memo is not defeated.
 const GridCell = memo(function GridCell({
   slotStart,
   tz,
   isAvailable,
-  isManual,
+  manualStatus,
   isDragging,
   dragValue,
+  selectionMode,
   onMouseDown,
   onTouchStart,
+  onKeyDown,
 }) {
   const draggingAdd = isDragging && dragValue
   const draggingRemove = isDragging && !dragValue
+  const isManualAvailable = manualStatus === 'available'
+  const isManualUnavailable = manualStatus === 'unavailable'
 
   return (
     <td
       data-slot={slotStart || undefined}
       onMouseDown={onMouseDown}
       onTouchStart={onTouchStart}
+      onKeyDown={onKeyDown}
+      tabIndex={slotStart ? 0 : -1}
       className={clsx(
         'grid-cell border border-gray-100',
+        selectionMode && 'grid-cell-selecting',
         draggingAdd && 'bg-indigo-300',
         draggingRemove && 'bg-gray-100',
-        !isDragging && isManual && 'grid-cell-manual',
-        !isDragging && !isManual && isAvailable && 'grid-cell-rule',
-        !isDragging && !isAvailable && 'grid-cell-empty'
+        !isDragging && isManualAvailable && 'grid-cell-manual',
+        !isDragging && isManualUnavailable && 'grid-cell-manual-unavailable',
+        !isDragging && !isManualAvailable && !isManualUnavailable && isAvailable && 'grid-cell-rule',
+        !isDragging && !isManualAvailable && !isManualUnavailable && !isAvailable && 'grid-cell-empty'
       )}
       title={slotStart ? formatSlotTime(slotStart, tz) : ''}
     />
@@ -48,45 +57,38 @@ export default function AvailabilityGrid({
   manualOverrides,
   onToggle,
   onDragSelect,
+  selectionMode = true,
 }) {
   const { t } = useTranslation()
   const [isDragging, setIsDragging] = useState(false)
   const [dragValue, setDragValue] = useState(true)
   const [draggedSlots, setDraggedSlots] = useState(new Set())
 
-  // Refs for reliable access inside document event listeners — avoids stale closures entirely
+  // Refs for reliable access inside document event listeners — avoids stale closures
   const isDraggingRef = useRef(false)
   const dragValueRef = useRef(true)
   const draggedSlotsRef = useRef(new Set())
   const onDragSelectRef = useRef(onDragSelect)
+  const onToggleRef = useRef(onToggle)
+  const availabilityRef = useRef(availability)
+  const selectionModeRef = useRef(selectionMode)
+
+  // Keep refs in sync with latest props without re-creating callbacks
   useEffect(() => { onDragSelectRef.current = onDragSelect }, [onDragSelect])
+  useEffect(() => { onToggleRef.current = onToggle }, [onToggle])
+  useEffect(() => { availabilityRef.current = availability }, [availability])
+  useEffect(() => { selectionModeRef.current = selectionMode }, [selectionMode])
 
   const tz = session?.timezone || 'UTC'
-  const slotsByDate = groupSlotsByDate(slots, tz)
-  const dates = Object.keys(slotsByDate).sort()
-  const timeLabels = getTimeLabels(slots, tz)
-  const slotLookup = buildSlotLookup(slots, tz)
 
-  const isSlotAvailable = useCallback(
-    (slotStart) => {
-      if (!slotStart) return false
-      return availability.has(slotStart)
-    },
-    [availability]
-  )
-
-  const isManualOverride = useCallback(
-    (slotStart) => {
-      if (!slotStart) return false
-      return manualOverrides[slotStart] !== undefined
-    },
-    [manualOverrides]
-  )
-
-  const getSlotStart = useCallback(
-    (dateKey, timeLabel) => slotLookup[dateKey]?.[timeLabel] || null,
-    [slotLookup]
-  )
+  // Memoize derived slot data — only recomputes when slots/tz change
+  const { slotsByDate, dates, timeLabels, slotLookup } = useMemo(() => {
+    const slotsByDate = groupSlotsByDate(slots, tz)
+    const dates = Object.keys(slotsByDate).sort()
+    const timeLabels = getTimeLabels(slots, tz)
+    const slotLookup = buildSlotLookup(slots, tz)
+    return { slotsByDate, dates, timeLabels, slotLookup }
+  }, [slots, tz])
 
   // Add a slot to the drag selection — reads from refs, never stale
   const addSlotToDrag = useCallback((slotStart) => {
@@ -109,8 +111,7 @@ export default function AvailabilityGrid({
     setDraggedSlots(new Set())
   }, [])
 
-  // Document-level move tracking — elementFromPoint is reliable at any speed,
-  // unlike mouseenter which skips cells when the pointer moves quickly
+  // Document-level move tracking — elementFromPoint is reliable at any speed
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isDraggingRef.current) return
@@ -121,7 +122,6 @@ export default function AvailabilityGrid({
 
     const handleTouchMove = (e) => {
       if (!isDraggingRef.current) return
-      // Prevent page scroll while the user is dragging to select cells
       e.preventDefault()
       const touch = e.touches[0]
       if (!touch) return
@@ -131,7 +131,6 @@ export default function AvailabilityGrid({
     }
 
     document.addEventListener('mousemove', handleMouseMove)
-    // passive: false is required so we can call e.preventDefault() in touchmove
     document.addEventListener('touchmove', handleTouchMove, { passive: false })
     document.addEventListener('mouseup', endDrag)
     document.addEventListener('touchend', endDrag)
@@ -144,38 +143,45 @@ export default function AvailabilityGrid({
     }
   }, [addSlotToDrag, endDrag])
 
-  const handleMouseDown = useCallback(
-    (slotStart) => (e) => {
-      if (e.button !== 0) return
-      e.preventDefault()
-      if (!slotStart) return
-      const newValue = !availability.has(slotStart)
-      isDraggingRef.current = true
-      dragValueRef.current = newValue
-      draggedSlotsRef.current = new Set([slotStart])
-      setIsDragging(true)
-      setDragValue(newValue)
-      setDraggedSlots(new Set([slotStart]))
-      onToggle(slotStart)
-    },
-    [availability, onToggle]
-  )
+  // Stable handlers — read slotStart from data-slot attribute, availability from ref.
+  // This means GridCell memoization is never defeated by prop churn.
+  const handleMouseDown = useCallback((e) => {
+    if (e.button !== 0) return
+    const slotStart = e.currentTarget.dataset.slot
+    if (!slotStart) return
+    e.preventDefault()
+    const newValue = !availabilityRef.current.has(slotStart)
+    isDraggingRef.current = true
+    dragValueRef.current = newValue
+    draggedSlotsRef.current = new Set([slotStart])
+    setIsDragging(true)
+    setDragValue(newValue)
+    setDraggedSlots(new Set([slotStart]))
+    onToggleRef.current(slotStart)
+  }, [])
 
-  const handleTouchStart = useCallback(
-    (slotStart) => (e) => {
-      if (!slotStart) return
-      e.preventDefault()
-      const newValue = !availability.has(slotStart)
-      isDraggingRef.current = true
-      dragValueRef.current = newValue
-      draggedSlotsRef.current = new Set([slotStart])
-      setIsDragging(true)
-      setDragValue(newValue)
-      setDraggedSlots(new Set([slotStart]))
-      onToggle(slotStart)
-    },
-    [availability, onToggle]
-  )
+  const handleTouchStart = useCallback((e) => {
+    if (!selectionModeRef.current) return
+    const slotStart = e.currentTarget.dataset.slot
+    if (!slotStart) return
+    e.preventDefault()
+    const newValue = !availabilityRef.current.has(slotStart)
+    isDraggingRef.current = true
+    dragValueRef.current = newValue
+    draggedSlotsRef.current = new Set([slotStart])
+    setIsDragging(true)
+    setDragValue(newValue)
+    setDraggedSlots(new Set([slotStart]))
+    onToggleRef.current(slotStart)
+  }, [])
+
+  const handleKeyDown = useCallback((e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return
+    const slotStart = e.currentTarget.dataset.slot
+    if (!slotStart) return
+    e.preventDefault()
+    onToggleRef.current(slotStart)
+  }, [])
 
   if (!slots || slots.length === 0) {
     return (
@@ -227,7 +233,7 @@ export default function AvailabilityGrid({
                   {timeLabel}
                 </td>
                 {dates.map((dateKey) => {
-                  const slotStart = getSlotStart(dateKey, timeLabel)
+                  const slotStart = slotLookup[dateKey]?.[timeLabel] || null
                   if (!slotStart) {
                     return (
                       <td
@@ -237,8 +243,8 @@ export default function AvailabilityGrid({
                     )
                   }
 
-                  const available = isSlotAvailable(slotStart)
-                  const manual = isManualOverride(slotStart)
+                  const available = availability.has(slotStart)
+                  const manualStatus = manualOverrides[slotStart]
                   const draggingThisSlot = draggedSlots.has(slotStart)
 
                   return (
@@ -247,11 +253,13 @@ export default function AvailabilityGrid({
                       slotStart={slotStart}
                       tz={tz}
                       isAvailable={available}
-                      isManual={manual}
+                      manualStatus={manualStatus}
                       isDragging={draggingThisSlot}
                       dragValue={dragValue}
-                      onMouseDown={handleMouseDown(slotStart)}
-                      onTouchStart={handleTouchStart(slotStart)}
+                      selectionMode={selectionMode}
+                      onMouseDown={handleMouseDown}
+                      onTouchStart={handleTouchStart}
+                      onKeyDown={handleKeyDown}
                     />
                   )
                 })}

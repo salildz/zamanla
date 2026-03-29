@@ -3,6 +3,7 @@
 const slotRepo = require('../repositories/slotRepository');
 const { generateSessionSlots, isSlotMatchingRule } = require('../utils/timeUtils');
 const { withTransaction } = require('../config/database');
+const { AppError } = require('../middleware/errorHandler');
 
 /**
  * Get all availability rules for a participant.
@@ -98,27 +99,43 @@ async function replaceParticipantRules(participantId, session, rules) {
  * Manual slots take priority - they are upserted and override any existing entry.
  *
  * @param {string} participantId
- * @param {string} sessionId
+ * @param {Object} session
  * @param {Array} slots - array of { slotStart, status, sourceType }
+ * @param {import('pg').PoolClient} [client]
  */
-async function applyManualSlots(participantId, sessionId, slots) {
-  // Build slot objects for upsert
-  // We need slotEnd; since we don't have it here, we'll compute it from session slot_minutes.
-  // However, for manual overrides the slotEnd can be derived from session or stored as-is.
-  // The caller passes slotStart; we'll store slotEnd = slotStart + slot_minutes from session.
-  // Since session isn't passed here, we accept optional slotEnd in the slot data, or default to slotStart + 30 min.
-  // Better: accept slotEnd in the slot override schema, or query session for slot_minutes.
-  // For simplicity, we query session inside participantService; here we accept slotEnd too.
-  const slotsForUpsert = slots.map((slot) => ({
-    participantId,
-    sessionId,
-    slotStart: new Date(slot.slotStart),
-    slotEnd: slot.slotEnd ? new Date(slot.slotEnd) : new Date(new Date(slot.slotStart).getTime() + 30 * 60 * 1000),
-    status: slot.status || 'available',
-    sourceType: slot.sourceType || 'manual',
-  }));
+async function applyManualSlots(participantId, session, slots, client) {
+  const slotMinutes = Number(session.slot_minutes ?? session.slotMinutes ?? 30);
+  const slotDurationMs = Number.isFinite(slotMinutes) && slotMinutes > 0
+    ? slotMinutes * 60 * 1000
+    : 30 * 60 * 1000;
 
-  await slotRepo.upsertSlots(slotsForUpsert);
+  const slotsForUpsert = slots.map((slot) => {
+    const slotStart = new Date(slot.slotStart);
+    if (Number.isNaN(slotStart.getTime())) {
+      throw new AppError('Invalid manual slot start time', 400, 'INVALID_SLOT_START');
+    }
+
+    const slotEnd = slot.slotEnd
+      ? new Date(slot.slotEnd)
+      : new Date(slotStart.getTime() + slotDurationMs);
+    if (Number.isNaN(slotEnd.getTime())) {
+      throw new AppError('Invalid manual slot end time', 400, 'INVALID_SLOT_END');
+    }
+    if (slotEnd <= slotStart) {
+      throw new AppError('Manual slot end must be after slot start', 400, 'INVALID_SLOT_RANGE');
+    }
+
+    return {
+      participantId,
+      sessionId: session.id,
+      slotStart,
+      slotEnd,
+      status: slot.status || 'available',
+      sourceType: 'manual',
+    };
+  });
+
+  await slotRepo.upsertSlots(slotsForUpsert, client);
 }
 
 module.exports = {

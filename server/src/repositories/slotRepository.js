@@ -97,6 +97,17 @@ async function deleteRuleDerivedSlotsByParticipant(participantId, client) {
 }
 
 /**
+ * Delete only manual slots for a participant, preserving rule_derived slots.
+ */
+async function deleteManualSlotsByParticipant(participantId, client) {
+  const conn = client || db;
+  await conn.query(
+    "DELETE FROM availability_slots WHERE participant_id = $1 AND source_type = 'manual'",
+    [participantId]
+  );
+}
+
+/**
  * Get all available slots for a session.
  */
 async function getAvailableSlotsBySession(sessionId) {
@@ -129,6 +140,7 @@ module.exports = {
   upsertSlots,
   deleteSlotsByParticipant,
   deleteRuleDerivedSlotsByParticipant,
+  deleteManualSlotsByParticipant,
   getAvailableSlotsBySession,
   getSlotsByParticipant,
 };

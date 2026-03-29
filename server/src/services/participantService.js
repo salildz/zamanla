@@ -2,10 +2,12 @@
 
 const participantRepo = require('../repositories/participantRepository');
 const sessionRepo = require('../repositories/sessionRepository');
+const slotRepo = require('../repositories/slotRepository');
 const availabilityService = require('./availabilityService');
 const { generateEditToken } = require('../utils/tokens');
 const { AppError } = require('../middleware/errorHandler');
 const { verifyTurnstile } = require('./sessionService');
+const { withTransaction } = require('../config/database');
 
 /**
  * Add a participant to a session.
@@ -77,9 +79,15 @@ async function updateParticipant(publicToken, editToken, data) {
     await availabilityService.replaceParticipantRules(participant.id, session, data.rules);
   }
 
-  // Process manual slot overrides if provided
-  if (data.slots !== undefined && data.slots.length > 0) {
-    await availabilityService.applyManualSlots(participant.id, session.id, data.slots);
+  // Replace manual slots: always clear existing ones, then insert the new set.
+  // This ensures deselected slots and removed overrides are properly removed from the DB.
+  if (data.slots !== undefined) {
+    await withTransaction(async (client) => {
+      await slotRepo.deleteManualSlotsByParticipant(participant.id, client);
+      if (data.slots.length > 0) {
+        await availabilityService.applyManualSlots(participant.id, session, data.slots, client);
+      }
+    });
   }
 
   const slots = await availabilityService.getParticipantSlots(participant.id);

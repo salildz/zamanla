@@ -231,6 +231,37 @@ function MyAvailabilityTab({ session, publicToken }) {
   )
 }
 
+function BestTimeBanner({ results, session }) {
+  const { t } = useTranslation()
+  if (!results || results.length === 0) return null
+
+  const sorted = [...results].sort((a, b) => b.availableCount - a.availableCount)
+  const top = sorted[0]
+  if (!top || top.availableCount === 0) return null
+
+  const tz = session?.timezone || 'UTC'
+  const time = dayjs(top.slotStart).tz(tz).format('ddd, D MMM · HH:mm')
+  const pct = top.totalParticipants > 0
+    ? Math.round((top.availableCount / top.totalParticipants) * 100)
+    : 0
+
+  return (
+    <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-2.5 mb-3">
+      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-bold shrink-0">
+        1
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-medium text-emerald-800 truncate">{time}</p>
+        <p className="text-xs text-emerald-600">
+          {t('admin.overview.availableSlots', { count: top.availableCount })}
+          {' · '}{pct}%
+        </p>
+      </div>
+      <span className="shrink-0 text-xs text-emerald-700 font-semibold">{t('results.bestTimes.title')}</span>
+    </div>
+  )
+}
+
 function GroupResultsTab({ session, publicToken }) {
   const { t } = useTranslation()
   const [highlightedSlot, setHighlightedSlot] = useState(null)
@@ -259,22 +290,25 @@ function GroupResultsTab({ session, publicToken }) {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4">
-      <div className="flex-1 min-w-0">
-        <ResultsHeatmap
-          session={session}
-          slots={allSlots}
-          results={results || []}
-          highlightedSlots={highlightedSlots}
-        />
-      </div>
-      <div className="lg:w-64 xl:w-72 shrink-0">
-        <BestTimesPanel
-          results={results || []}
-          session={session}
-          onHighlight={setHighlightedSlot}
-          highlightedSlots={highlightedSlots}
-        />
+    <div>
+      <BestTimeBanner results={results || []} session={session} />
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex-1 min-w-0">
+          <ResultsHeatmap
+            session={session}
+            slots={allSlots}
+            results={results || []}
+            highlightedSlots={highlightedSlots}
+          />
+        </div>
+        <div className="lg:w-64 xl:w-72 shrink-0">
+          <BestTimesPanel
+            results={results || []}
+            session={session}
+            onHighlight={setHighlightedSlot}
+            highlightedSlots={highlightedSlots}
+          />
+        </div>
       </div>
     </div>
   )
@@ -284,6 +318,26 @@ export default function SessionPage() {
   const { t } = useTranslation()
   const { publicToken } = useParams()
   const [activeTab, setActiveTab] = useState('availability')
+  const tabItems = [
+    {
+      id: 'availability',
+      label: t('session.tabs.myAvailability'),
+      icon: (
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ),
+    },
+    {
+      id: 'results',
+      label: t('session.tabs.groupResults'),
+      icon: (
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 13h4v8H3v-8zm7-6h4v14h-4V7zm7 3h4v11h-4V10z" />
+        </svg>
+      ),
+    },
+  ]
 
   const { data: session, isLoading, isError, error, refetch } = useSession(publicToken)
 
@@ -333,19 +387,20 @@ export default function SessionPage() {
         {/* Tabs */}
         <div className="bg-white border-b border-gray-100 sticky top-14 z-30">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <div className="flex gap-1 -mb-px">
-              <button
-                onClick={() => setActiveTab('availability')}
-                className={`tab-button ${activeTab === 'availability' ? 'tab-button-active' : 'tab-button-inactive'}`}
-              >
-                {t('session.tabs.myAvailability')}
-              </button>
-              <button
-                onClick={() => setActiveTab('results')}
-                className={`tab-button ${activeTab === 'results' ? 'tab-button-active' : 'tab-button-inactive'}`}
-              >
-                {t('session.tabs.groupResults')}
-              </button>
+            <div className="grid grid-cols-2 gap-2 py-1">
+              {tabItems.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  aria-pressed={activeTab === tab.id}
+                  className={`tab-button ${activeTab === tab.id ? 'tab-button-active' : 'tab-button-inactive'}`}
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    {tab.icon}
+                    <span className="truncate">{tab.label}</span>
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
         </div>

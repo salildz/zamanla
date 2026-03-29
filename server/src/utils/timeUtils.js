@@ -3,6 +3,13 @@
 const { fromZonedTime, toZonedTime, format: tzFormat } = require('date-fns-tz');
 const { addMinutes, parseISO, eachDayOfInterval, format } = require('date-fns');
 
+function normalizeDateOnly(value) {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value.toISOString().substring(0, 10);
+  }
+  return String(value).substring(0, 10);
+}
+
 /**
  * Generate all time slots for a session.
  *
@@ -27,8 +34,14 @@ function generateSessionSlots(session) {
     timezone,
   } = session;
 
-  const startDate = parseISO(date_start.toString().substring(0, 10));
-  const endDate = parseISO(date_end.toString().substring(0, 10));
+  // PostgreSQL TIME type returns "HH:MM:SS" — normalize to "HH:MM" to avoid
+  // building an invalid datetime string like "09:00:00:00" that causes fromZonedTime
+  // to return Invalid Date, which makes the while-loop condition false and produces [].
+  const startTimeNorm = String(day_start_time).substring(0, 5);
+  const endTimeNorm = String(day_end_time).substring(0, 5);
+
+  const startDate = parseISO(normalizeDateOnly(date_start));
+  const endDate = parseISO(normalizeDateOnly(date_end));
 
   const days = eachDayOfInterval({ start: startDate, end: endDate });
   const slots = [];
@@ -41,8 +54,8 @@ function generateSessionSlots(session) {
     const dateStr = format(day, 'yyyy-MM-dd');
 
     // Build UTC instants for the start and end of operating hours in session timezone
-    const currentSlotInit = fromZonedTime(`${dateStr}T${day_start_time}:00`, timezone);
-    const dayEnd = fromZonedTime(`${dateStr}T${day_end_time}:00`, timezone);
+    const currentSlotInit = fromZonedTime(`${dateStr}T${startTimeNorm}:00`, timezone);
+    const dayEnd = fromZonedTime(`${dateStr}T${endTimeNorm}:00`, timezone);
 
     let currentSlot = currentSlotInit;
 
@@ -74,8 +87,12 @@ function isSlotMatchingRule(slotStart, rule, timezone) {
 
   if (!rule.weekdays.includes(dayOfWeek)) return false;
 
+  // Normalize rule times to HH:MM — DB returns TIME as "HH:MM:SS"
+  const ruleStart = String(rule.start_time).substring(0, 5);
+  const ruleEnd = String(rule.end_time).substring(0, 5);
+
   const slotTimeStr = tzFormat(zonedTime, 'HH:mm', { timeZone: timezone });
-  return slotTimeStr >= rule.start_time && slotTimeStr < rule.end_time;
+  return slotTimeStr >= ruleStart && slotTimeStr < ruleEnd;
 }
 
 /**

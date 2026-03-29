@@ -67,11 +67,20 @@
     "descriptionLabel": "Description",
     "descriptionPlaceholder": "Optional: describe the meeting or any context",
     "timezoneLabel": "Timezone",
+    "timezoneHint": "Participants will see all times in this timezone.",
+    "timezoneSearch": "Search timezones...",
+    "timezoneNoResults": "No results",
     "dateStartLabel": "Start Date",
     "dateEndLabel": "End Date",
     "dayStartLabel": "Day Start Time",
     "dayEndLabel": "Day End Time",
     "slotSizeLabel": "Slot Size",
+    "timePresets": {
+      "title": "Quick presets",
+      "workday": "Workday",
+      "evening": "Evening",
+      "fullDay": "Full day"
+    },
     "includeWeekendsLabel": "Include weekends (Saturday & Sunday)",
     "submitButton": "Create Session",
     "submittingButton": "Creating session...",
@@ -85,6 +94,14 @@
       "90": "90 minutes",
       "120": "2 hours"
     },
+    "preview": {
+      "title": "Live preview",
+      "fallbackTitle": "Untitled session",
+      "dateRange": "Date range",
+      "timeWindow": "Time window",
+      "slotSize": "Slot size",
+      "timezone": "Timezone"
+    },
     "success": {
       "title": "Session Created!",
       "subtitle": "{{title}} is ready to share.",
@@ -92,6 +109,8 @@
       "adminWarningMessage": "This is the only way to manage your session. There is no way to recover it if lost.",
       "adminDashboardButton": "Go to Admin Dashboard",
       "shareTitle": "Share this link with participants",
+      "shareButton": "Share Link",
+      "shareNativeText": "Join my scheduling session: {{title}}",
       "viewSessionButton": "View Session Page",
       "createAnotherLink": "Create another session"
     }
@@ -210,15 +229,26 @@
     "savingButton": "Saving...",
     "clearAll": "Clear all",
     "noSlotsSelected": "Tap to select times",
+    "clearUndoBanner": "Selection cleared.",
+    "clearUndoAction": "Undo",
     "unsaved": "Unsaved",
+    "unsavedLeaveWarning": "You have unsaved changes.",
     "instructions": "Tap or drag to mark your available times. Use recurring rules to auto-fill weekly patterns.",
     "toast": {
       "saved": "Availability saved!",
-      "saveFailed": "Failed to save availability."
+      "saveFailed": "Failed to save availability.",
+      "cleared": "Selection cleared.",
+      "undoCleared": "Selection restored.",
+      "adjustedStale_one": "{{count}} outdated override was removed.",
+      "adjustedStale_other": "{{count}} outdated overrides were removed."
     },
     "grid": {
       "noSlots": "No time slots available for this session.",
-      "scrollHint": "← swipe to see more →"
+      "scrollHint": "← swipe to see more →",
+      "selectModeHint": "Tap or drag to select times",
+      "scrollModeHint": "Scroll mode — tap a cell to toggle",
+      "scrollGridButton": "Scroll grid",
+      "selectTimesButton": "Select times"
     },
     "rules": {
       "title": "Recurring Availability",
@@ -255,6 +285,12 @@
     "lessAvailable": "Less available",
     "moreAvailable": "More available",
     "noSlots": "No time slots to display.",
+    "tapHint": "Tap any cell to see who's available at that time.",
+    "filters": {
+      "showOnlyAvailableRows": "Show only active rows",
+      "showAllRows": "Show all rows",
+      "noAvailableRows": "No rows with availability yet."
+    },
     "noData": "No availability submitted yet. Be the first to respond!",
     "tooltip": {
       "available": "{{available}} / {{total}} available",
@@ -268,7 +304,9 @@
       "topSubtitle": "Ranked by number of available participants",
       "noOverlap": "No common availability found yet.",
       "availableParticipants": "Available:",
-      "shareHint": "Share the session link to collect responses"
+      "shareHint": "Share the session link to collect responses",
+      "showMore": "Show more best times",
+      "showLess": "Show fewer"
     }
   },
   "validation": {

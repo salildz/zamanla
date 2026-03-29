@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
@@ -38,7 +38,12 @@ function groupConsecutiveSlots(topSlots, tz) {
 export default function BestTimesPanel({ results, session, onHighlight, highlightedSlots }) {
   const { t } = useTranslation()
   const [expanded, setExpanded] = useState(null)
+  const [visibleCount, setVisibleCount] = useState(5)
   const tz = session?.timezone || 'UTC'
+
+  useEffect(() => {
+    setVisibleCount(5)
+  }, [results])
 
   if (!results || results.length === 0) {
     return (
@@ -56,8 +61,9 @@ export default function BestTimesPanel({ results, session, onHighlight, highligh
 
   // Filter to slots with at least 1 person available
   const slotsWithAvailability = results.filter((r) => r.availableCount > 0)
-  const topSlots = groupConsecutiveSlots(slotsWithAvailability, tz).slice(0, 5)
-  const maxCount = topSlots[0]?.availableCount || 1
+  const topSlots = groupConsecutiveSlots(slotsWithAvailability, tz)
+  const visibleSlots = topSlots.slice(0, visibleCount)
+  const hasMore = topSlots.length > visibleCount
   const totalParticipants = results[0]?.totalParticipants || 0
 
   return (
@@ -75,7 +81,7 @@ export default function BestTimesPanel({ results, session, onHighlight, highligh
         </div>
       ) : (
         <ul className="divide-y divide-gray-50">
-          {topSlots.map((slot, idx) => {
+          {visibleSlots.map((slot, idx) => {
             const ratio = totalParticipants > 0 ? slot.availableCount / totalParticipants : 0
             const isExpanded = expanded === slot.slotStart
             const isHighlighted = highlightedSlots?.has(slot.slotStart)
@@ -164,6 +170,28 @@ export default function BestTimesPanel({ results, session, onHighlight, highligh
             )
           })}
         </ul>
+      )}
+
+      {topSlots.length > 5 && (
+        <div className="px-4 py-2 border-t border-gray-100">
+          {hasMore ? (
+            <button
+              type="button"
+              onClick={() => setVisibleCount((count) => count + 5)}
+              className="w-full text-sm font-medium text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 rounded-md py-2 transition-colors"
+            >
+              {t('results.bestTimes.showMore')}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setVisibleCount(5)}
+              className="w-full text-sm font-medium text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-md py-2 transition-colors"
+            >
+              {t('results.bestTimes.showLess')}
+            </button>
+          )}
+        </div>
       )}
 
       {totalParticipants === 0 && (

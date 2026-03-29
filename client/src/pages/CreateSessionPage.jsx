@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -8,10 +8,11 @@ import dayjs from 'dayjs'
 import Button from '../components/common/Button.jsx'
 import Input from '../components/common/Input.jsx'
 import Select from '../components/common/Select.jsx'
+import TimezoneCombobox from '../components/common/TimezoneCombobox.jsx'
 import TurnstileWidget, { isTurnstileEnabled } from '../components/common/TurnstileWidget.jsx'
 import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
 import { createSession } from '../services/api.js'
-import { getBrowserTimezone, getTimezoneOptionsWithOffset } from '../utils/timezoneUtils.js'
+import { getBrowserTimezone } from '../utils/timezoneUtils.js'
 import { useCreateSessionSchema } from '../hooks/useSchemas.js'
 
 const today = dayjs().format('YYYY-MM-DD')
@@ -54,7 +55,6 @@ export default function CreateSessionPage() {
   const navigate = useNavigate()
   const [turnstileToken, setTurnstileToken] = useState(null)
   const [created, setCreated] = useState(null)
-  const tzOptions = getTimezoneOptionsWithOffset()
   const schema = useCreateSessionSchema()
 
   const slotOptions = [
@@ -68,6 +68,8 @@ export default function CreateSessionPage() {
   const {
     register,
     handleSubmit,
+    control,
+    setValue,
     formState: { errors },
     watch,
   } = useForm({
@@ -103,11 +105,52 @@ export default function CreateSessionPage() {
     })
   }
 
+  const previewTitle = watch('title')
+  const previewDateStart = watch('dateStart')
+  const previewDateEnd = watch('dateEnd')
+  const previewDayStart = watch('dayStartTime')
+  const previewDayEnd = watch('dayEndTime')
+  const previewSlotMinutes = watch('slotMinutes')
+  const previewTimezone = watch('timezone')
+
+  const applyTimePreset = (preset) => {
+    if (preset === 'workday') {
+      setValue('dayStartTime', '09:00', { shouldDirty: true })
+      setValue('dayEndTime', '18:00', { shouldDirty: true })
+      setValue('includeWeekends', false, { shouldDirty: true })
+      return
+    }
+    if (preset === 'evening') {
+      setValue('dayStartTime', '18:00', { shouldDirty: true })
+      setValue('dayEndTime', '22:00', { shouldDirty: true })
+      setValue('includeWeekends', false, { shouldDirty: true })
+      return
+    }
+    if (preset === 'fullDay') {
+      setValue('dayStartTime', '08:00', { shouldDirty: true })
+      setValue('dayEndTime', '22:00', { shouldDirty: true })
+      setValue('includeWeekends', true, { shouldDirty: true })
+    }
+  }
+
   const baseUrl = window.location.origin
 
   if (created) {
     const publicUrl = `${baseUrl}/s/${created.publicToken}`
     const adminUrl = `${baseUrl}/admin/${created.adminToken}`
+    const canShare = typeof navigator.share === 'function'
+
+    const handleShare = async () => {
+      try {
+        await navigator.share({
+          title: created.title,
+          text: t('create.success.shareNativeText', { title: created.title }),
+          url: publicUrl,
+        })
+      } catch {
+        // User cancelled or share failed — fall through silently
+      }
+    }
 
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -130,7 +173,7 @@ export default function CreateSessionPage() {
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="max-w-lg w-full">
             {/* Success header */}
-            <div className="text-center mb-8">
+            <div className="text-center mb-6">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4">
                 <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -142,47 +185,60 @@ export default function CreateSessionPage() {
               </p>
             </div>
 
-            {/* Admin link warning */}
+            {/* Public share link — primary action */}
+            <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4 shadow-sm">
+              <p className="text-sm font-semibold text-gray-700 mb-2">
+                {t('create.success.shareTitle')}
+              </p>
+              <div className="flex items-center gap-2 bg-gray-50 rounded-lg border border-gray-200 px-3 py-2 mb-3">
+                <span className="flex-1 text-xs text-gray-600 font-mono truncate">{publicUrl}</span>
+                <CopyButton text={publicUrl} />
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                {canShare && (
+                  <button
+                    type="button"
+                    onClick={handleShare}
+                    className="flex-1 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    </svg>
+                    {t('create.success.shareButton')}
+                  </button>
+                )}
+                <Link to={`/s/${created.publicToken}`} className="flex-1">
+                  <button
+                    type="button"
+                    className="w-full flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
+                  >
+                    {t('create.success.viewSessionButton')}
+                  </button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Admin link warning — secondary */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
               <div className="flex gap-3">
                 <svg className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold text-amber-800">{t('create.success.adminWarningTitle')}</p>
                   <p className="text-xs text-amber-700 mt-0.5">
                     {t('create.success.adminWarningMessage')}
                   </p>
+                  <div className="mt-2 flex items-center gap-2 bg-white rounded-lg border border-amber-200 px-3 py-2">
+                    <span className="flex-1 text-xs text-gray-600 font-mono truncate">{adminUrl}</span>
+                    <CopyButton text={adminUrl} />
+                  </div>
+                  <div className="mt-2">
+                    <Link to={`/admin/${created.adminToken}`} className="text-xs font-medium text-amber-700 hover:text-amber-900 underline underline-offset-2">
+                      {t('create.success.adminDashboardButton')} →
+                    </Link>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-3 flex items-center gap-2 bg-white rounded-lg border border-amber-200 px-3 py-2">
-                <span className="flex-1 text-xs text-gray-600 font-mono truncate">{adminUrl}</span>
-                <CopyButton text={adminUrl} />
-              </div>
-              <div className="mt-2 flex justify-center">
-                <Link to={`/admin/${created.adminToken}`}>
-                  <Button variant="secondary" size="sm" className="text-amber-700 border-amber-300 hover:bg-amber-50">
-                    {t('create.success.adminDashboardButton')}
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            {/* Public share link */}
-            <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
-              <p className="text-sm font-semibold text-gray-700 mb-2">
-                {t('create.success.shareTitle')}
-              </p>
-              <div className="flex items-center gap-2 bg-gray-50 rounded-lg border border-gray-200 px-3 py-2">
-                <span className="flex-1 text-xs text-gray-600 font-mono truncate">{publicUrl}</span>
-                <CopyButton text={publicUrl} />
-              </div>
-              <div className="mt-3 flex justify-center">
-                <Link to={`/s/${created.publicToken}`}>
-                  <Button variant="primary" size="sm">
-                    {t('create.success.viewSessionButton')}
-                  </Button>
-                </Link>
               </div>
             </div>
 
@@ -219,17 +275,17 @@ export default function CreateSessionPage() {
         </div>
       </nav>
 
-      <div className="max-w-2xl mx-auto px-4 py-10">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">{t('create.pageTitle')}</h1>
-          <p className="text-gray-500 mt-1">{t('create.pageSubtitle')}</p>
+      <div className="max-w-2xl mx-auto px-4 py-6 sm:py-10">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('create.pageTitle')}</h1>
+          <p className="text-gray-500 mt-1 text-sm sm:text-base">{t('create.pageSubtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100 overflow-hidden">
             {/* Basic Info */}
-            <div className="px-6 py-5">
-              <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">
+            <div className="px-4 sm:px-6 py-4 sm:py-5">
+              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
                 {t('create.sectionBasicInfo')}
               </h2>
               <div className="flex flex-col gap-4">
@@ -243,7 +299,7 @@ export default function CreateSessionPage() {
                 <div className="flex flex-col gap-1">
                   <label className="text-sm font-medium text-gray-700">{t('create.descriptionLabel')}</label>
                   <textarea
-                    className="w-full rounded-md border border-gray-300 bg-white text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-gray-400 resize-none"
+                    className="w-full rounded-md border border-gray-300 bg-white text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-gray-400 resize-none"
                     rows={3}
                     placeholder={t('create.descriptionPlaceholder')}
                     {...register('description')}
@@ -256,18 +312,27 @@ export default function CreateSessionPage() {
             </div>
 
             {/* Date & Time */}
-            <div className="px-6 py-5">
-              <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">
+            <div className="px-4 sm:px-6 py-4 sm:py-5">
+              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
                 {t('create.sectionDateRange')}
               </h2>
               <div className="flex flex-col gap-4">
-                <Select
-                  label={t('create.timezoneLabel')}
-                  required
-                  options={tzOptions.map((tz) => ({ value: tz.value, label: tz.displayLabel }))}
-                  error={errors.timezone?.message}
-                  {...register('timezone')}
-                />
+                <div>
+                  <Controller
+                    name="timezone"
+                    control={control}
+                    render={({ field }) => (
+                      <TimezoneCombobox
+                        label={t('create.timezoneLabel')}
+                        required
+                        value={field.value}
+                        onChange={field.onChange}
+                        error={errors.timezone?.message}
+                      />
+                    )}
+                  />
+                  <p className="text-xs text-gray-400 mt-1">{t('create.timezoneHint')}</p>
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <Input
                     label={t('create.dateStartLabel')}
@@ -288,8 +353,8 @@ export default function CreateSessionPage() {
             </div>
 
             {/* Time Settings */}
-            <div className="px-6 py-5">
-              <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">
+            <div className="px-4 sm:px-6 py-4 sm:py-5">
+              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
                 {t('create.sectionTimeWindow')}
               </h2>
               <div className="flex flex-col gap-4">
@@ -309,6 +374,32 @@ export default function CreateSessionPage() {
                     {...register('dayEndTime')}
                   />
                 </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-600 mb-1.5">{t('create.timePresets.title')}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => applyTimePreset('workday')}
+                      className="text-xs font-medium px-3 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                    >
+                      {t('create.timePresets.workday')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => applyTimePreset('evening')}
+                      className="text-xs font-medium px-3 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                    >
+                      {t('create.timePresets.evening')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => applyTimePreset('fullDay')}
+                      className="text-xs font-medium px-3 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                    >
+                      {t('create.timePresets.fullDay')}
+                    </button>
+                  </div>
+                </div>
                 <Select
                   label={t('create.slotSizeLabel')}
                   required
@@ -316,23 +407,23 @@ export default function CreateSessionPage() {
                   error={errors.slotMinutes?.message}
                   {...register('slotMinutes')}
                 />
-                <div className="flex items-center gap-3">
+                <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     id="includeWeekends"
                     type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 shrink-0"
                     {...register('includeWeekends')}
                   />
-                  <label htmlFor="includeWeekends" className="text-sm text-gray-700">
+                  <span className="text-sm text-gray-700">
                     {t('create.includeWeekendsLabel')}
-                  </label>
-                </div>
+                  </span>
+                </label>
               </div>
             </div>
 
             {/* Turnstile */}
             {isTurnstileEnabled() && (
-              <div className="px-6 py-5">
+              <div className="px-4 sm:px-6 py-4 sm:py-5">
                 <TurnstileWidget
                   onVerify={setTurnstileToken}
                   onExpire={() => setTurnstileToken(null)}
@@ -346,7 +437,35 @@ export default function CreateSessionPage() {
             )}
 
             {/* Submit */}
-            <div className="px-6 py-5 bg-gray-50 flex flex-col gap-3">
+            <div className="px-4 sm:px-6 py-4 sm:py-5 bg-gray-50 flex flex-col gap-3">
+              <div className="bg-white border border-indigo-100 rounded-lg px-3 py-2.5">
+                <p className="text-xs font-semibold text-indigo-700 uppercase tracking-wide mb-1.5">
+                  {t('create.preview.title')}
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-gray-600">
+                  <p>
+                    <span className="text-gray-500">{t('create.titleLabel')}: </span>
+                    <span className="font-medium text-gray-700">{previewTitle || t('create.preview.fallbackTitle')}</span>
+                  </p>
+                  <p>
+                    <span className="text-gray-500">{t('create.preview.dateRange')}: </span>
+                    <span className="font-medium text-gray-700">{previewDateStart} - {previewDateEnd}</span>
+                  </p>
+                  <p>
+                    <span className="text-gray-500">{t('create.preview.timeWindow')}: </span>
+                    <span className="font-medium text-gray-700">{previewDayStart} - {previewDayEnd}</span>
+                  </p>
+                  <p>
+                    <span className="text-gray-500">{t('create.preview.slotSize')}: </span>
+                      <span className="font-medium text-gray-700">{t('common.slotMinutes', { count: Number(previewSlotMinutes) || 0 })}</span>
+                  </p>
+                  <p className="sm:col-span-2 truncate">
+                    <span className="text-gray-500">{t('create.preview.timezone')}: </span>
+                    <span className="font-medium text-gray-700">{previewTimezone}</span>
+                  </p>
+                </div>
+              </div>
+
               {mutation.isError && (
                 <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-sm text-red-700">
                   {mutation.error?.userMessage || t('create.errorGeneric')}

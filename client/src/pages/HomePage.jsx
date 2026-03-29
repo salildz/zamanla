@@ -43,7 +43,7 @@ export default function HomePage() {
   ]
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pb-20 sm:pb-0">
       {/* Nav */}
       <nav className="border-b border-gray-100 bg-white sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
@@ -185,6 +185,20 @@ export default function HomePage() {
           <p>{t('home.footerTagline')}</p>
         </div>
       </footer>
+
+      {/* Mobile sticky CTA */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-40 sm:hidden bg-white/95 backdrop-blur border-t border-gray-200"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      >
+        <div className="px-4 py-3">
+          <Link to="/create">
+            <Button variant="primary" size="lg" fullWidth>
+              {t('home.ctaButton')}
+            </Button>
+          </Link>
+        </div>
+      </div>
     </div>
   )
 }

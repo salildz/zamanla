@@ -2,8 +2,10 @@
 
 const sessionRepo = require('../repositories/sessionRepository');
 const slotRepo = require('../repositories/slotRepository');
+const participantRepo = require('../repositories/participantRepository');
 const { generateSessionSlots } = require('../utils/timeUtils');
 const { AppError } = require('../middleware/errorHandler');
+const logger = require('../utils/logger');
 
 /**
  * Aggregate availability results for a session.
@@ -21,19 +23,37 @@ async function getResults(publicToken) {
   // Generate all possible slots for the session
   const generatedSlots = generateSessionSlots(session);
 
-  // Query available slots from DB
-  const dbSlots = await slotRepo.getAvailableSlotsBySession(session.id);
+  // Fetch total participant count and available slots in parallel
+  const [totalParticipants, dbSlots] = await Promise.all([
+    participantRepo.countBySessionId(session.id),
+    slotRepo.getAvailableSlotsBySession(session.id),
+  ]);
 
-  // Build a map: slotStart ISO string -> [{ participantId, participantName }]
+  const generatedSlotStarts = new Set(generatedSlots.map((slot) => slot.slotStart.toISOString()));
+
+  // Build a map: slotStart ISO string -> [{ id, name }]
   const slotMap = new Map();
+  const unmatchedSlotStarts = new Set();
   for (const dbSlot of dbSlots) {
     const key = new Date(dbSlot.slot_start).toISOString();
+    if (!generatedSlotStarts.has(key)) {
+      unmatchedSlotStarts.add(key);
+    }
     if (!slotMap.has(key)) {
       slotMap.set(key, []);
     }
     slotMap.get(key).push({
       id: dbSlot.participant_id,
       name: dbSlot.participant_name,
+    });
+  }
+
+  if (unmatchedSlotStarts.size > 0) {
+    logger.warn('Found available slots outside generated session window', {
+      sessionId: session.id,
+      publicToken,
+      unmatchedCount: unmatchedSlotStarts.size,
+      sampleSlotStarts: Array.from(unmatchedSlotStarts).slice(0, 5),
     });
   }
 
@@ -44,14 +64,15 @@ async function getResults(publicToken) {
     return {
       slotStart: genSlot.slotStart.toISOString(),
       slotEnd: genSlot.slotEnd.toISOString(),
-      count: participants.length,
+      availableCount: participants.length,
+      totalParticipants,
       participants,
     };
   });
 
-  // Sort: count desc, then slotStart asc
+  // Sort: availableCount desc, then slotStart asc
   results.sort((a, b) => {
-    if (b.count !== a.count) return b.count - a.count;
+    if (b.availableCount !== a.availableCount) return b.availableCount - a.availableCount;
     return new Date(a.slotStart) - new Date(b.slotStart);
   });
 

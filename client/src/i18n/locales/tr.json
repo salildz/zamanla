@@ -67,11 +67,20 @@
     "descriptionLabel": "Açıklama",
     "descriptionPlaceholder": "İsteğe bağlı: toplantı veya bağlam hakkında bilgi ver",
     "timezoneLabel": "Saat Dilimi",
+    "timezoneHint": "Katılımcılar tüm saatleri bu dilimde görecek.",
+    "timezoneSearch": "Saat dilimi ara...",
+    "timezoneNoResults": "Sonuç yok",
     "dateStartLabel": "Başlangıç Tarihi",
     "dateEndLabel": "Bitiş Tarihi",
     "dayStartLabel": "Gün Başlangıç Saati",
     "dayEndLabel": "Gün Bitiş Saati",
     "slotSizeLabel": "Slot Boyutu",
+    "timePresets": {
+      "title": "Hızlı ayarlar",
+      "workday": "Mesai",
+      "evening": "Akşam",
+      "fullDay": "Tam gün"
+    },
     "includeWeekendsLabel": "Hafta sonlarını dahil et (Cumartesi & Pazar)",
     "submitButton": "Oturum Oluştur",
     "submittingButton": "Oturum oluşturuluyor...",
@@ -85,6 +94,14 @@
       "90": "90 dakika",
       "120": "2 saat"
     },
+    "preview": {
+      "title": "Canlı önizleme",
+      "fallbackTitle": "Başlıksız oturum",
+      "dateRange": "Tarih aralığı",
+      "timeWindow": "Saat aralığı",
+      "slotSize": "Slot boyutu",
+      "timezone": "Saat dilimi"
+    },
     "success": {
       "title": "Oturum Oluşturuldu!",
       "subtitle": "{{title}} paylaşıma hazır.",
@@ -92,6 +109,8 @@
       "adminWarningMessage": "Oturumunu yönetmenin tek yolu budur. Kaybolursa kurtarma yolu yoktur.",
       "adminDashboardButton": "Yönetici Paneline Git",
       "shareTitle": "Bu linki katılımcılarla paylaş",
+      "shareButton": "Linki Paylaş",
+      "shareNativeText": "Planlama oturumuma katıl: {{title}}",
       "viewSessionButton": "Oturum Sayfasını Görüntüle",
       "createAnotherLink": "Başka bir oturum oluştur"
     }
@@ -210,15 +229,26 @@
     "savingButton": "Kaydediliyor...",
     "clearAll": "Tümünü temizle",
     "noSlotsSelected": "Zaman seçmek için dokun",
+    "clearUndoBanner": "Seçimler temizlendi.",
+    "clearUndoAction": "Geri al",
     "unsaved": "Kaydedilmedi",
+    "unsavedLeaveWarning": "Kaydedilmemiş değişikliklerin var.",
     "instructions": "Müsait olduğun saatleri işaretlemek için dokun ya da sürükle. Haftalık kalıpları otomatik doldurmak için tekrarlayan kuralları kullan.",
     "toast": {
       "saved": "Müsaitlik kaydedildi!",
-      "saveFailed": "Müsaitlik kaydedilemedi."
+      "saveFailed": "Müsaitlik kaydedilemedi.",
+      "cleared": "Seçimler temizlendi.",
+      "undoCleared": "Seçimler geri yüklendi.",
+      "adjustedStale_one": "{{count}} eski seçim kaldırıldı.",
+      "adjustedStale_other": "{{count}} eski seçim kaldırıldı."
     },
     "grid": {
       "noSlots": "Bu oturum için zaman dilimi bulunamadı.",
-      "scrollHint": "← kaydır →"
+      "scrollHint": "← kaydır →",
+      "selectModeHint": "Zaman seçmek için dokun ya da sürükle",
+      "scrollModeHint": "Kaydırma modu — bir hücreye dokun",
+      "scrollGridButton": "Tabloyu kaydır",
+      "selectTimesButton": "Zaman seç"
     },
     "rules": {
       "title": "Tekrarlayan Müsaitlik",
@@ -255,6 +285,12 @@
     "lessAvailable": "Daha az müsait",
     "moreAvailable": "Daha çok müsait",
     "noSlots": "Görüntülenecek zaman dilimi yok.",
+    "tapHint": "Herhangi bir hücreye dokun ve o saatte kimin müsait olduğunu gör.",
+    "filters": {
+      "showOnlyAvailableRows": "Sadece aktif satırları göster",
+      "showAllRows": "Tüm satırları göster",
+      "noAvailableRows": "Henüz müsaitlik olan satır yok."
+    },
     "noData": "Henüz yanıt gelmedi. İlk yanıtlayan sen ol!",
     "tooltip": {
       "available": "{{available}} / {{total}} müsait",
@@ -268,7 +304,9 @@
       "topSubtitle": "Müsait katılımcı sayısına göre sıralandı",
       "noOverlap": "Henüz ortak müsait zaman bulunamadı.",
       "availableParticipants": "Müsait olanlar:",
-      "shareHint": "Yanıt toplamak için oturum linkini paylaş"
+      "shareHint": "Yanıt toplamak için oturum linkini paylaş",
+      "showMore": "Daha fazla uygun zaman göster",
+      "showLess": "Daha az göster"
     }
   },
   "validation": {
