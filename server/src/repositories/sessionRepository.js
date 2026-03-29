@@ -17,12 +17,13 @@ async function createSession({
   dayStartTime,
   dayEndTime,
   includeWeekends,
+  ownerId,
 }) {
   const { rows } = await db.query(
     `INSERT INTO sessions
        (public_token, admin_token, title, description, timezone,
-        date_start, date_end, slot_minutes, day_start_time, day_end_time, include_weekends)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        date_start, date_end, slot_minutes, day_start_time, day_end_time, include_weekends, owner_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
      RETURNING *`,
     [
       publicToken,
@@ -36,6 +37,7 @@ async function createSession({
       dayStartTime,
       dayEndTime,
       includeWeekends,
+      ownerId || null,
     ]
   );
   return rows[0];
@@ -124,6 +126,26 @@ async function deleteSession(id) {
   await db.query('DELETE FROM sessions WHERE id = $1', [id]);
 }
 
+async function claimByAdminToken(adminToken, userId) {
+  const { rows } = await db.query(
+    `UPDATE sessions
+     SET owner_id = $2, updated_at = NOW()
+     WHERE admin_token = $1
+       AND (owner_id IS NULL OR owner_id = $2)
+     RETURNING *`,
+    [adminToken, userId]
+  );
+  return rows[0] || null;
+}
+
+async function findByOwnerId(ownerId) {
+  const { rows } = await db.query(
+    'SELECT * FROM sessions WHERE owner_id = $1 ORDER BY created_at DESC',
+    [ownerId]
+  );
+  return rows;
+}
+
 module.exports = {
   createSession,
   findByPublicToken,
@@ -131,4 +153,6 @@ module.exports = {
   updateSession,
   closeSession,
   deleteSession,
+  claimByAdminToken,
+  findByOwnerId,
 };

@@ -4,6 +4,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:9051/api'
 
 const api = axios.create({
   baseURL: BASE_URL,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -68,6 +69,11 @@ export async function closeSession(adminToken) {
   return res.data.session
 }
 
+export async function claimSession(adminToken) {
+  const res = await api.post(`/sessions/admin/${adminToken}/claim`)
+  return res.data.session
+}
+
 export async function exportSession(adminToken, format = 'json') {
   const res = await api.get(`/sessions/admin/${adminToken}/export`, {
     params: { format },
@@ -96,6 +102,32 @@ export async function saveAvailability(publicToken, editToken, data) {
 export async function getResults(publicToken) {
   const res = await api.get(`/sessions/${publicToken}/results`)
   return res.data.slots
+}
+
+// Auth
+export async function registerUser(data) {
+  const res = await api.post('/auth/register', data)
+  return res.data.user
+}
+
+export async function loginUser(data) {
+  const res = await api.post('/auth/login', data)
+  return res.data.user
+}
+
+export async function logoutUser() {
+  const res = await api.post('/auth/logout')
+  return res.data
+}
+
+export async function getCurrentUser() {
+  const res = await api.get('/auth/me')
+  return res.data.user
+}
+
+export async function getMySchedules() {
+  const res = await api.get('/my/schedules')
+  return res.data.sessions
 }
 
 export default api

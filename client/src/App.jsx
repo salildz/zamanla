@@ -5,6 +5,8 @@ import HomePage from './pages/HomePage.jsx'
 import CreateSessionPage from './pages/CreateSessionPage.jsx'
 import SessionPage from './pages/SessionPage.jsx'
 import AdminPage from './pages/AdminPage.jsx'
+import AuthPage from './pages/AuthPage.jsx'
+import MySchedulesPage from './pages/MySchedulesPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 
 export default function App() {
@@ -16,6 +18,8 @@ export default function App() {
           <Route path="/create" element={<CreateSessionPage />} />
           <Route path="/s/:publicToken" element={<SessionPage />} />
           <Route path="/admin/:adminToken" element={<AdminPage />} />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/my/schedules" element={<MySchedulesPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>

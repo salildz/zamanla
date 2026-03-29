@@ -58,4 +58,18 @@ const exportLimiter = rateLimit({
   },
 });
 
-module.exports = { generalLimiter, createLimiter, adminLimiter, exportLimiter };
+/**
+ * Limiter for auth endpoints (login/register).
+ */
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 40,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: { code: 'RATE_LIMIT_EXCEEDED', message: 'Too many authentication requests, please try again later.' },
+  },
+});
+
+module.exports = { generalLimiter, createLimiter, adminLimiter, exportLimiter, authLimiter };

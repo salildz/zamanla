@@ -74,6 +74,7 @@ NODE_ENV=development
 CORS_ORIGIN=http://localhost:9050
 VITE_API_URL=http://localhost:9051/api
 DB_PASSWORD=zamanla_dev_password
+AUTH_JWT_SECRET=change_me_auth_jwt_secret
 ```
 
 The server uses `Dockerfile.dev` (includes nodemon). Source is volume-mounted at `./server:/app`, so changes to server code restart automatically.
@@ -102,6 +103,7 @@ NODE_ENV=development
 CORS_ORIGIN=https://zamanla-dev.yildizsalih.com
 VITE_API_URL=/api
 DB_PASSWORD=your_dev_password
+AUTH_JWT_SECRET=change_me_auth_jwt_secret
 HMR_HOST=zamanla-dev.yildizsalih.com
 HMR_CLIENT_PORT=443
 HMR_PROTOCOL=wss
@@ -179,6 +181,8 @@ VITE_API_URL=/api
 DB_NAME=zamanla
 DB_USER=zamanla
 DB_PASSWORD=your_strong_production_password
+AUTH_JWT_SECRET=your_strong_random_auth_secret
+AUTH_JWT_EXPIRES_IN=7d
 TURNSTILE_SECRET_KEY=your_cloudflare_turnstile_secret
 VITE_TURNSTILE_SITE_KEY=your_cloudflare_turnstile_site_key
 ```
@@ -325,6 +329,8 @@ docker compose -f docker-compose.prod.yml exec postgres \
 | `NODE_ENV` | `development` | `development` | `production` |
 | `CORS_ORIGIN` | `http://localhost:9050` | `https://zamanla-dev.yildizsalih.com` | `https://zamanla.yildizsalih.com` |
 | `VITE_API_URL` | `http://localhost:9051/api` | `/api` | `/api` |
+| `AUTH_JWT_SECRET` | `change_me_auth_jwt_secret` | `change_me_auth_jwt_secret` | *(required)* |
+| `AUTH_JWT_EXPIRES_IN` | `7d` | `7d` | `7d` |
 | `HMR_HOST` | *(not set)* | `zamanla-dev.yildizsalih.com` | *(not set)* |
 | `HMR_CLIENT_PORT` | *(not set)* | `443` | *(not set)* |
 | `HMR_PROTOCOL` | *(not set)* | `wss` | *(not set)* |

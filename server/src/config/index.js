@@ -21,6 +21,13 @@ const config = {
     verifyUrl: 'https://challenges.cloudflare.com/turnstile/v1/siteverify',
   },
 
+  auth: {
+    jwtSecret: process.env.AUTH_JWT_SECRET || 'dev-only-change-me',
+    jwtExpiresIn: process.env.AUTH_JWT_EXPIRES_IN || '7d',
+    cookieName: process.env.AUTH_COOKIE_NAME || 'zamanla_auth',
+    cookieMaxAgeMs: parseInt(process.env.AUTH_COOKIE_MAX_AGE_MS || `${7 * 24 * 60 * 60 * 1000}`, 10),
+  },
+
   rateLimit: {
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100,

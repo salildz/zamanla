@@ -17,7 +17,8 @@
   "nav": {
     "newSession": "New Session",
     "adminDashboard": "Admin Dashboard",
-    "newSessionPage": "New Session"
+    "newSessionPage": "New Session",
+    "mySchedules": "My Schedules"
   },
   "home": {
     "badge": "Free to use · No account required",
@@ -189,6 +190,20 @@
       "participantLinkDesc": "Share this link with anyone you want to invite.",
       "openParticipantView": "Open Participant View"
     },
+    "claim": {
+      "title": "Save this schedule to your account",
+      "loading": "Checking account status...",
+      "anonymousMessage": "Sign in to keep this admin schedule in your personal dashboard.",
+      "claimableMessage": "Signed in as {{email}}. Claim this schedule to manage it from your dashboard.",
+      "ownedByYou": "This schedule is already saved in your account.",
+      "ownedByAnother": "This schedule is already claimed by another account.",
+      "actions": {
+        "login": "Log in",
+        "register": "Create account",
+        "claim": "Save to my account",
+        "openDashboard": "Open My Schedules"
+      }
+    },
     "toast": {
       "titleUpdated": "Title updated.",
       "titleUpdateFailed": "Failed to update title.",
@@ -198,6 +213,8 @@
       "sessionCloseFailed": "Failed to close session.",
       "sessionDeleted": "Session deleted.",
       "sessionDeleteFailed": "Failed to delete session.",
+      "sessionClaimed": "Schedule saved to your account.",
+      "sessionClaimFailed": "Could not save this schedule to your account.",
       "exportedCsv": "Exported as CSV.",
       "exportedJson": "Exported as JSON.",
       "exportFailed": "Export failed."
@@ -218,6 +235,58 @@
     "home": "Home",
     "createSession": "Create a session",
     "hint": "Need help? Make sure you have the correct link."
+  },
+  "auth": {
+    "loading": "Checking your account...",
+    "mode": {
+      "login": "Log in",
+      "register": "Create account"
+    },
+    "loginTitle": "Welcome back",
+    "registerTitle": "Create your account",
+    "subtitle": "Accounts are optional. Create one only if you want to save and manage schedules in one place.",
+    "fields": {
+      "email": "Email",
+      "password": "Password"
+    },
+    "passwordHint": "Use at least 8 characters.",
+    "optionalNote": "You can continue using Zamanla anonymously at any time.",
+    "actions": {
+      "login": "Log in",
+      "createAccount": "Create account",
+      "logout": "Log out"
+    },
+    "validation": {
+      "emailInvalid": "Please enter a valid email address.",
+      "passwordRequired": "Password is required.",
+      "passwordMin": "Password must be at least 8 characters."
+    }
+  },
+  "dashboard": {
+    "title": "My Schedules",
+    "subtitle": "Signed in as {{email}}",
+    "loadingUser": "Loading your account...",
+    "loadingSchedules": "Loading schedules...",
+    "loadErrorTitle": "Could not load your schedules",
+    "status": {
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "actions": {
+      "openPublic": "Public View",
+      "openAdmin": "Manage"
+    },
+    "empty": {
+      "title": "No saved schedules yet",
+      "subtitle": "Create a new schedule, or claim one from an admin link.",
+      "createButton": "Create your first schedule"
+    },
+    "loginRequired": {
+      "title": "Sign in to see your schedules",
+      "subtitle": "Your dashboard stores schedules you've created while signed in or claimed from admin links.",
+      "loginButton": "Log in",
+      "registerButton": "Create account"
+    }
   },
   "availability": {
     "title": "Your Availability",
@@ -327,6 +396,10 @@
     "SESSION_NOT_FOUND": "Session not found.",
     "PARTICIPANT_NOT_FOUND": "Participant not found.",
     "SESSION_CLOSED": "This session is closed.",
+    "SESSION_ALREADY_CLAIMED": "This schedule is already claimed by another account.",
+    "AUTH_REQUIRED": "Please log in to continue.",
+    "INVALID_CREDENTIALS": "Invalid email or password.",
+    "EMAIL_ALREADY_REGISTERED": "This email is already registered.",
     "NOT_FOUND": "Resource not found.",
     "networkError": "Network error — please check your connection.",
     "unknownError": "An unexpected error occurred."

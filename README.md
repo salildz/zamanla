@@ -132,6 +132,10 @@ npm run dev
 | `PORT` | `9051` | Backend server port |
 | `CORS_ORIGIN` | `http://localhost:9050` | Allowed CORS origin(s) |
 | `TURNSTILE_SECRET_KEY` | *(optional)* | Cloudflare Turnstile secret key |
+| `AUTH_JWT_SECRET` | `dev-only-change-me` | JWT signing secret for optional account auth |
+| `AUTH_JWT_EXPIRES_IN` | `7d` | JWT expiration (e.g. `7d`, `12h`) |
+| `AUTH_COOKIE_NAME` | `zamanla_auth` | Auth cookie name |
+| `AUTH_COOKIE_MAX_AGE_MS` | `604800000` | Auth cookie max age in milliseconds |
 | `VITE_API_URL` | `http://localhost:9051/api` | Frontend API base URL |
 | `VITE_TURNSTILE_SITE_KEY` | *(optional)* | Cloudflare Turnstile site key |
 
@@ -175,7 +179,23 @@ These ports were chosen to avoid conflicts with other projects on this host.
 | `PATCH` | `/api/sessions/admin/:adminToken` | Update session settings |
 | `DELETE` | `/api/sessions/admin/:adminToken` | Delete session |
 | `POST` | `/api/sessions/admin/:adminToken/close` | Close session to new responses |
+| `POST` | `/api/sessions/admin/:adminToken/claim` | Claim this session for the logged-in account |
 | `GET` | `/api/sessions/admin/:adminToken/export` | Export results (`?format=json\|csv`) |
+
+### Auth (Optional)
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/api/auth/register` | Create account and start auth session |
+| `POST` | `/api/auth/login` | Login and start auth session |
+| `POST` | `/api/auth/logout` | Logout and clear auth cookie |
+| `GET` | `/api/auth/me` | Get current authenticated user (or `null`) |
+
+### My Account
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/api/my/schedules` | List schedules owned by authenticated user |
 
 ### Participants
 
@@ -221,6 +241,7 @@ Priority: manual overrides > rule-derived slots.
 - **Rate limiting:** create session (30/15min), participant join (60/15min), general (200/15min), export (50/hr)
 - **Input validation:** all payloads validated with Zod schemas server-side
 - **Turnstile:** optional Cloudflare Turnstile on session creation and participant join forms
+- **Optional auth:** JWT in HttpOnly cookie (`SameSite=Lax`, `Secure` in production)
 - **CORS:** locked to configured origin(s)
 - **Helmet:** standard security headers on all responses
 
@@ -235,6 +256,8 @@ NODE_ENV=production
 CORS_ORIGIN=https://scheduler.yildizsalih.com
 VITE_API_URL=https://scheduler.yildizsalih.com/api
 DB_PASSWORD=<strong-random-password>
+AUTH_JWT_SECRET=<strong-random-secret>
+AUTH_JWT_EXPIRES_IN=7d
 TURNSTILE_SECRET_KEY=<from-cloudflare>
 VITE_TURNSTILE_SITE_KEY=<from-cloudflare>
 ```

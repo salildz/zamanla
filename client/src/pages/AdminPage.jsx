@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
-import { useMutation } from '@tanstack/react-query'
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -10,8 +9,10 @@ import {
   useUpdateSession,
   useDeleteSession,
   useCloseSession,
+  useClaimSession,
   useResults,
 } from '../hooks/useSession.js'
+import { useCurrentUser } from '../hooks/useAuth.js'
 import { exportSession } from '../services/api.js'
 import { generateSessionSlots, formatDateRange } from '../utils/slotUtils.js'
 import ResultsHeatmap from '../components/results/ResultsHeatmap.jsx'
@@ -173,13 +174,18 @@ function AdminContent({ session, adminToken }) {
   const { t } = useTranslation()
   const toast = useToast()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [activeTab, setActiveTab] = useState('overview')
   const [confirmDialog, setConfirmDialog] = useState(null)
   const [highlightedSlot, setHighlightedSlot] = useState(null)
+  const autoClaimTriggeredRef = useRef(false)
+
+  const { data: currentUser, isLoading: currentUserLoading } = useCurrentUser()
 
   const updateMutation = useUpdateSession(adminToken)
   const closeMutation = useCloseSession(adminToken)
   const deleteMutation = useDeleteSession(adminToken)
+  const claimMutation = useClaimSession(adminToken)
 
   const { data: results, isLoading: resultsLoading } = useResults(session.publicToken, {
     refetchInterval: 30000,
@@ -190,6 +196,27 @@ function AdminContent({ session, adminToken }) {
   const baseUrl = window.location.origin
   const publicUrl = `${baseUrl}/s/${session.publicToken}`
   const adminUrl = `${baseUrl}/admin/${adminToken}`
+  const claimReturnPath = `/admin/${adminToken}?autoclaim=1`
+  const claimLoginPath = `/auth?mode=login&next=${encodeURIComponent(claimReturnPath)}`
+  const claimRegisterPath = `/auth?mode=register&next=${encodeURIComponent(claimReturnPath)}`
+  const isAutoclaimRequested = searchParams.get('autoclaim') === '1'
+
+  const claimStatus = useMemo(() => {
+    const ownerId = session.ownerId == null ? null : Number(session.ownerId)
+    const currentUserId = currentUser?.id == null ? null : Number(currentUser.id)
+
+    if (!currentUser) return 'anonymous'
+    if (!ownerId) return 'claimable'
+    if (ownerId === currentUserId) return 'ownedByCurrentUser'
+    return 'ownedByAnotherUser'
+  }, [currentUser, session.ownerId])
+
+  const clearAutoclaimParam = () => {
+    if (!isAutoclaimRequested) return
+    const params = new URLSearchParams(searchParams)
+    params.delete('autoclaim')
+    setSearchParams(params, { replace: true })
+  }
 
   const handleUpdateTitle = async (title) => {
     try {
@@ -227,6 +254,17 @@ function AdminContent({ session, adminToken }) {
       setTimeout(() => navigate('/'), 1500)
     } catch (err) {
       toast.error(err.userMessage || t('admin.toast.sessionDeleteFailed'))
+    }
+  }
+
+  const handleClaimSession = async () => {
+    try {
+      await claimMutation.mutateAsync()
+      toast.success(t('admin.toast.sessionClaimed'))
+      clearAutoclaimParam()
+    } catch (err) {
+      toast.error(err.userMessage || t('admin.toast.sessionClaimFailed'))
+      clearAutoclaimParam()
     }
   }
 
@@ -272,6 +310,31 @@ function AdminContent({ session, adminToken }) {
   }, [results])
 
   const highlightedSlots = highlightedSlot ? new Set([highlightedSlot]) : null
+
+  useEffect(() => {
+    autoClaimTriggeredRef.current = false
+  }, [adminToken])
+
+  useEffect(() => {
+    if (!isAutoclaimRequested) return
+    if (currentUserLoading) return
+    if (!currentUser) return
+    if (autoClaimTriggeredRef.current) return
+
+    autoClaimTriggeredRef.current = true
+
+    if (claimStatus === 'ownedByCurrentUser' || claimStatus === 'ownedByAnotherUser') {
+      clearAutoclaimParam()
+      return
+    }
+
+    handleClaimSession()
+  }, [
+    claimStatus,
+    currentUser,
+    currentUserLoading,
+    isAutoclaimRequested,
+  ])
 
   const tabs = [
     {
@@ -545,6 +608,63 @@ function AdminContent({ session, adminToken }) {
         {/* Links tab */}
         {activeTab === 'links' && (
           <div className="flex flex-col gap-4 max-w-2xl">
+            {/* Claim ownership */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5">
+              <div className="flex gap-3">
+                <div className="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 0h10.5a1.5 1.5 0 011.5 1.5v7.5a1.5 1.5 0 01-1.5 1.5H6.75a1.5 1.5 0 01-1.5-1.5V12a1.5 1.5 0 011.5-1.5z" />
+                  </svg>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-gray-800">{t('admin.claim.title')}</p>
+
+                  {currentUserLoading ? (
+                    <p className="text-xs text-gray-500 mt-1">{t('admin.claim.loading')}</p>
+                  ) : claimStatus === 'anonymous' ? (
+                    <>
+                      <p className="text-xs text-gray-500 mt-1">{t('admin.claim.anonymousMessage')}</p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        <Link to={claimLoginPath}>
+                          <Button variant="primary" size="sm">{t('admin.claim.actions.login')}</Button>
+                        </Link>
+                        <Link to={claimRegisterPath}>
+                          <Button variant="secondary" size="sm">{t('admin.claim.actions.register')}</Button>
+                        </Link>
+                      </div>
+                    </>
+                  ) : claimStatus === 'claimable' ? (
+                    <>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {t('admin.claim.claimableMessage', { email: currentUser?.email })}
+                      </p>
+                      <div className="mt-3">
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={handleClaimSession}
+                          loading={claimMutation.isPending}
+                        >
+                          {t('admin.claim.actions.claim')}
+                        </Button>
+                      </div>
+                    </>
+                  ) : claimStatus === 'ownedByCurrentUser' ? (
+                    <>
+                      <p className="text-xs text-emerald-700 mt-1">{t('admin.claim.ownedByYou')}</p>
+                      <div className="mt-3">
+                        <Link to="/my/schedules">
+                          <Button variant="secondary" size="sm">{t('admin.claim.actions.openDashboard')}</Button>
+                        </Link>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-xs text-amber-700 mt-1">{t('admin.claim.ownedByAnother')}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Admin link warning */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
               <div className="flex gap-3 mb-3">

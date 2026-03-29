@@ -14,12 +14,12 @@
 
 set -euo pipefail
 
-SKIP_PULL=false
+SKIP_PULL=true
 SKIP_FRONTEND=false
 
 for arg in "$@"; do
   case $arg in
-    --skip-pull)      SKIP_PULL=true ;;
+    --dont-skip-pull)      SKIP_PULL=false ;;
     --skip-frontend)  SKIP_FRONTEND=true ;;
   esac
 done

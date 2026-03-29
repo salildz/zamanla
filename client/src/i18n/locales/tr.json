@@ -17,7 +17,8 @@
   "nav": {
     "newSession": "Yeni Oturum",
     "adminDashboard": "Yönetici Paneli",
-    "newSessionPage": "Yeni Oturum"
+    "newSessionPage": "Yeni Oturum",
+    "mySchedules": "Planlarım"
   },
   "home": {
     "badge": "Ücretsiz · Hesap gerektirmez",
@@ -189,6 +190,20 @@
       "participantLinkDesc": "Bu linki davet etmek istediğin herkesle paylaş.",
       "openParticipantView": "Katılımcı Görünümünü Aç"
     },
+    "claim": {
+      "title": "Bu planı hesabına kaydet",
+      "loading": "Hesap durumu kontrol ediliyor...",
+      "anonymousMessage": "Bu yönetici planını kişisel panelinde saklamak için giriş yap.",
+      "claimableMessage": "{{email}} ile giriş yaptın. Bu planı panelinden yönetmek için hesabına ekle.",
+      "ownedByYou": "Bu plan zaten hesabına kaydedilmiş.",
+      "ownedByAnother": "Bu plan başka bir hesap tarafından sahiplenilmiş.",
+      "actions": {
+        "login": "Giriş yap",
+        "register": "Hesap oluştur",
+        "claim": "Hesabıma kaydet",
+        "openDashboard": "Planlarımı aç"
+      }
+    },
     "toast": {
       "titleUpdated": "Başlık güncellendi.",
       "titleUpdateFailed": "Başlık güncellenemedi.",
@@ -198,6 +213,8 @@
       "sessionCloseFailed": "Oturum kapatılamadı.",
       "sessionDeleted": "Oturum silindi.",
       "sessionDeleteFailed": "Oturum silinemedi.",
+      "sessionClaimed": "Plan hesabına kaydedildi.",
+      "sessionClaimFailed": "Plan hesabına kaydedilemedi.",
       "exportedCsv": "CSV olarak dışa aktarıldı.",
       "exportedJson": "JSON olarak dışa aktarıldı.",
       "exportFailed": "Dışa aktarma başarısız."
@@ -218,6 +235,58 @@
     "home": "Ana Sayfa",
     "createSession": "Oturum oluştur",
     "hint": "Yardım mı lazım? Doğru linke sahip olduğundan emin ol."
+  },
+  "auth": {
+    "loading": "Hesabın kontrol ediliyor...",
+    "mode": {
+      "login": "Giriş yap",
+      "register": "Hesap oluştur"
+    },
+    "loginTitle": "Tekrar hoş geldin",
+    "registerTitle": "Hesabını oluştur",
+    "subtitle": "Hesap zorunlu değil. Sadece planlarını tek yerde kaydetmek ve yönetmek istersen oluştur.",
+    "fields": {
+      "email": "E-posta",
+      "password": "Şifre"
+    },
+    "passwordHint": "En az 8 karakter kullan.",
+    "optionalNote": "İstersen Zamanla'yı her zaman anonim olarak da kullanabilirsin.",
+    "actions": {
+      "login": "Giriş yap",
+      "createAccount": "Hesap oluştur",
+      "logout": "Çıkış yap"
+    },
+    "validation": {
+      "emailInvalid": "Geçerli bir e-posta adresi gir.",
+      "passwordRequired": "Şifre gerekli.",
+      "passwordMin": "Şifre en az 8 karakter olmalı."
+    }
+  },
+  "dashboard": {
+    "title": "Planlarım",
+    "subtitle": "{{email}} ile giriş yaptın",
+    "loadingUser": "Hesabın yükleniyor...",
+    "loadingSchedules": "Planlar yükleniyor...",
+    "loadErrorTitle": "Planların yüklenemedi",
+    "status": {
+      "open": "Açık",
+      "closed": "Kapalı"
+    },
+    "actions": {
+      "openPublic": "Katılımcı Görünümü",
+      "openAdmin": "Yönet"
+    },
+    "empty": {
+      "title": "Henüz kayıtlı plan yok",
+      "subtitle": "Yeni bir plan oluştur veya yönetici linkinden bir planı hesabına ekle.",
+      "createButton": "İlk planını oluştur"
+    },
+    "loginRequired": {
+      "title": "Planlarını görmek için giriş yap",
+      "subtitle": "Panelin, giriş yaptıktan sonra oluşturduğun veya yönetici linkinden sahiplenilen planları saklar.",
+      "loginButton": "Giriş yap",
+      "registerButton": "Hesap oluştur"
+    }
   },
   "availability": {
     "title": "Müsaitliğim",
@@ -327,6 +396,10 @@
     "SESSION_NOT_FOUND": "Oturum bulunamadı.",
     "PARTICIPANT_NOT_FOUND": "Katılımcı bulunamadı.",
     "SESSION_CLOSED": "Bu oturum kapatılmış.",
+    "SESSION_ALREADY_CLAIMED": "Bu plan başka bir hesap tarafından sahiplenilmiş.",
+    "AUTH_REQUIRED": "Devam etmek için giriş yapmalısın.",
+    "INVALID_CREDENTIALS": "E-posta veya şifre hatalı.",
+    "EMAIL_ALREADY_REGISTERED": "Bu e-posta zaten kayıtlı.",
     "NOT_FOUND": "Kaynak bulunamadı.",
     "networkError": "Ağ hatası — bağlantını kontrol et.",
     "unknownError": "Beklenmeyen bir hata oluştu."

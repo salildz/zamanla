@@ -6,14 +6,18 @@ const router = express.Router();
 const sessionCtrl = require('../controllers/sessionController');
 const participantCtrl = require('../controllers/participantController');
 const { createLimiter, adminLimiter, exportLimiter, generalLimiter } = require('../middleware/rateLimiter');
+const { optionalAuth, requireAuth } = require('../middleware/auth');
 
 // ─── Session creation ───────────────────────────────────────────────────────
 // POST /api/sessions
-router.post('/', createLimiter, sessionCtrl.createSession);
+router.post('/', createLimiter, optionalAuth, sessionCtrl.createSession);
 
 // ─── Admin routes (must be registered BEFORE /:publicToken to avoid conflicts) ──
 // GET /api/sessions/admin/:adminToken
 router.get('/admin/:adminToken', adminLimiter, sessionCtrl.getSessionAdmin);
+
+// POST /api/sessions/admin/:adminToken/claim
+router.post('/admin/:adminToken/claim', adminLimiter, requireAuth, sessionCtrl.claimSession);
 
 // PATCH /api/sessions/admin/:adminToken
 router.patch('/admin/:adminToken', adminLimiter, sessionCtrl.updateSession);

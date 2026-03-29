@@ -32,6 +32,7 @@ function formatSession(session, includeAdmin = false) {
   };
   if (includeAdmin) {
     base.adminToken = session.admin_token;
+    base.ownerId = session.owner_id || null;
   }
   return base;
 }
@@ -43,7 +44,13 @@ function formatSession(session, includeAdmin = false) {
 async function createSession(req, res) {
   const parsed = createSessionSchema.parse(req.body);
 
-  const session = await sessionService.createSession(parsed, parsed.cfTurnstileResponse);
+  const session = await sessionService.createSession(
+    {
+      ...parsed,
+      ownerId: req.authUser?.id || null,
+    },
+    parsed.cfTurnstileResponse
+  );
 
   logger.info('Session created', { sessionId: session.id, publicToken: session.public_token });
 
@@ -68,6 +75,22 @@ async function getSession(req, res) {
 async function getSessionAdmin(req, res) {
   const { adminToken } = req.params;
   const session = await sessionService.getSessionByAdminToken(adminToken);
+  return sendSuccess(res, { session: formatSession(session, true) });
+}
+
+/**
+ * POST /api/sessions/admin/:adminToken/claim
+ * Claim an anonymous/admin-token session for the authenticated user.
+ */
+async function claimSession(req, res) {
+  const { adminToken } = req.params;
+  const session = await sessionService.claimSession(adminToken, req.authUser.id);
+
+  logger.info('Session claimed by user', {
+    sessionId: session.id,
+    ownerId: req.authUser.id,
+  });
+
   return sendSuccess(res, { session: formatSession(session, true) });
 }
 
@@ -176,13 +199,26 @@ async function getResults(req, res) {
   });
 }
 
+/**
+ * GET /api/my/schedules
+ * List schedules owned by the authenticated user.
+ */
+async function getMySchedules(req, res) {
+  const sessions = await sessionService.getOwnedSessions(req.authUser.id);
+  return sendSuccess(res, {
+    sessions: sessions.map((session) => formatSession(session, true)),
+  });
+}
+
 module.exports = {
   createSession,
   getSession,
   getSessionAdmin,
+  claimSession,
   updateSession,
   deleteSession,
   closeSession,
   exportSession,
   getResults,
+  getMySchedules,
 };

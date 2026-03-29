@@ -60,6 +60,7 @@ async function createSession(data, turnstileToken) {
     dayStartTime: data.dayStartTime,
     dayEndTime: data.dayEndTime,
     includeWeekends: data.includeWeekends,
+    ownerId: data.ownerId || null,
   });
 
   return session;
@@ -131,6 +132,32 @@ async function deleteSession(adminToken) {
   await sessionRepo.deleteSession(session.id);
 }
 
+/**
+ * Claim an existing session (by admin token) for an authenticated user.
+ */
+async function claimSession(adminToken, userId) {
+  const claimed = await sessionRepo.claimByAdminToken(adminToken, userId);
+  if (claimed) return claimed;
+
+  const existing = await sessionRepo.findByAdminToken(adminToken);
+  if (!existing) {
+    throw new AppError('Session not found', 404, 'SESSION_NOT_FOUND');
+  }
+
+  if (existing.owner_id && existing.owner_id !== userId) {
+    throw new AppError('This session is already claimed by another account', 409, 'SESSION_ALREADY_CLAIMED');
+  }
+
+  return existing;
+}
+
+/**
+ * List sessions owned by the authenticated user.
+ */
+async function getOwnedSessions(userId) {
+  return sessionRepo.findByOwnerId(userId);
+}
+
 module.exports = {
   verifyTurnstile,
   createSession,
@@ -139,4 +166,6 @@ module.exports = {
   updateSession,
   closeSession,
   deleteSession,
+  claimSession,
+  getOwnedSessions,
 };

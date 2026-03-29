@@ -5,7 +5,9 @@ import {
   updateAdminSession,
   deleteSession,
   closeSession,
+  claimSession,
   getResults,
+  getMySchedules,
 } from '../services/api.js'
 
 export function useSession(publicToken) {
@@ -47,6 +49,25 @@ export function useCloseSession(adminToken) {
     onSuccess: (updated) => {
       queryClient.setQueryData(['adminSession', adminToken], updated)
     },
+  })
+}
+
+export function useClaimSession(adminToken) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => claimSession(adminToken),
+    onSuccess: (updated) => {
+      queryClient.setQueryData(['adminSession', adminToken], updated)
+      queryClient.invalidateQueries({ queryKey: ['mySchedules'] })
+    },
+  })
+}
+
+export function useMySchedules(options = {}) {
+  return useQuery({
+    queryKey: ['mySchedules'],
+    queryFn: getMySchedules,
+    ...options,
   })
 }
 

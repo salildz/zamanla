@@ -6,6 +6,7 @@ require('express-async-errors');
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const config = require('./src/config');
 const logger = require('./src/utils/logger');
@@ -32,6 +33,7 @@ app.use(cors({
 // Body parsing
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+app.use(cookieParser());
 
 // Request logging
 app.use(requestLogger);
@@ -57,12 +59,14 @@ app.use(errorHandler);
 
 const PORT = config.port;
 
-app.listen(PORT, () => {
-  logger.info(`Zamanla server listening on port ${PORT}`, {
-    port: PORT,
-    env: config.nodeEnv,
-    corsOrigin: config.corsOrigin,
+if (require.main === module) {
+  app.listen(PORT, () => {
+    logger.info(`Zamanla server listening on port ${PORT}`, {
+      port: PORT,
+      env: config.nodeEnv,
+      corsOrigin: config.corsOrigin,
+    });
   });
-});
+}
 
 module.exports = app;

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from '../components/common/Button.jsx'
 import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
+import { useCurrentUser, useLogout } from '../hooks/useAuth.js'
 
 const featureKeys = [
   'flexible',
@@ -35,6 +36,8 @@ const featureIcons = [
 
 export default function HomePage() {
   const { t } = useTranslation()
+  const { data: user } = useCurrentUser()
+  const logoutMutation = useLogout()
 
   const howItWorksSteps = [
     { step: '1', title: t('home.howItWorks.step1Title'), desc: t('home.howItWorks.step1Desc') },
@@ -58,6 +61,29 @@ export default function HomePage() {
           </div>
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
+            {user ? (
+              <>
+                <Link to="/my/schedules">
+                  <Button variant="secondary" size="sm">
+                    {t('nav.mySchedules')}
+                  </Button>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => logoutMutation.mutate()}
+                  loading={logoutMutation.isPending}
+                >
+                  {t('auth.actions.logout')}
+                </Button>
+              </>
+            ) : (
+              <Link to="/auth?mode=login">
+                <Button variant="secondary" size="sm">
+                  {t('auth.actions.login')}
+                </Button>
+              </Link>
+            )}
             <Link to="/create">
               <Button variant="primary" size="sm">
                 {t('nav.newSession')}
