@@ -282,6 +282,17 @@
     "loadingUser": "Hesabın yükleniyor...",
     "loadingSchedules": "Planlar yükleniyor...",
     "loadErrorTitle": "Planların yüklenemedi",
+    "profile": {
+      "title": "Varsayılan görünen ad",
+      "subtitle": "Bir plana katılırken bu ad otomatik doldurulur.",
+      "label": "Ad",
+      "placeholder": "örn. Ayşe",
+      "save": "İsmi kaydet",
+      "reset": "Sıfırla",
+      "saved": "Varsayılan isim güncellendi.",
+      "helper": "İstersen her oturumda katılmadan önce adını değiştirebilirsin.",
+      "current": "Geçerli: {{name}}"
+    },
     "status": {
       "open": "Açık",
       "closed": "Kapalı"

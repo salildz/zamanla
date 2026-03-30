@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from '../components/common/Button.jsx'
@@ -10,6 +11,7 @@ import { useApiError } from '../hooks/useApiError.js'
 import { useCurrentUser, useLogout } from '../hooks/useAuth.js'
 import { useMySchedules } from '../hooks/useSession.js'
 import { formatDateRange } from '../utils/slotUtils.js'
+import { getStoredProfileName, setStoredProfileName } from '../utils/profileNameStorage.js'
 
 function EmptyState() {
   const { t } = useTranslation()
@@ -46,6 +48,98 @@ function LoginPrompt() {
         </div>
       </div>
     </div>
+  )
+}
+
+function ProfileNameSettings({ user }) {
+  const { t } = useTranslation()
+  const [savedName, setSavedName] = useState('')
+  const [draftName, setDraftName] = useState('')
+  const [showSavedNotice, setShowSavedNotice] = useState(false)
+
+  useEffect(() => {
+    if (!user?.id) return
+    const storedName = getStoredProfileName(user.id)
+    setSavedName(storedName)
+    setDraftName(storedName)
+  }, [user?.id])
+
+  useEffect(() => {
+    if (!showSavedNotice) return undefined
+
+    const timeoutId = window.setTimeout(() => {
+      setShowSavedNotice(false)
+    }, 1800)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [showSavedNotice])
+
+  const normalizedDraft = useMemo(() => draftName.trim(), [draftName])
+  const hasChanges = normalizedDraft !== savedName
+
+  const handleSave = () => {
+    if (!user?.id) return
+    setStoredProfileName(user.id, normalizedDraft)
+    setSavedName(normalizedDraft)
+    setDraftName(normalizedDraft)
+    setShowSavedNotice(true)
+  }
+
+  const handleReset = () => {
+    setDraftName(savedName)
+  }
+
+  return (
+    <section className="surface-card border border-gray-200 rounded-2xl p-4 sm:p-5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900">{t('dashboard.profile.title')}</h2>
+          <p className="text-sm text-gray-500 mt-1">{t('dashboard.profile.subtitle')}</p>
+        </div>
+        {savedName ? (
+          <Badge variant="primary" size="sm">{t('dashboard.profile.current', { name: savedName })}</Badge>
+        ) : (
+          <Badge variant="default" size="sm">{t('common.none')}</Badge>
+        )}
+      </div>
+
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex-1">
+          <label className="text-sm font-medium text-gray-700 block mb-1">{t('dashboard.profile.label')}</label>
+          <input
+            type="text"
+            value={draftName}
+            onChange={(event) => setDraftName(event.target.value)}
+            placeholder={t('dashboard.profile.placeholder')}
+            className="w-full rounded-md border border-gray-300 bg-gray-50 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-gray-400"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={handleReset}
+            disabled={!hasChanges}
+          >
+            {t('dashboard.profile.reset')}
+          </Button>
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            onClick={handleSave}
+            disabled={!hasChanges}
+          >
+            {t('dashboard.profile.save')}
+          </Button>
+        </div>
+      </div>
+
+      <p className="text-xs text-gray-500 mt-2">{t('dashboard.profile.helper')}</p>
+      {showSavedNotice && <p className="text-xs text-emerald-700 mt-2">{t('dashboard.profile.saved')}</p>}
+    </section>
   )
 }
 
@@ -128,6 +222,8 @@ export default function MySchedulesPage() {
                 </p>
               </div>
             </div>
+
+            <ProfileNameSettings user={user} />
 
             {isLoading && (
               <div className="surface-card border border-gray-200 rounded-xl p-6">

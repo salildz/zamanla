@@ -18,15 +18,6 @@ function MoonIcon({ className = '' }) {
   )
 }
 
-function SystemIcon({ className = '' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-      <rect x="3" y="4" width="18" height="13" rx="2" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8.5 20h7M12 17v3" />
-    </svg>
-  )
-}
-
 const THEME_BUTTONS = [
   {
     key: 'light',
@@ -38,21 +29,17 @@ const THEME_BUTTONS = [
     Icon: MoonIcon,
     labelKey: 'theme.dark',
   },
-  {
-    key: 'system',
-    Icon: SystemIcon,
-    labelKey: 'theme.system',
-  },
 ]
 
 export default function ThemeSwitcher({ compact = false, className = '' }) {
   const { t } = useTranslation()
   const { preference, resolvedTheme, setTheme } = useThemePreference()
+  const activeTheme = preference === 'system' ? resolvedTheme : preference
 
   return (
     <div className={`inline-flex items-center rounded-2xl border border-gray-300 bg-gray-100/90 p-1 backdrop-blur-sm ${className}`.trim()}>
       {THEME_BUTTONS.map(({ key, Icon, labelKey }) => {
-        const active = preference === key
+        const active = activeTheme === key
 
         return (
           <button

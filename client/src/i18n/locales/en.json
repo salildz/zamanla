@@ -282,6 +282,17 @@
     "loadingUser": "Loading your account...",
     "loadingSchedules": "Loading schedules...",
     "loadErrorTitle": "Could not load your schedules",
+    "profile": {
+      "title": "Default display name",
+      "subtitle": "This name is prefilled when you join a schedule.",
+      "label": "Name",
+      "placeholder": "e.g. Alice",
+      "save": "Save name",
+      "reset": "Reset",
+      "saved": "Default name updated.",
+      "helper": "You can still edit your name before joining any session.",
+      "current": "Current: {{name}}"
+    },
     "status": {
       "open": "Open",
       "closed": "Closed"

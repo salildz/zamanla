@@ -21,6 +21,7 @@ const GridCell = memo(function GridCell({
   selectionMode,
   onMouseDown,
   onTouchStart,
+  onClick,
   onKeyDown,
 }) {
   const draggingAdd = isDragging && dragValue
@@ -33,8 +34,10 @@ const GridCell = memo(function GridCell({
       data-slot={slotStart || undefined}
       onMouseDown={onMouseDown}
       onTouchStart={onTouchStart}
+      onClick={onClick}
       onKeyDown={onKeyDown}
       tabIndex={slotStart ? 0 : -1}
+      aria-pressed={slotStart ? isAvailable : undefined}
       className={clsx(
         'grid-cell border border-gray-100',
         selectionMode && 'grid-cell-selecting',
@@ -175,6 +178,14 @@ export default function AvailabilityGrid({
     onToggleRef.current(slotStart)
   }, [])
 
+  const handleClick = useCallback((e) => {
+    // In scroll mode, a simple tap should still toggle a slot.
+    if (selectionModeRef.current) return
+    const slotStart = e.currentTarget.dataset.slot
+    if (!slotStart) return
+    onToggleRef.current(slotStart)
+  }, [])
+
   const handleKeyDown = useCallback((e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return
     const slotStart = e.currentTarget.dataset.slot
@@ -259,6 +270,7 @@ export default function AvailabilityGrid({
                       selectionMode={selectionMode}
                       onMouseDown={handleMouseDown}
                       onTouchStart={handleTouchStart}
+                      onClick={handleClick}
                       onKeyDown={handleKeyDown}
                     />
                   )
