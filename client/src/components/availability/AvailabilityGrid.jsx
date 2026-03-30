@@ -41,8 +41,8 @@ const GridCell = memo(function GridCell({
       className={clsx(
         'grid-cell border border-gray-100',
         selectionMode && 'grid-cell-selecting',
-        draggingAdd && 'bg-indigo-300',
-        draggingRemove && 'bg-gray-100',
+        draggingAdd && 'grid-cell-dragging-add',
+        draggingRemove && 'grid-cell-dragging-remove',
         !isDragging && isManualAvailable && 'grid-cell-manual',
         !isDragging && isManualUnavailable && 'grid-cell-manual-unavailable',
         !isDragging && !isManualAvailable && !isManualUnavailable && isAvailable && 'grid-cell-rule',

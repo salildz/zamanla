@@ -140,10 +140,25 @@ export function formatDateRange(dateStart, dateEnd, tz) {
 
 // Compute heatmap color (returns a CSS color string) based on ratio 0..1
 export function heatmapColor(ratio) {
-  if (ratio <= 0) return '#f9fafb' // gray-50
-  // Interpolate from #d1fae5 (emerald-100) to #059669 (emerald-600)
-  const r = Math.round(209 + (5 - 209) * ratio)
-  const g = Math.round(250 + (150 - 250) * ratio)
-  const b = Math.round(229 + (105 - 229) * ratio)
+  const safeRatio = Math.max(0, Math.min(1, ratio || 0))
+  const isDarkTheme =
+    typeof document !== 'undefined' &&
+    document.documentElement.dataset.theme === 'dark'
+
+  if (safeRatio <= 0) {
+    return isDarkTheme ? 'rgb(18, 28, 46)' : '#f9fafb'
+  }
+
+  // Interpolate from soft -> strong green scale depending on active theme.
+  const start = isDarkTheme
+    ? { r: 45, g: 102, b: 88 }
+    : { r: 209, g: 250, b: 229 }
+  const end = isDarkTheme
+    ? { r: 56, g: 224, b: 167 }
+    : { r: 5, g: 150, b: 105 }
+
+  const r = Math.round(start.r + (end.r - start.r) * safeRatio)
+  const g = Math.round(start.g + (end.g - start.g) * safeRatio)
+  const b = Math.round(start.b + (end.b - start.b) * safeRatio)
   return `rgb(${r},${g},${b})`
 }

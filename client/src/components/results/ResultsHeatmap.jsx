@@ -114,7 +114,7 @@ const HeatmapCell = memo(function HeatmapCell({ resultSlot, tz, isHighlighted, i
   const [showTooltip, setShowTooltip] = useState(false)
 
   if (!resultSlot) {
-    return <td className="heatmap-cell border border-gray-100 bg-gray-50" />
+    return <td className="heatmap-cell heatmap-cell-empty" />
   }
 
   const { availableCount, totalParticipants } = resultSlot
@@ -125,7 +125,7 @@ const HeatmapCell = memo(function HeatmapCell({ resultSlot, tz, isHighlighted, i
     <td
       className={clsx(
         'heatmap-cell border relative',
-        ratio > 0 ? 'border-emerald-100' : 'border-gray-100',
+        ratio > 0 ? 'heatmap-cell-active' : 'heatmap-cell-idle',
         isHighlighted && 'ring-2 ring-inset ring-indigo-500',
         isSelected && 'ring-2 ring-inset ring-indigo-600 brightness-90'
       )}
@@ -135,7 +135,7 @@ const HeatmapCell = memo(function HeatmapCell({ resultSlot, tz, isHighlighted, i
       onClick={onClick}
     >
       {ratio > 0 && (
-        <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-emerald-800 opacity-80 pointer-events-none select-none">
+        <span className="absolute inset-0 flex items-center justify-center text-[11px] sm:text-xs font-semibold text-emerald-800 opacity-85 pointer-events-none select-none">
           {availableCount}
         </span>
       )}
@@ -147,7 +147,9 @@ const HeatmapCell = memo(function HeatmapCell({ resultSlot, tz, isHighlighted, i
 export default function ResultsHeatmap({ session, slots, results, highlightedSlots }) {
   const { t } = useTranslation()
   const [selectedSlot, setSelectedSlot] = useState(null)
-  const [showOnlyAvailableRows, setShowOnlyAvailableRows] = useState(false)
+  const [showOnlyAvailableRows, setShowOnlyAvailableRows] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches
+  )
   const tz = session?.timezone || 'UTC'
 
   const resultLookup = useMemo(() => {
@@ -230,7 +232,7 @@ export default function ResultsHeatmap({ session, slots, results, highlightedSlo
         <button
           type="button"
           onClick={() => setShowOnlyAvailableRows((v) => !v)}
-          className="text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-3 py-1 hover:bg-indigo-100 transition-colors"
+          className="w-full sm:w-auto min-h-[40px] text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg px-3 py-1.5 hover:bg-indigo-100 transition-colors"
         >
           {showOnlyAvailableRows
             ? t('results.filters.showAllRows')

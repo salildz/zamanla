@@ -28,12 +28,18 @@ export default function ParticipantEditor({ session, participant, publicToken })
   })
   const [isDirty, setIsDirty] = useState(false)
   const [rulesExpanded, setRulesExpanded] = useState(true)
-  // Mobile: start in selection mode so drag works immediately.
-  // User can tap "Scroll grid" to temporarily enter scroll mode.
+  // Desktop keeps drag-select enabled; phones start in scroll mode for easier navigation.
   const [selectionMode, setSelectionMode] = useState(true)
   const [lastClearedState, setLastClearedState] = useState(null)
   const [showUndoClear, setShowUndoClear] = useState(false)
   const undoTimerRef = useRef(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (window.matchMedia('(max-width: 1023px)').matches) {
+      setSelectionMode(false)
+    }
+  }, [])
 
   useEffect(() => {
     return () => {
@@ -272,6 +278,21 @@ export default function ParticipantEditor({ session, participant, publicToken })
         {t('availability.instructions')}
       </p>
 
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-gray-600">
+          <span className="h-2.5 w-2.5 rounded-sm bg-emerald-400" />
+          {t('availability.legend.fromRule')}
+        </span>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-gray-600">
+          <span className="h-2.5 w-2.5 rounded-sm bg-indigo-500" />
+          {t('availability.legend.manual')}
+        </span>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-gray-600">
+          <span className="h-2.5 w-2.5 rounded-sm bg-red-400" />
+          {t('availability.legend.unavailable')}
+        </span>
+      </div>
+
       {showUndoClear && (
         <div className="flex items-center justify-between gap-3 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-sm">
           <span className="text-amber-800">
@@ -330,39 +351,45 @@ export default function ParticipantEditor({ session, participant, publicToken })
 
         {/* Availability Grid */}
         <div className="flex-1 min-w-0">
-          {/* Mobile: selection/scroll mode toggle */}
-          <div className="lg:hidden flex items-center justify-between mb-2">
-            <p className="text-xs text-gray-400">
+          {/* Mobile: explicit mode switcher */}
+          <div className="lg:hidden mb-2 rounded-xl border border-gray-200 bg-gray-50/80 p-2">
+            <p className="text-xs text-gray-500 px-1 mb-2">
               {selectionMode
                 ? t('availability.grid.selectModeHint')
                 : t('availability.grid.scrollModeHint')}
             </p>
-            <button
-              type="button"
-              onClick={() => setSelectionMode((v) => !v)}
-              className={clsx(
-                'flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition-colors',
-                selectionMode
-                  ? 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
-                  : 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700'
-              )}
-            >
-              {selectionMode ? (
-                <>
-                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
-                  </svg>
-                  {t('availability.grid.scrollGridButton')}
-                </>
-              ) : (
-                <>
-                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  {t('availability.grid.selectTimesButton')}
-                </>
-              )}
-            </button>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectionMode(false)}
+                className={clsx(
+                  'inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-lg border px-2 text-xs font-semibold transition-colors',
+                  !selectionMode
+                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
+                )}
+              >
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+                </svg>
+                {t('availability.grid.scrollGridButton')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectionMode(true)}
+                className={clsx(
+                  'inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-lg border px-2 text-xs font-semibold transition-colors',
+                  selectionMode
+                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
+                )}
+              >
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                {t('availability.grid.selectTimesButton')}
+              </button>
+            </div>
           </div>
 
           <AvailabilityGrid
@@ -382,7 +409,7 @@ export default function ParticipantEditor({ session, participant, publicToken })
         className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white border-t border-gray-200"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
-        <div className="flex items-center justify-between gap-3 px-4 py-3 max-w-5xl mx-auto">
+        <div className="px-4 py-3 max-w-5xl mx-auto">
           <div className="flex items-center gap-2 min-w-0">
             {availableCount > 0 ? (
               <span className="text-sm font-medium text-gray-700 truncate">
@@ -399,10 +426,11 @@ export default function ParticipantEditor({ session, participant, publicToken })
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+
+          <div className="mt-2 grid grid-cols-[auto_1fr] gap-2">
             <Button
               variant="ghost"
-              size="sm"
+              size="md"
               onClick={handleClearAll}
               disabled={saveMutation.isPending || availableCount === 0}
             >
@@ -410,7 +438,8 @@ export default function ParticipantEditor({ session, participant, publicToken })
             </Button>
             <Button
               variant="primary"
-              size="sm"
+              size="md"
+              fullWidth
               onClick={handleSave}
               loading={saveMutation.isPending}
               disabled={!isDirty}
