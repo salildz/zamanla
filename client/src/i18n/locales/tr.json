@@ -334,11 +334,17 @@
         "step1Desc": "Tek parmakla tabloda gezerek istediğin gün ve saate git.",
         "step2Title": "Dokunarak aç/kapat",
         "step2Desc": "Bir hücreye bir kez dokunarak müsait yap, tekrar dokunarak geri al.",
-        "step3Title": "Uzun bas-sürükle + kaydet",
-        "step3Desc": "Hızlı çoklu seçim için uzun basıp sürükle, sonra alttan Kaydet'e bas.",
+        "step3Title": "Uzun bas + sürükle",
+        "step3Desc": "Hızlı çoklu seçim için bir hücreye uzun basıp parmağını sürükle.",
+        "step4Title": "Çıkmadan kaydet",
+        "step4Desc": "Kaydedilmedi uyarısını görüyorsan alttaki Kaydet'e dokun.",
         "dismiss": "Geç",
         "gotIt": "Anladım",
-        "helpAria": "Hızlı kullanım rehberini aç"
+        "helpAria": "Hızlı kullanım rehberini aç",
+        "next": "İleri",
+        "prev": "Geri",
+        "swipeHint": "Adımlar arasında sağa/sola kaydırarak da geçebilirsin.",
+        "stepCounter": "Adım {{current}} / {{total}}"
       },
     "toast": {
       "saved": "Müsaitlik kaydedildi!",

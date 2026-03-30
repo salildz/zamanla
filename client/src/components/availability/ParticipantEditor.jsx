@@ -9,6 +9,7 @@ import { useSaveAvailability } from '../../hooks/useParticipant.js'
 import { useToast } from '../common/Toast.jsx'
 
 const MOBILE_ONBOARDING_KEY = 'zamanla_mobile_onboarding_v1_seen'
+const ONBOARDING_STEP_COUNT = 4
 
 export default function ParticipantEditor({ session, participant, publicToken }) {
   const { t } = useTranslation()
@@ -36,6 +37,7 @@ export default function ParticipantEditor({ session, participant, publicToken })
   const [lastClearedState, setLastClearedState] = useState(null)
   const [showUndoClear, setShowUndoClear] = useState(false)
   const undoTimerRef = useRef(null)
+  const onboardingTouchStartXRef = useRef(null)
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined
@@ -82,22 +84,45 @@ export default function ParticipantEditor({ session, participant, publicToken })
     setShowOnboarding(true)
   }, [])
 
-  useEffect(() => {
-    if (!showOnboarding) return undefined
+  const closeOnboarding = useCallback(() => {
+    setShowOnboarding(false)
+  }, [])
 
-    const stepTimer = window.setInterval(() => {
-      setOnboardingStep((current) => Math.min(current + 1, 2))
-    }, 5000)
+  const goToNextOnboardingStep = useCallback(() => {
+    setOnboardingStep((current) => Math.min(current + 1, ONBOARDING_STEP_COUNT - 1))
+  }, [])
 
-    const closeTimer = window.setTimeout(() => {
-      setShowOnboarding(false)
-    }, 15000)
+  const goToPrevOnboardingStep = useCallback(() => {
+    setOnboardingStep((current) => Math.max(current - 1, 0))
+  }, [])
 
-    return () => {
-      window.clearInterval(stepTimer)
-      window.clearTimeout(closeTimer)
+  const jumpToOnboardingStep = useCallback((stepIndex) => {
+    setOnboardingStep(Math.max(0, Math.min(stepIndex, ONBOARDING_STEP_COUNT - 1)))
+  }, [])
+
+  const handleOnboardingTouchStart = useCallback((event) => {
+    if (event.touches.length !== 1) return
+    onboardingTouchStartXRef.current = event.touches[0].clientX
+  }, [])
+
+  const handleOnboardingTouchEnd = useCallback((event) => {
+    if (onboardingTouchStartXRef.current == null || event.changedTouches.length !== 1) {
+      onboardingTouchStartXRef.current = null
+      return
     }
-  }, [showOnboarding])
+
+    const deltaX = event.changedTouches[0].clientX - onboardingTouchStartXRef.current
+    onboardingTouchStartXRef.current = null
+
+    if (Math.abs(deltaX) < 32) return
+
+    if (deltaX < 0) {
+      goToNextOnboardingStep()
+      return
+    }
+
+    goToPrevOnboardingStep()
+  }, [goToNextOnboardingStep, goToPrevOnboardingStep])
 
   useEffect(() => {
     return () => {
@@ -301,8 +326,13 @@ export default function ParticipantEditor({ session, participant, publicToken })
       title: t('availability.tour.step3Title'),
       description: t('availability.tour.step3Desc'),
     },
+    {
+      title: t('availability.tour.step4Title'),
+      description: t('availability.tour.step4Desc'),
+    },
   ]
   const currentOnboarding = onboardingSteps[onboardingStep] || onboardingSteps[0]
+  const isLastOnboardingStep = onboardingStep >= onboardingSteps.length - 1
 
   return (
     // pb-20 on mobile so the sticky save bar doesn't obscure content
@@ -367,7 +397,11 @@ export default function ParticipantEditor({ session, participant, publicToken })
       </div>
 
       {showOnboarding && isMobile && (
-        <div className="lg:hidden rounded-2xl border px-4 py-3 shadow-sm reveal-fade onboarding-panel">
+        <div
+          className="lg:hidden rounded-2xl border px-4 py-3 shadow-sm reveal-fade onboarding-panel"
+          onTouchStart={handleOnboardingTouchStart}
+          onTouchEnd={handleOnboardingTouchEnd}
+        >
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-[11px] uppercase tracking-wide font-semibold mb-1 onboarding-kicker">
@@ -375,10 +409,13 @@ export default function ParticipantEditor({ session, participant, publicToken })
               </p>
               <h3 className="text-sm font-semibold text-gray-900">{currentOnboarding.title}</h3>
               <p className="text-xs mt-1 leading-relaxed onboarding-copy">{currentOnboarding.description}</p>
+              <p className="text-[11px] mt-2 onboarding-copy opacity-85">
+                {t('availability.tour.swipeHint')}
+              </p>
             </div>
             <button
               type="button"
-              onClick={() => setShowOnboarding(false)}
+              onClick={closeOnboarding}
               className="shrink-0 text-xs font-semibold onboarding-link"
             >
               {t('availability.tour.dismiss')}
@@ -388,27 +425,45 @@ export default function ParticipantEditor({ session, participant, publicToken })
           <div className="mt-3 flex items-center justify-between gap-3">
             <div className="flex items-center gap-1.5">
               {onboardingSteps.map((_, idx) => (
-                <span
+                <button
                   key={idx}
+                  type="button"
+                  onClick={() => jumpToOnboardingStep(idx)}
                   className={clsx(
                     'h-1.5 rounded-full transition-all',
                     idx <= onboardingStep ? 'w-5 onboarding-dot-active' : 'w-2.5 onboarding-dot-inactive'
                   )}
+                  aria-label={t('availability.tour.stepCounter', { current: idx + 1, total: onboardingSteps.length })}
                 />
               ))}
             </div>
-            <button
-              type="button"
-              onClick={() => setShowOnboarding(false)}
-              className="text-xs font-semibold px-2.5 py-1.5 rounded-md onboarding-primary-btn"
-            >
-              {t('availability.tour.gotIt')}
-            </button>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={goToPrevOnboardingStep}
+                disabled={onboardingStep === 0}
+                className="text-xs font-semibold px-2.5 py-1.5 rounded-md onboarding-secondary-btn disabled:opacity-45 disabled:cursor-not-allowed"
+              >
+                {t('availability.tour.prev')}
+              </button>
+              <button
+                type="button"
+                onClick={isLastOnboardingStep ? closeOnboarding : goToNextOnboardingStep}
+                className="text-xs font-semibold px-2.5 py-1.5 rounded-md onboarding-primary-btn"
+              >
+                {isLastOnboardingStep ? t('availability.tour.gotIt') : t('availability.tour.next')}
+              </button>
+            </div>
           </div>
+
+          <p className="text-[11px] onboarding-copy mt-2 text-right">
+            {t('availability.tour.stepCounter', { current: onboardingStep + 1, total: onboardingSteps.length })}
+          </p>
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-2 text-xs">
+      <div className="flex items-center gap-2 text-[11px] sm:text-xs overflow-x-auto sm:overflow-visible whitespace-nowrap pb-1 -mb-1">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-gray-600">
           <span className="h-2.5 w-2.5 rounded-sm bg-emerald-400" />
           {t('availability.legend.fromRule')}
@@ -483,7 +538,7 @@ export default function ParticipantEditor({ session, participant, publicToken })
         <div className="flex-1 min-w-0">
           <div className={clsx(
             'rounded-xl transition-all',
-            showOnboarding && onboardingStep < 2 && 'onboarding-focus'
+            showOnboarding && onboardingStep < 3 && 'onboarding-focus'
           )}>
             <AvailabilityGrid
               session={session}
@@ -501,7 +556,7 @@ export default function ParticipantEditor({ session, participant, publicToken })
       <div
         className={clsx(
           'fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white border-t border-gray-200 transition-shadow',
-          showOnboarding && onboardingStep === 2 && 'onboarding-save-focus'
+          showOnboarding && onboardingStep === 3 && 'onboarding-save-focus'
         )}
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >

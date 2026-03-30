@@ -334,11 +334,17 @@
         "step1Desc": "Move around the table with one finger to find the day and hour you want.",
         "step2Title": "Tap to toggle",
         "step2Desc": "Tap any slot once to mark available, tap again to remove.",
-        "step3Title": "Long press to paint + save",
-        "step3Desc": "Long press and drag for fast multi-select, then use the bottom Save button.",
+        "step3Title": "Long press + drag",
+        "step3Desc": "Press and hold on a slot, then drag to fill multiple slots quickly.",
+        "step4Title": "Save before leaving",
+        "step4Desc": "When you see the unsaved marker, tap Save at the bottom.",
         "dismiss": "Skip",
         "gotIt": "Got it",
-        "helpAria": "Open quick usage guide"
+        "helpAria": "Open quick usage guide",
+        "next": "Next",
+        "prev": "Back",
+        "swipeHint": "You can also swipe left/right to change steps.",
+        "stepCounter": "Step {{current}} / {{total}}"
       },
     "toast": {
       "saved": "Availability saved!",
