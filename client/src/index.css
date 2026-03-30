@@ -64,6 +64,19 @@
     --heatmap-idle-border: rgba(151, 175, 208, 0.5);
     --heatmap-active-border: rgba(101, 180, 152, 0.58);
 
+    --tour-panel-bg: linear-gradient(140deg, rgba(232, 242, 255, 0.95), rgba(246, 250, 255, 0.96));
+    --tour-panel-border: rgba(123, 177, 238, 0.55);
+    --tour-kicker: rgb(var(--accent-rgb) / 0.9);
+    --tour-link: rgb(var(--accent-rgb) / 0.88);
+    --tour-link-hover: rgb(var(--accent-rgb) / 1);
+    --tour-copy: var(--text-2);
+    --tour-dot-active: var(--accent-strong);
+    --tour-dot-idle: rgb(var(--accent-rgb) / 0.35);
+    --tour-cta-bg: var(--accent-strong);
+    --tour-cta-hover: rgb(var(--accent-rgb) / 0.92);
+    --tour-focus-ring: rgb(var(--accent-rgb) / 0.76);
+    --tour-save-glow: rgba(33, 98, 186, 0.24);
+
     --shadow-elev: 0 16px 36px rgba(33, 64, 106, 0.14);
     --scrollbar-thumb: rgba(130, 156, 194, 0.56);
     --scrollbar-thumb-hover: rgba(114, 142, 185, 0.7);
@@ -129,6 +142,19 @@
     --heatmap-empty-bg: rgba(18, 28, 46, 0.96);
     --heatmap-idle-border: rgba(113, 139, 180, 0.54);
     --heatmap-active-border: rgba(101, 201, 167, 0.68);
+
+    --tour-panel-bg: linear-gradient(145deg, rgba(21, 35, 57, 0.95), rgba(16, 28, 48, 0.95));
+    --tour-panel-border: rgba(108, 177, 238, 0.56);
+    --tour-kicker: rgb(var(--accent-rgb) / 0.96);
+    --tour-link: rgb(var(--accent-rgb) / 0.93);
+    --tour-link-hover: rgb(var(--accent-rgb) / 1);
+    --tour-copy: var(--text-1);
+    --tour-dot-active: rgb(var(--accent-rgb) / 0.92);
+    --tour-dot-idle: rgb(var(--accent-rgb) / 0.32);
+    --tour-cta-bg: rgb(var(--accent-rgb) / 0.88);
+    --tour-cta-hover: rgb(var(--accent-rgb) / 1);
+    --tour-focus-ring: rgb(var(--accent-rgb) / 0.84);
+    --tour-save-glow: rgba(74, 154, 234, 0.34);
 
     --shadow-elev: 0 18px 48px rgba(3, 8, 18, 0.32);
     --scrollbar-thumb: rgba(116, 148, 192, 0.52);
@@ -617,6 +643,54 @@
 
   .heatmap-cell-active {
     border-color: var(--heatmap-active-border) !important;
+  }
+
+  .onboarding-panel {
+    background: var(--tour-panel-bg);
+    border-color: var(--tour-panel-border) !important;
+  }
+
+  .onboarding-kicker {
+    color: var(--tour-kicker) !important;
+  }
+
+  .onboarding-copy {
+    color: var(--tour-copy) !important;
+  }
+
+  .onboarding-link {
+    color: var(--tour-link) !important;
+  }
+
+  .onboarding-link:hover {
+    color: var(--tour-link-hover) !important;
+  }
+
+  .onboarding-dot-active {
+    background: var(--tour-dot-active) !important;
+  }
+
+  .onboarding-dot-inactive {
+    background: var(--tour-dot-idle) !important;
+  }
+
+  .onboarding-primary-btn {
+    background: var(--tour-cta-bg) !important;
+    color: #fff !important;
+  }
+
+  .onboarding-primary-btn:hover {
+    background: var(--tour-cta-hover) !important;
+  }
+
+  .onboarding-focus {
+    box-shadow:
+      0 0 0 2px var(--tour-focus-ring),
+      0 0 0 4px rgb(var(--surface-0-rgb) / 0.82);
+  }
+
+  .onboarding-save-focus {
+    box-shadow: 0 -10px 28px var(--tour-save-glow);
   }
 
   @media (min-width: 640px) {

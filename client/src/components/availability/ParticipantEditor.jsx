@@ -352,19 +352,19 @@ export default function ParticipantEditor({ session, participant, publicToken })
       </p>
 
       {showOnboarding && isMobile && (
-        <div className="lg:hidden rounded-2xl border border-indigo-200 bg-indigo-50/90 px-4 py-3 shadow-sm reveal-fade">
+        <div className="lg:hidden rounded-2xl border px-4 py-3 shadow-sm reveal-fade onboarding-panel">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-[11px] uppercase tracking-wide font-semibold text-indigo-700 mb-1">
+              <p className="text-[11px] uppercase tracking-wide font-semibold mb-1 onboarding-kicker">
                 {t('availability.tour.title')}
               </p>
               <h3 className="text-sm font-semibold text-gray-900">{currentOnboarding.title}</h3>
-              <p className="text-xs text-gray-600 mt-1 leading-relaxed">{currentOnboarding.description}</p>
+              <p className="text-xs mt-1 leading-relaxed onboarding-copy">{currentOnboarding.description}</p>
             </div>
             <button
               type="button"
               onClick={() => setShowOnboarding(false)}
-              className="shrink-0 text-xs font-semibold text-indigo-700 hover:text-indigo-900"
+              className="shrink-0 text-xs font-semibold onboarding-link"
             >
               {t('availability.tour.dismiss')}
             </button>
@@ -377,7 +377,7 @@ export default function ParticipantEditor({ session, participant, publicToken })
                   key={idx}
                   className={clsx(
                     'h-1.5 rounded-full transition-all',
-                    idx <= onboardingStep ? 'w-5 bg-indigo-600' : 'w-2.5 bg-indigo-200'
+                    idx <= onboardingStep ? 'w-5 onboarding-dot-active' : 'w-2.5 onboarding-dot-inactive'
                   )}
                 />
               ))}
@@ -385,7 +385,7 @@ export default function ParticipantEditor({ session, participant, publicToken })
             <button
               type="button"
               onClick={() => setShowOnboarding(false)}
-              className="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1.5 rounded-md"
+              className="text-xs font-semibold px-2.5 py-1.5 rounded-md onboarding-primary-btn"
             >
               {t('availability.tour.gotIt')}
             </button>
@@ -470,51 +470,51 @@ export default function ParticipantEditor({ session, participant, publicToken })
           <div className="lg:hidden mb-2 rounded-xl border border-gray-200 bg-gray-50/80 p-2">
             <div className={clsx(
               'rounded-lg transition-all',
-              showOnboarding && onboardingStep === 0 && 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-gray-50'
+              showOnboarding && onboardingStep === 0 && 'onboarding-focus'
             )}>
-            <p className="text-xs text-gray-500 px-1 mb-2">
-              {selectionMode
-                ? t('availability.grid.selectModeHint')
-                : t('availability.grid.scrollModeHint')}
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setSelectionMode(false)}
-                className={clsx(
-                  'inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-lg border px-2 text-xs font-semibold transition-colors',
-                  !selectionMode
-                    ? 'bg-indigo-600 text-white border-indigo-600'
-                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
-                )}
-              >
-                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
-                </svg>
-                {t('availability.grid.scrollGridButton')}
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectionMode(true)}
-                className={clsx(
-                  'inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-lg border px-2 text-xs font-semibold transition-colors',
-                  selectionMode
-                    ? 'bg-indigo-600 text-white border-indigo-600'
-                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
-                )}
-              >
-                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                {t('availability.grid.selectTimesButton')}
-              </button>
-            </div>
+              <p className="text-xs text-gray-500 px-1 mb-2">
+                {selectionMode
+                  ? t('availability.grid.selectModeHint')
+                  : t('availability.grid.scrollModeHint')}
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectionMode(false)}
+                  className={clsx(
+                    'inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-lg border px-2 text-xs font-semibold transition-colors',
+                    !selectionMode
+                      ? 'bg-indigo-600 text-white border-indigo-600'
+                      : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
+                  )}
+                >
+                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+                  </svg>
+                  {t('availability.grid.scrollGridButton')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectionMode(true)}
+                  className={clsx(
+                    'inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-lg border px-2 text-xs font-semibold transition-colors',
+                    selectionMode
+                      ? 'bg-indigo-600 text-white border-indigo-600'
+                      : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
+                  )}
+                >
+                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  {t('availability.grid.selectTimesButton')}
+                </button>
+              </div>
             </div>
           </div>
 
           <div className={clsx(
             'rounded-xl transition-all',
-            showOnboarding && onboardingStep === 1 && 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-gray-50'
+            showOnboarding && onboardingStep === 1 && 'onboarding-focus'
           )}>
             <AvailabilityGrid
               session={session}
@@ -533,7 +533,7 @@ export default function ParticipantEditor({ session, participant, publicToken })
       <div
         className={clsx(
           'fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white border-t border-gray-200 transition-shadow',
-          showOnboarding && onboardingStep === 2 && 'shadow-[0_-10px_28px_rgba(33,98,186,0.25)]'
+          showOnboarding && onboardingStep === 2 && 'onboarding-save-focus'
         )}
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
