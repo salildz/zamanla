@@ -8,6 +8,8 @@ import { generateSessionSlots, applyRulesToSlots } from '../../utils/slotUtils.j
 import { useSaveAvailability } from '../../hooks/useParticipant.js'
 import { useToast } from '../common/Toast.jsx'
 
+const MOBILE_ONBOARDING_KEY = 'zamanla_mobile_onboarding_v1_seen'
+
 export default function ParticipantEditor({ session, participant, publicToken }) {
   const { t } = useTranslation()
   const toast = useToast()
@@ -30,16 +32,72 @@ export default function ParticipantEditor({ session, participant, publicToken })
   const [rulesExpanded, setRulesExpanded] = useState(true)
   // Desktop keeps drag-select enabled; phones start in scroll mode for easier navigation.
   const [selectionMode, setSelectionMode] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [onboardingStep, setOnboardingStep] = useState(0)
   const [lastClearedState, setLastClearedState] = useState(null)
   const [showUndoClear, setShowUndoClear] = useState(false)
   const undoTimerRef = useRef(null)
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    if (window.matchMedia('(max-width: 1023px)').matches) {
-      setSelectionMode(false)
+    if (typeof window === 'undefined') return undefined
+
+    const mediaQuery = window.matchMedia('(max-width: 1023px)')
+    const syncMobileState = () => {
+      setIsMobile(mediaQuery.matches)
+      if (mediaQuery.matches) {
+        setSelectionMode(false)
+      }
     }
+
+    syncMobileState()
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', syncMobileState)
+      return () => mediaQuery.removeEventListener('change', syncMobileState)
+    }
+
+    if (typeof mediaQuery.addListener === 'function') {
+      mediaQuery.addListener(syncMobileState)
+      return () => mediaQuery.removeListener(syncMobileState)
+    }
+
+    return undefined
   }, [])
+
+  useEffect(() => {
+    if (!isMobile || typeof window === 'undefined') return
+
+    try {
+      const alreadySeen = window.localStorage.getItem(MOBILE_ONBOARDING_KEY) === '1'
+      if (alreadySeen) return
+
+      window.localStorage.setItem(MOBILE_ONBOARDING_KEY, '1')
+      setOnboardingStep(0)
+      setShowOnboarding(true)
+    } catch {
+      // Storage can fail in private mode; still show onboarding once per tab life.
+      setOnboardingStep(0)
+      setShowOnboarding(true)
+    }
+  }, [isMobile])
+
+  useEffect(() => {
+    if (!showOnboarding) return undefined
+
+    const stepTimer = window.setInterval(() => {
+      setOnboardingStep((current) => Math.min(current + 1, 2))
+    }, 5000)
+
+    const closeTimer = window.setTimeout(() => {
+      setShowOnboarding(false)
+    }, 15000)
+
+    return () => {
+      window.clearInterval(stepTimer)
+      window.clearTimeout(closeTimer)
+    }
+  }, [showOnboarding])
 
   useEffect(() => {
     return () => {
@@ -230,6 +288,21 @@ export default function ParticipantEditor({ session, participant, publicToken })
   }
 
   const availableCount = effectiveAvailability.size
+  const onboardingSteps = [
+    {
+      title: t('availability.tour.step1Title'),
+      description: t('availability.tour.step1Desc'),
+    },
+    {
+      title: t('availability.tour.step2Title'),
+      description: t('availability.tour.step2Desc'),
+    },
+    {
+      title: t('availability.tour.step3Title'),
+      description: t('availability.tour.step3Desc'),
+    },
+  ]
+  const currentOnboarding = onboardingSteps[onboardingStep] || onboardingSteps[0]
 
   return (
     // pb-20 on mobile so the sticky save bar doesn't obscure content
@@ -277,6 +350,48 @@ export default function ParticipantEditor({ session, participant, publicToken })
       <p className="text-sm text-gray-500">
         {t('availability.instructions')}
       </p>
+
+      {showOnboarding && isMobile && (
+        <div className="lg:hidden rounded-2xl border border-indigo-200 bg-indigo-50/90 px-4 py-3 shadow-sm reveal-fade">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[11px] uppercase tracking-wide font-semibold text-indigo-700 mb-1">
+                {t('availability.tour.title')}
+              </p>
+              <h3 className="text-sm font-semibold text-gray-900">{currentOnboarding.title}</h3>
+              <p className="text-xs text-gray-600 mt-1 leading-relaxed">{currentOnboarding.description}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowOnboarding(false)}
+              className="shrink-0 text-xs font-semibold text-indigo-700 hover:text-indigo-900"
+            >
+              {t('availability.tour.dismiss')}
+            </button>
+          </div>
+
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-1.5">
+              {onboardingSteps.map((_, idx) => (
+                <span
+                  key={idx}
+                  className={clsx(
+                    'h-1.5 rounded-full transition-all',
+                    idx <= onboardingStep ? 'w-5 bg-indigo-600' : 'w-2.5 bg-indigo-200'
+                  )}
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowOnboarding(false)}
+              className="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1.5 rounded-md"
+            >
+              {t('availability.tour.gotIt')}
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center gap-2 text-xs">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-gray-600">
@@ -353,6 +468,10 @@ export default function ParticipantEditor({ session, participant, publicToken })
         <div className="flex-1 min-w-0">
           {/* Mobile: explicit mode switcher */}
           <div className="lg:hidden mb-2 rounded-xl border border-gray-200 bg-gray-50/80 p-2">
+            <div className={clsx(
+              'rounded-lg transition-all',
+              showOnboarding && onboardingStep === 0 && 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-gray-50'
+            )}>
             <p className="text-xs text-gray-500 px-1 mb-2">
               {selectionMode
                 ? t('availability.grid.selectModeHint')
@@ -390,23 +509,32 @@ export default function ParticipantEditor({ session, participant, publicToken })
                 {t('availability.grid.selectTimesButton')}
               </button>
             </div>
+            </div>
           </div>
 
-          <AvailabilityGrid
-            session={session}
-            slots={allSlots}
-            availability={effectiveAvailability}
-            manualOverrides={manualOverrides}
-            onToggle={handleToggle}
-            onDragSelect={handleDragSelect}
-            selectionMode={selectionMode}
-          />
+          <div className={clsx(
+            'rounded-xl transition-all',
+            showOnboarding && onboardingStep === 1 && 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-gray-50'
+          )}>
+            <AvailabilityGrid
+              session={session}
+              slots={allSlots}
+              availability={effectiveAvailability}
+              manualOverrides={manualOverrides}
+              onToggle={handleToggle}
+              onDragSelect={handleDragSelect}
+              selectionMode={selectionMode}
+            />
+          </div>
         </div>
       </div>
 
       {/* Mobile sticky save bar — fixed at bottom of viewport */}
       <div
-        className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white border-t border-gray-200"
+        className={clsx(
+          'fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white border-t border-gray-200 transition-shadow',
+          showOnboarding && onboardingStep === 2 && 'shadow-[0_-10px_28px_rgba(33,98,186,0.25)]'
+        )}
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
         <div className="px-4 py-3 max-w-5xl mx-auto">

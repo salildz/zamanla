@@ -328,6 +328,17 @@
     "unsaved": "Kaydedilmedi",
     "unsavedLeaveWarning": "Kaydedilmemiş değişikliklerin var.",
     "instructions": "Müsait olduğun saatleri işaretlemek için dokun ya da sürükle. Haftalık kalıpları otomatik doldurmak için tekrarlayan kuralları kullan.",
+      "tour": {
+        "title": "Hızlı kullanım",
+        "step1Title": "Önce kaydır",
+        "step1Desc": "Yanlışlıkla seçim yapmamak için önce Tabloyu kaydır modunda gün ve saatlere göz at.",
+        "step2Title": "Sonra saat seç",
+        "step2Desc": "Zaman seç moduna geçip dokunarak veya sürükleyerek müsaitliğini işaretle.",
+        "step3Title": "Çıkmadan kaydet",
+        "step3Desc": "Kaydedilmedi uyarısını görüyorsan alttaki Kaydet butonuna bas.",
+        "dismiss": "Geç",
+        "gotIt": "Anladım"
+      },
     "toast": {
       "saved": "Müsaitlik kaydedildi!",
       "saveFailed": "Müsaitlik kaydedilemedi.",

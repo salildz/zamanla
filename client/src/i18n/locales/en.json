@@ -328,6 +328,17 @@
     "unsaved": "Unsaved",
     "unsavedLeaveWarning": "You have unsaved changes.",
     "instructions": "Tap or drag to mark your available times. Use recurring rules to auto-fill weekly patterns.",
+      "tour": {
+        "title": "Quick guide",
+        "step1Title": "Scroll first",
+        "step1Desc": "Use Scroll grid to move through days and hours without accidental edits.",
+        "step2Title": "Then mark times",
+        "step2Desc": "Switch to Select times and tap or drag to mark your availability quickly.",
+        "step3Title": "Save before leaving",
+        "step3Desc": "Use the bottom Save button whenever you see the unsaved indicator.",
+        "dismiss": "Skip",
+        "gotIt": "Got it"
+      },
     "toast": {
       "saved": "Availability saved!",
       "saveFailed": "Failed to save availability.",
