@@ -18,10 +18,8 @@ const GridCell = memo(function GridCell({
   manualStatus,
   isDragging,
   dragValue,
-  selectionMode,
   onMouseDown,
   onTouchStart,
-  onClick,
   onKeyDown,
 }) {
   const draggingAdd = isDragging && dragValue
@@ -34,13 +32,11 @@ const GridCell = memo(function GridCell({
       data-slot={slotStart || undefined}
       onMouseDown={onMouseDown}
       onTouchStart={onTouchStart}
-      onClick={onClick}
       onKeyDown={onKeyDown}
       tabIndex={slotStart ? 0 : -1}
       aria-pressed={slotStart ? isAvailable : undefined}
       className={clsx(
         'grid-cell border border-gray-100',
-        selectionMode && 'grid-cell-selecting',
         draggingAdd && 'grid-cell-dragging-add',
         draggingRemove && 'grid-cell-dragging-remove',
         !isDragging && isManualAvailable && 'grid-cell-manual',
@@ -60,7 +56,6 @@ export default function AvailabilityGrid({
   manualOverrides,
   onToggle,
   onDragSelect,
-  selectionMode = true,
 }) {
   const { t } = useTranslation()
   const [isDragging, setIsDragging] = useState(false)
@@ -74,13 +69,13 @@ export default function AvailabilityGrid({
   const onDragSelectRef = useRef(onDragSelect)
   const onToggleRef = useRef(onToggle)
   const availabilityRef = useRef(availability)
-  const selectionModeRef = useRef(selectionMode)
+  const longPressTimerRef = useRef(null)
+  const touchStartRef = useRef(null)
 
   // Keep refs in sync with latest props without re-creating callbacks
   useEffect(() => { onDragSelectRef.current = onDragSelect }, [onDragSelect])
   useEffect(() => { onToggleRef.current = onToggle }, [onToggle])
   useEffect(() => { availabilityRef.current = availability }, [availability])
-  useEffect(() => { selectionModeRef.current = selectionMode }, [selectionMode])
 
   const tz = session?.timezone || 'UTC'
 
@@ -114,6 +109,12 @@ export default function AvailabilityGrid({
     setDraggedSlots(new Set())
   }, [])
 
+  const clearLongPressTimer = useCallback(() => {
+    if (!longPressTimerRef.current) return
+    window.clearTimeout(longPressTimerRef.current)
+    longPressTimerRef.current = null
+  }, [])
+
   // Document-level move tracking — elementFromPoint is reliable at any speed
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -124,6 +125,24 @@ export default function AvailabilityGrid({
     }
 
     const handleTouchMove = (e) => {
+      // If the finger moved before long-press threshold, treat as scroll and cancel paint mode start.
+      if (!isDraggingRef.current && longPressTimerRef.current && touchStartRef.current) {
+        if (e.touches.length !== 1) {
+          clearLongPressTimer()
+          touchStartRef.current = null
+          return
+        }
+
+        const touch = e.touches[0]
+        const dx = Math.abs(touch.clientX - touchStartRef.current.x)
+        const dy = Math.abs(touch.clientY - touchStartRef.current.y)
+        if (dx + dy > 10) {
+          clearLongPressTimer()
+          touchStartRef.current = null
+        }
+        return
+      }
+
       if (!isDraggingRef.current) return
       e.preventDefault()
       const touch = e.touches[0]
@@ -133,18 +152,40 @@ export default function AvailabilityGrid({
       if (slotStart) addSlotToDrag(slotStart)
     }
 
+    const handleTouchEnd = () => {
+      // Short tap: toggle one slot.
+      if (longPressTimerRef.current && !isDraggingRef.current) {
+        clearLongPressTimer()
+        const slotStart = touchStartRef.current?.slotStart
+        if (slotStart) {
+          onToggleRef.current(slotStart)
+        }
+      }
+
+      touchStartRef.current = null
+      endDrag()
+    }
+
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('touchmove', handleTouchMove, { passive: false })
     document.addEventListener('mouseup', endDrag)
-    document.addEventListener('touchend', endDrag)
+    document.addEventListener('touchend', handleTouchEnd)
+    document.addEventListener('touchcancel', handleTouchEnd)
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('touchmove', handleTouchMove)
       document.removeEventListener('mouseup', endDrag)
-      document.removeEventListener('touchend', endDrag)
+      document.removeEventListener('touchend', handleTouchEnd)
+      document.removeEventListener('touchcancel', handleTouchEnd)
     }
-  }, [addSlotToDrag, endDrag])
+  }, [addSlotToDrag, clearLongPressTimer, endDrag])
+
+  useEffect(() => {
+    return () => {
+      clearLongPressTimer()
+    }
+  }, [clearLongPressTimer])
 
   // Stable handlers — read slotStart from data-slot attribute, availability from ref.
   // This means GridCell memoization is never defeated by prop churn.
@@ -164,27 +205,34 @@ export default function AvailabilityGrid({
   }, [])
 
   const handleTouchStart = useCallback((e) => {
-    if (!selectionModeRef.current) return
-    const slotStart = e.currentTarget.dataset.slot
-    if (!slotStart) return
-    e.preventDefault()
-    const newValue = !availabilityRef.current.has(slotStart)
-    isDraggingRef.current = true
-    dragValueRef.current = newValue
-    draggedSlotsRef.current = new Set([slotStart])
-    setIsDragging(true)
-    setDragValue(newValue)
-    setDraggedSlots(new Set([slotStart]))
-    onToggleRef.current(slotStart)
-  }, [])
+    if (e.touches.length !== 1) return
 
-  const handleClick = useCallback((e) => {
-    // In scroll mode, a simple tap should still toggle a slot.
-    if (selectionModeRef.current) return
     const slotStart = e.currentTarget.dataset.slot
     if (!slotStart) return
-    onToggleRef.current(slotStart)
-  }, [])
+
+    const touch = e.touches[0]
+    touchStartRef.current = {
+      slotStart,
+      x: touch.clientX,
+      y: touch.clientY,
+    }
+
+    clearLongPressTimer()
+    longPressTimerRef.current = window.setTimeout(() => {
+      const startSlot = touchStartRef.current?.slotStart || slotStart
+      if (!startSlot) return
+
+      const newValue = !availabilityRef.current.has(startSlot)
+      isDraggingRef.current = true
+      dragValueRef.current = newValue
+      draggedSlotsRef.current = new Set([startSlot])
+      setIsDragging(true)
+      setDragValue(newValue)
+      setDraggedSlots(new Set([startSlot]))
+      onToggleRef.current(startSlot)
+      longPressTimerRef.current = null
+    }, 180)
+  }, [clearLongPressTimer])
 
   const handleKeyDown = useCallback((e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return
@@ -267,10 +315,8 @@ export default function AvailabilityGrid({
                       manualStatus={manualStatus}
                       isDragging={draggingThisSlot}
                       dragValue={dragValue}
-                      selectionMode={selectionMode}
                       onMouseDown={handleMouseDown}
                       onTouchStart={handleTouchStart}
-                      onClick={handleClick}
                       onKeyDown={handleKeyDown}
                     />
                   )

@@ -30,8 +30,6 @@ export default function ParticipantEditor({ session, participant, publicToken })
   })
   const [isDirty, setIsDirty] = useState(false)
   const [rulesExpanded, setRulesExpanded] = useState(true)
-  // Desktop keeps drag-select enabled; phones start in scroll mode for easier navigation.
-  const [selectionMode, setSelectionMode] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [onboardingStep, setOnboardingStep] = useState(0)
@@ -45,9 +43,6 @@ export default function ParticipantEditor({ session, participant, publicToken })
     const mediaQuery = window.matchMedia('(max-width: 1023px)')
     const syncMobileState = () => {
       setIsMobile(mediaQuery.matches)
-      if (mediaQuery.matches) {
-        setSelectionMode(false)
-      }
     }
 
     syncMobileState()
@@ -81,6 +76,11 @@ export default function ParticipantEditor({ session, participant, publicToken })
       setShowOnboarding(true)
     }
   }, [isMobile])
+
+  const openOnboarding = useCallback(() => {
+    setOnboardingStep(0)
+    setShowOnboarding(true)
+  }, [])
 
   useEffect(() => {
     if (!showOnboarding) return undefined
@@ -347,9 +347,24 @@ export default function ParticipantEditor({ session, participant, publicToken })
       </div>
 
       {/* Instructions */}
-      <p className="text-sm text-gray-500">
-        {t('availability.instructions')}
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-sm text-gray-500">
+          {t('availability.instructions')}
+        </p>
+        {isMobile && (
+          <button
+            type="button"
+            onClick={openOnboarding}
+            aria-label={t('availability.tour.helpAria')}
+            title={t('availability.tour.helpAria')}
+            className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9a3.75 3.75 0 117.489 0c0 1.379-.935 2.215-2.033 2.928-.96.624-1.717 1.275-1.717 2.322v.25M12 17.5h.01" />
+            </svg>
+          </button>
+        )}
+      </div>
 
       {showOnboarding && isMobile && (
         <div className="lg:hidden rounded-2xl border px-4 py-3 shadow-sm reveal-fade onboarding-panel">
@@ -466,55 +481,9 @@ export default function ParticipantEditor({ session, participant, publicToken })
 
         {/* Availability Grid */}
         <div className="flex-1 min-w-0">
-          {/* Mobile: explicit mode switcher */}
-          <div className="lg:hidden mb-2 rounded-xl border border-gray-200 bg-gray-50/80 p-2">
-            <div className={clsx(
-              'rounded-lg transition-all',
-              showOnboarding && onboardingStep === 0 && 'onboarding-focus'
-            )}>
-              <p className="text-xs text-gray-500 px-1 mb-2">
-                {selectionMode
-                  ? t('availability.grid.selectModeHint')
-                  : t('availability.grid.scrollModeHint')}
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectionMode(false)}
-                  className={clsx(
-                    'inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-lg border px-2 text-xs font-semibold transition-colors',
-                    !selectionMode
-                      ? 'bg-indigo-600 text-white border-indigo-600'
-                      : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
-                  )}
-                >
-                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
-                  </svg>
-                  {t('availability.grid.scrollGridButton')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectionMode(true)}
-                  className={clsx(
-                    'inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-lg border px-2 text-xs font-semibold transition-colors',
-                    selectionMode
-                      ? 'bg-indigo-600 text-white border-indigo-600'
-                      : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
-                  )}
-                >
-                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  {t('availability.grid.selectTimesButton')}
-                </button>
-              </div>
-            </div>
-          </div>
-
           <div className={clsx(
             'rounded-xl transition-all',
-            showOnboarding && onboardingStep === 1 && 'onboarding-focus'
+            showOnboarding && onboardingStep < 2 && 'onboarding-focus'
           )}>
             <AvailabilityGrid
               session={session}
@@ -523,7 +492,6 @@ export default function ParticipantEditor({ session, participant, publicToken })
               manualOverrides={manualOverrides}
               onToggle={handleToggle}
               onDragSelect={handleDragSelect}
-              selectionMode={selectionMode}
             />
           </div>
         </div>

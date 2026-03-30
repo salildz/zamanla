@@ -330,14 +330,15 @@
     "instructions": "Müsait olduğun saatleri işaretlemek için dokun ya da sürükle. Haftalık kalıpları otomatik doldurmak için tekrarlayan kuralları kullan.",
       "tour": {
         "title": "Hızlı kullanım",
-        "step1Title": "Önce kaydır",
-        "step1Desc": "Yanlışlıkla seçim yapmamak için önce Tabloyu kaydır modunda gün ve saatlere göz at.",
-        "step2Title": "Sonra saat seç",
-        "step2Desc": "Zaman seç moduna geçip dokunarak veya sürükleyerek müsaitliğini işaretle.",
-        "step3Title": "Çıkmadan kaydet",
-        "step3Desc": "Kaydedilmedi uyarısını görüyorsan alttaki Kaydet butonuna bas.",
+        "step1Title": "Doğal şekilde kaydır",
+        "step1Desc": "Tek parmakla tabloda gezerek istediğin gün ve saate git.",
+        "step2Title": "Dokunarak aç/kapat",
+        "step2Desc": "Bir hücreye bir kez dokunarak müsait yap, tekrar dokunarak geri al.",
+        "step3Title": "Uzun bas-sürükle + kaydet",
+        "step3Desc": "Hızlı çoklu seçim için uzun basıp sürükle, sonra alttan Kaydet'e bas.",
         "dismiss": "Geç",
-        "gotIt": "Anladım"
+        "gotIt": "Anladım",
+        "helpAria": "Hızlı kullanım rehberini aç"
       },
     "toast": {
       "saved": "Müsaitlik kaydedildi!",

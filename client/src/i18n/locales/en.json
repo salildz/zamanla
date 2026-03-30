@@ -330,14 +330,15 @@
     "instructions": "Tap or drag to mark your available times. Use recurring rules to auto-fill weekly patterns.",
       "tour": {
         "title": "Quick guide",
-        "step1Title": "Scroll first",
-        "step1Desc": "Use Scroll grid to move through days and hours without accidental edits.",
-        "step2Title": "Then mark times",
-        "step2Desc": "Switch to Select times and tap or drag to mark your availability quickly.",
-        "step3Title": "Save before leaving",
-        "step3Desc": "Use the bottom Save button whenever you see the unsaved indicator.",
+        "step1Title": "Scroll naturally",
+        "step1Desc": "Move around the table with one finger to find the day and hour you want.",
+        "step2Title": "Tap to toggle",
+        "step2Desc": "Tap any slot once to mark available, tap again to remove.",
+        "step3Title": "Long press to paint + save",
+        "step3Desc": "Long press and drag for fast multi-select, then use the bottom Save button.",
         "dismiss": "Skip",
-        "gotIt": "Got it"
+        "gotIt": "Got it",
+        "helpAria": "Open quick usage guide"
       },
     "toast": {
       "saved": "Availability saved!",
