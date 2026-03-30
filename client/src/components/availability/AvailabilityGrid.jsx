@@ -9,6 +9,11 @@ import {
   formatSlotTime,
 } from '../../utils/slotUtils.js'
 
+const LONG_PRESS_DELAY_MS = 240
+const TAP_MOVE_THRESHOLD_PX = 14
+const TAP_MAX_DURATION_MS = 420
+const IGNORE_MOUSE_AFTER_TOUCH_MS = 700
+
 // A single grid cell — memoized to prevent re-renders during drag.
 // Handlers are passed as stable refs so memo is not defeated.
 const GridCell = memo(function GridCell({
@@ -71,6 +76,7 @@ export default function AvailabilityGrid({
   const availabilityRef = useRef(availability)
   const longPressTimerRef = useRef(null)
   const touchStartRef = useRef(null)
+  const lastTouchInteractionRef = useRef(0)
 
   // Keep refs in sync with latest props without re-creating callbacks
   useEffect(() => { onDragSelectRef.current = onDragSelect }, [onDragSelect])
@@ -136,9 +142,12 @@ export default function AvailabilityGrid({
         const touch = e.touches[0]
         const dx = Math.abs(touch.clientX - touchStartRef.current.x)
         const dy = Math.abs(touch.clientY - touchStartRef.current.y)
-        if (dx + dy > 10) {
+        if (Math.max(dx, dy) > TAP_MOVE_THRESHOLD_PX) {
           clearLongPressTimer()
-          touchStartRef.current = null
+          touchStartRef.current = {
+            ...touchStartRef.current,
+            cancelTap: true,
+          }
         }
         return
       }
@@ -153,12 +162,18 @@ export default function AvailabilityGrid({
     }
 
     const handleTouchEnd = () => {
-      // Short tap: toggle one slot.
-      if (longPressTimerRef.current && !isDraggingRef.current) {
+      lastTouchInteractionRef.current = Date.now()
+      const touchStart = touchStartRef.current
+
+      // Short tap: toggle one slot if the interaction stayed within tap limits.
+      if (!isDraggingRef.current) {
         clearLongPressTimer()
-        const slotStart = touchStartRef.current?.slotStart
-        if (slotStart) {
-          onToggleRef.current(slotStart)
+
+        if (touchStart && !touchStart.cancelTap) {
+          const duration = Date.now() - touchStart.startedAt
+          if (duration <= TAP_MAX_DURATION_MS) {
+            onToggleRef.current(touchStart.slotStart)
+          }
         }
       }
 
@@ -191,6 +206,7 @@ export default function AvailabilityGrid({
   // This means GridCell memoization is never defeated by prop churn.
   const handleMouseDown = useCallback((e) => {
     if (e.button !== 0) return
+    if (Date.now() - lastTouchInteractionRef.current < IGNORE_MOUSE_AFTER_TOUCH_MS) return
     const slotStart = e.currentTarget.dataset.slot
     if (!slotStart) return
     e.preventDefault()
@@ -210,11 +226,15 @@ export default function AvailabilityGrid({
     const slotStart = e.currentTarget.dataset.slot
     if (!slotStart) return
 
+    lastTouchInteractionRef.current = Date.now()
+
     const touch = e.touches[0]
     touchStartRef.current = {
       slotStart,
       x: touch.clientX,
       y: touch.clientY,
+      startedAt: Date.now(),
+      cancelTap: false,
     }
 
     clearLongPressTimer()
@@ -231,7 +251,7 @@ export default function AvailabilityGrid({
       setDraggedSlots(new Set([startSlot]))
       onToggleRef.current(startSlot)
       longPressTimerRef.current = null
-    }, 180)
+    }, LONG_PRESS_DELAY_MS)
   }, [clearLongPressTimer])
 
   const handleKeyDown = useCallback((e) => {

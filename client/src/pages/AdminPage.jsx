@@ -504,7 +504,7 @@ function AdminContent({ session, adminToken }) {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white/85 backdrop-blur-xl border-b border-gray-100 sticky top-14 z-30">
+      <div className="tab-rail sticky top-14 z-30">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-3 gap-2 py-1">
             {tabs.map((tab) => (
