@@ -12,7 +12,7 @@ export default function LoadingSpinner({ size = 'md', className, label = 'Loadin
     <div className={clsx('flex flex-col items-center justify-center gap-3', className)} role="status">
       <div
         className={clsx(
-          'animate-spin rounded-full border-t-indigo-600 border-indigo-200',
+          'animate-spin rounded-full border-t-indigo-500 border-gray-300',
           sizes[size]
         )}
         style={{ borderStyle: 'solid' }}

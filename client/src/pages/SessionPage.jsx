@@ -13,6 +13,7 @@ import {
   getStoredEditToken,
   clearStoredEditToken,
 } from '../hooks/useParticipant.js'
+import { useCurrentUser } from '../hooks/useAuth.js'
 import { generateSessionSlots } from '../utils/slotUtils.js'
 import ParticipantEditor from '../components/availability/ParticipantEditor.jsx'
 import ResultsHeatmap from '../components/results/ResultsHeatmap.jsx'
@@ -25,8 +26,10 @@ import Badge from '../components/common/Badge.jsx'
 import TurnstileWidget, { isTurnstileEnabled } from '../components/common/TurnstileWidget.jsx'
 import { ToastProvider } from '../components/common/Toast.jsx'
 import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
+import ThemeSwitcher from '../components/common/ThemeSwitcher.jsx'
 import { formatDateRange } from '../utils/slotUtils.js'
 import { useJoinSessionSchema } from '../hooks/useSchemas.js'
+import { getStoredProfileName, setStoredProfileName } from '../utils/profileNameStorage.js'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -86,25 +89,89 @@ function ClosedBadgeLabel() {
 function JoinForm({ publicToken, session, onJoin }) {
   const { t } = useTranslation()
   const [turnstileToken, setTurnstileToken] = useState(null)
+  const [rememberedName, setRememberedName] = useState('')
+  const [isEditingRememberedName, setIsEditingRememberedName] = useState(true)
+  const [saveNoticeVisible, setSaveNoticeVisible] = useState(false)
+  const { data: currentUser } = useCurrentUser()
+  const userId = currentUser?.id ?? null
   const joinMutation = useJoinSession(publicToken)
   const joinSchema = useJoinSessionSchema()
 
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(joinSchema) })
+  } = useForm({
+    resolver: zodResolver(joinSchema),
+    defaultValues: {
+      name: '',
+    },
+  })
+
+  const watchedName = watch('name')
+  const normalizedName = typeof watchedName === 'string' ? watchedName.trim() : ''
+  const showNameInput = !userId || isEditingRememberedName || !rememberedName
+
+  useEffect(() => {
+    if (!userId) {
+      setRememberedName('')
+      setIsEditingRememberedName(true)
+      return
+    }
+
+    const storedName = getStoredProfileName(userId)
+    setRememberedName(storedName)
+
+    if (storedName) {
+      setValue('name', storedName, { shouldDirty: false, shouldValidate: true })
+      setIsEditingRememberedName(false)
+      return
+    }
+
+    setValue('name', '', { shouldDirty: false, shouldValidate: false })
+    setIsEditingRememberedName(true)
+  }, [userId, setValue])
+
+  useEffect(() => {
+    if (!saveNoticeVisible) return undefined
+
+    const timeoutId = window.setTimeout(() => {
+      setSaveNoticeVisible(false)
+    }, 1800)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [saveNoticeVisible])
+
+  const handleSaveRememberedName = () => {
+    if (!userId || !normalizedName) return
+
+    setStoredProfileName(userId, normalizedName)
+    setRememberedName(normalizedName)
+    setIsEditingRememberedName(false)
+    setSaveNoticeVisible(true)
+  }
 
   const onSubmit = (values) => {
     if (isTurnstileEnabled() && !turnstileToken) return
+
+    const submittedName = values.name.trim()
+
     joinMutation.mutate(
       {
-        name: values.name,
-        ...(isTurnstileEnabled() && turnstileToken ? { turnstileToken } : {}),
+        name: submittedName,
+        ...(isTurnstileEnabled() && turnstileToken ? { cfTurnstileResponse: turnstileToken } : {}),
       },
       {
         // Per-call onSuccess: notify the parent so it can update editToken state
         onSuccess: (participant) => {
+          if (userId && submittedName) {
+            setStoredProfileName(userId, submittedName)
+            setRememberedName(submittedName)
+            setIsEditingRememberedName(false)
+          }
+
           onJoin?.(participant.editToken)
         },
       }
@@ -113,7 +180,7 @@ function JoinForm({ publicToken, session, onJoin }) {
 
   if (session.isClosed) {
     return (
-      <div className="text-center py-10">
+      <div className="text-center py-10 reveal-up">
         <div className="inline-flex items-center justify-center w-14 h-14 bg-red-50 rounded-full mb-4">
           <svg className="w-7 h-7 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -127,7 +194,7 @@ function JoinForm({ publicToken, session, onJoin }) {
 
   return (
     <div className="max-w-sm mx-auto py-6 sm:py-10 px-4 sm:px-0">
-      <div className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 shadow-sm">
+      <div className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 shadow-sm reveal-up" style={{ '--reveal-delay': '40ms' }}>
         <div className="text-center mb-5 sm:mb-6">
           <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-50 rounded-full mb-3">
             <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -138,17 +205,61 @@ function JoinForm({ publicToken, session, onJoin }) {
           <p className="text-sm text-gray-500 mt-1">
             {t('session.join.subtitle', { title: session.title })}
           </p>
+          {currentUser?.email && (
+            <p className="text-xs text-gray-500 mt-2 rounded-lg border border-indigo-200 bg-indigo-50/80 px-3 py-2 text-left">
+              {t('session.join.authHint', { email: currentUser.email })}
+            </p>
+          )}
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
-          <Input
-            label={t('session.join.nameLabel')}
-            required
-            placeholder={t('session.join.namePlaceholder')}
-            error={errors.name?.message}
-            autoFocus
-            {...register('name')}
-          />
+          {currentUser && rememberedName && !isEditingRememberedName && (
+            <div className="rounded-lg border border-indigo-200 bg-indigo-50/80 px-3 py-2 flex items-center justify-between gap-3">
+              <p className="text-sm text-gray-700 truncate">
+                {t('session.join.rememberedAs', { name: rememberedName })}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditingRememberedName(true)
+                  setValue('name', rememberedName, { shouldDirty: false, shouldValidate: true })
+                }}
+                className="shrink-0 text-xs font-semibold text-indigo-700 hover:text-indigo-900"
+              >
+                {t('session.join.editRememberedName')}
+              </button>
+            </div>
+          )}
+
+          {showNameInput ? (
+            <Input
+              label={t('session.join.nameLabel')}
+              required
+              placeholder={t('session.join.namePlaceholder')}
+              error={errors.name?.message}
+              autoFocus
+              {...register('name')}
+            />
+          ) : (
+            <input type="hidden" {...register('name')} />
+          )}
+
+          {currentUser && showNameInput && (
+            <div className="flex justify-end -mt-1">
+              <button
+                type="button"
+                onClick={handleSaveRememberedName}
+                disabled={!normalizedName}
+                className="text-xs font-semibold text-indigo-700 hover:text-indigo-900 disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
+                {t('session.join.saveRememberedName')}
+              </button>
+            </div>
+          )}
+
+          {saveNoticeVisible && (
+            <p className="text-xs text-emerald-700 -mt-2">{t('session.join.saveSuccess')}</p>
+          )}
 
           {isTurnstileEnabled() && (
             <TurnstileWidget
@@ -366,7 +477,7 @@ export default function SessionPage() {
     <ToastProvider>
       <div className="min-h-screen bg-gray-50">
         {/* Nav */}
-        <nav className="border-b border-gray-100 bg-white sticky top-0 z-40">
+        <nav className="border-b border-gray-100 bg-white/85 backdrop-blur-xl sticky top-0 z-40">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
               <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
@@ -377,7 +488,10 @@ export default function SessionPage() {
               </div>
               <span className="font-bold text-gray-900 text-lg">Zamanla</span>
             </Link>
-            <LanguageSwitcher />
+            <div className="flex items-center gap-2">
+              <ThemeSwitcher compact />
+              <LanguageSwitcher />
+            </div>
           </div>
         </nav>
 
@@ -385,7 +499,7 @@ export default function SessionPage() {
         <SessionHeader session={session} />
 
         {/* Tabs */}
-        <div className="bg-white border-b border-gray-100 sticky top-14 z-30">
+        <div className="bg-white/85 backdrop-blur-xl border-b border-gray-100 sticky top-14 z-30">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-2 gap-2 py-1">
               {tabItems.map((tab) => (

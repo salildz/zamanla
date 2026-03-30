@@ -2,6 +2,14 @@
 
 const { z } = require('zod');
 
+function normalizeOptionalToken(value) {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
+const turnstileTokenSchema = z.preprocess(normalizeOptionalToken, z.string().optional());
+
 const ruleSchema = z.object({
   weekdays: z
     .array(z.number().int().min(0).max(6))
@@ -27,8 +35,13 @@ const slotOverrideSchema = z.object({
 
 const createParticipantSchema = z.object({
   name: z.string().min(1, 'Name is required').max(255, 'Name too long'),
-  cfTurnstileResponse: z.string().optional(),
-});
+  cfTurnstileResponse: turnstileTokenSchema,
+  // Backward compatibility: older clients may still send turnstileToken.
+  turnstileToken: turnstileTokenSchema,
+}).transform(({ turnstileToken, cfTurnstileResponse, ...rest }) => ({
+  ...rest,
+  cfTurnstileResponse: cfTurnstileResponse || turnstileToken,
+}));
 
 const updateParticipantSchema = z.object({
   name: z.string().min(1).max(255).optional(),

@@ -7,7 +7,7 @@ export default function ErrorMessage({ title, message, onRetry, className }) {
   return (
     <div
       className={clsx(
-        'rounded-lg border border-red-200 bg-red-50 p-4 flex gap-3',
+        'rounded-xl border border-red-300 bg-red-50/70 backdrop-blur-sm p-4 flex gap-3',
         className
       )}
       role="alert"

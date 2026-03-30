@@ -104,7 +104,7 @@ export default function TimezoneCombobox({ value, onChange, error, label, requir
         onClick={() => (isOpen ? close() : open())}
         onKeyDown={handleTriggerKeyDown}
         className={clsx(
-          'w-full flex items-center gap-2 rounded-md border bg-white text-sm px-3 py-2.5 text-left transition-colors focus:outline-none focus:ring-2',
+          'w-full flex items-center gap-2 rounded-md border bg-gray-50 text-sm px-3 py-2.5 text-left transition-colors backdrop-blur-sm focus:outline-none focus:ring-2',
           error ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-indigo-500'
         )}
       >
@@ -152,7 +152,7 @@ export default function TimezoneCombobox({ value, onChange, error, label, requir
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+        <div className="absolute z-50 mt-1 w-full bg-gray-50 border border-gray-200 rounded-lg shadow-lg overflow-hidden backdrop-blur-xl">
           {/* Search input */}
           <div className="p-2 border-b border-gray-100">
             <input
@@ -166,7 +166,7 @@ export default function TimezoneCombobox({ value, onChange, error, label, requir
               }}
               onKeyDown={handleSearchKeyDown}
               placeholder={t('create.timezoneSearch')}
-              className="w-full text-sm px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-gray-400"
+              className="w-full text-sm px-3 py-2 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-gray-400"
             />
           </div>
 

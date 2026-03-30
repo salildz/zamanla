@@ -21,13 +21,13 @@ const Select = forwardRef(function Select(
           ref={ref}
           id={selectId}
           className={clsx(
-            'w-full rounded-md border text-sm transition-colors appearance-none',
+            'w-full rounded-md border text-sm transition-colors appearance-none backdrop-blur-sm',
             'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
             'pl-3 pr-8 py-2',
             error
-              ? 'border-red-400 bg-red-50 focus:ring-red-400'
-              : 'border-gray-300 bg-white hover:border-gray-400',
-            'disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed',
+              ? 'border-red-400 bg-red-50/70 focus:ring-red-400'
+              : 'border-gray-300 bg-gray-50 hover:border-gray-400',
+            'disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed',
             className
           )}
           {...props}

@@ -1,11 +1,11 @@
 import clsx from 'clsx'
 
 const variants = {
-  primary: 'bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 focus-visible:ring-indigo-500 disabled:bg-indigo-300',
-  secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100 focus-visible:ring-gray-400 disabled:bg-gray-50 disabled:text-gray-400',
-  danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus-visible:ring-red-500 disabled:bg-red-300',
-  ghost: 'bg-transparent text-gray-600 hover:bg-gray-100 active:bg-gray-200 focus-visible:ring-gray-400 disabled:text-gray-300',
-  success: 'bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 focus-visible:ring-emerald-500 disabled:bg-emerald-300',
+  primary: 'bg-indigo-600 text-white border border-indigo-300 hover:bg-indigo-700 active:bg-indigo-800 focus-visible:ring-indigo-500 disabled:opacity-60',
+  secondary: 'bg-gray-100 text-gray-100 border border-gray-300 hover:bg-gray-200 active:bg-gray-300 focus-visible:ring-gray-400 disabled:opacity-60',
+  danger: 'bg-red-600 text-white border border-red-500 hover:bg-red-700 active:bg-red-800 focus-visible:ring-red-500 disabled:opacity-60',
+  ghost: 'bg-transparent text-gray-300 hover:bg-gray-100 active:bg-gray-200 focus-visible:ring-gray-400 disabled:text-gray-400',
+  success: 'bg-emerald-600 text-white border border-emerald-500 hover:bg-emerald-700 active:bg-emerald-800 focus-visible:ring-emerald-500 disabled:opacity-60',
 }
 
 const sizes = {
@@ -34,9 +34,9 @@ export default function Button({
       type={type}
       disabled={disabled || loading}
       className={clsx(
-        'inline-flex items-center justify-center gap-2 font-medium transition-colors',
+        'inline-flex items-center justify-center gap-2 font-medium transition-all',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-        'disabled:cursor-not-allowed',
+        'disabled:cursor-not-allowed backdrop-blur-sm',
         variants[variant],
         sizes[size],
         fullWidth && 'w-full',

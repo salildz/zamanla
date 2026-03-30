@@ -2,6 +2,12 @@
 
 const { z } = require('zod');
 
+function normalizeOptionalToken(value) {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
 // Common IANA timezone check (basic validation)
 const timezoneSchema = z
   .string()
@@ -24,6 +30,8 @@ const dateSchema = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format');
 
+const turnstileTokenSchema = z.preprocess(normalizeOptionalToken, z.string().optional());
+
 const createSessionSchema = z.object({
   title: z.string().min(1, 'Title is required').max(255, 'Title too long'),
   description: z.string().max(5000, 'Description too long').optional().nullable(),
@@ -34,8 +42,13 @@ const createSessionSchema = z.object({
   dayStartTime: timeSchema.default('08:00'),
   dayEndTime: timeSchema.default('22:00'),
   includeWeekends: z.boolean().default(true),
-  cfTurnstileResponse: z.string().optional(),
-}).refine(
+  cfTurnstileResponse: turnstileTokenSchema,
+  // Backward compatibility: older clients may still send turnstileToken.
+  turnstileToken: turnstileTokenSchema,
+}).transform(({ turnstileToken, cfTurnstileResponse, ...rest }) => ({
+  ...rest,
+  cfTurnstileResponse: cfTurnstileResponse || turnstileToken,
+})).refine(
   (data) => data.dateStart <= data.dateEnd,
   { message: 'dateEnd must be on or after dateStart', path: ['dateEnd'] }
 ).refine(

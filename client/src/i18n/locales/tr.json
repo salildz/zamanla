@@ -20,6 +20,15 @@
     "newSessionPage": "Yeni Oturum",
     "mySchedules": "Planlarım"
   },
+  "theme": {
+    "light": "Açık",
+    "dark": "Koyu",
+    "system": "Sistem",
+    "current": {
+      "light": "açık tema",
+      "dark": "koyu tema"
+    }
+  },
   "home": {
     "badge": "Ücretsiz · Hesap gerektirmez",
     "heroTitle": "Herkese uygun",
@@ -129,8 +138,13 @@
     "join": {
       "title": "Adını gir",
       "subtitle": "{{title}} için müsaitliğini paylaş",
+      "authHint": "{{email}} ile giriş yaptın. İsmin sonraki katılımlarda hatırlanır.",
       "nameLabel": "Adın",
       "namePlaceholder": "örn. Ayşe",
+      "rememberedAs": "Kayıtlı isim: {{name}}",
+      "editRememberedName": "Düzenle",
+      "saveRememberedName": "İsmi kaydet",
+      "saveSuccess": "İsim sonraki katılımlar için kaydedildi.",
       "submitButton": "Müsaitliğe Devam Et",
       "submittingButton": "Katılınıyor...",
       "errorGeneric": "Katılım başarısız. Lütfen tekrar dene."

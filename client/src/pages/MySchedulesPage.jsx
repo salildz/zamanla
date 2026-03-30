@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import Button from '../components/common/Button.jsx'
 import Badge from '../components/common/Badge.jsx'
 import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
+import ThemeSwitcher from '../components/common/ThemeSwitcher.jsx'
 import { PageLoader } from '../components/common/LoadingSpinner.jsx'
 import ErrorMessage from '../components/common/ErrorMessage.jsx'
 import { useApiError } from '../hooks/useApiError.js'
@@ -13,7 +14,7 @@ import { formatDateRange } from '../utils/slotUtils.js'
 function EmptyState() {
   const { t } = useTranslation()
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
+    <div className="surface-card border border-gray-200 rounded-2xl p-8 text-center">
       <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-100 text-indigo-700 mb-3">
         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -32,7 +33,7 @@ function LoginPrompt() {
   const { t } = useTranslation()
   return (
     <div className="max-w-md mx-auto">
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 text-center">
+      <div className="surface-card border border-gray-200 rounded-2xl p-6 text-center">
         <h1 className="text-xl font-bold text-gray-900 mb-2">{t('dashboard.loginRequired.title')}</h1>
         <p className="text-sm text-gray-500 mb-5">{t('dashboard.loginRequired.subtitle')}</p>
         <div className="flex flex-col sm:flex-row gap-2 justify-center">
@@ -78,7 +79,7 @@ export default function MySchedulesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="border-b border-gray-100 bg-white sticky top-0 z-40">
+      <nav className="border-b border-gray-100 bg-white/85 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <Link to="/" className="flex items-center gap-2 shrink-0">
@@ -95,6 +96,7 @@ export default function MySchedulesPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            <ThemeSwitcher compact />
             <LanguageSwitcher />
             {user && (
               <Button
@@ -128,13 +130,13 @@ export default function MySchedulesPage() {
             </div>
 
             {isLoading && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <div className="surface-card border border-gray-200 rounded-xl p-6">
                 <div className="text-sm text-gray-500">{t('dashboard.loadingSchedules')}</div>
               </div>
             )}
 
             {isError && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <div className="surface-card border border-gray-200 rounded-xl p-6">
                 <ErrorMessage
                   title={t('dashboard.loadErrorTitle')}
                   message={errorMessage}
@@ -148,7 +150,7 @@ export default function MySchedulesPage() {
             {!isLoading && !isError && sessions?.length > 0 && (
               <div className="grid grid-cols-1 gap-3">
                 {sessions.map((session) => (
-                  <article key={session.id} className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
+                  <article key={session.id} className="surface-card border border-gray-200 rounded-xl p-4 sm:p-5">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-1">

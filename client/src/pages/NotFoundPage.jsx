@@ -9,7 +9,7 @@ export default function NotFoundPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Nav */}
-      <nav className="border-b border-gray-100 bg-white">
+      <nav className="border-b border-gray-100 bg-white/85 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
@@ -30,7 +30,7 @@ export default function NotFoundPage() {
           <div className="relative mb-8">
             <div className="text-8xl font-extrabold text-gray-100 select-none">404</div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center shadow-lg">
                 <svg
                   className="w-8 h-8 text-indigo-500"
                   fill="none"

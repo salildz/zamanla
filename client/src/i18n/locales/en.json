@@ -20,6 +20,15 @@
     "newSessionPage": "New Session",
     "mySchedules": "My Schedules"
   },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "current": {
+      "light": "light mode",
+      "dark": "dark mode"
+    }
+  },
   "home": {
     "badge": "Free to use · No account required",
     "heroTitle": "Find the best time",
@@ -129,8 +138,13 @@
     "join": {
       "title": "Enter your name",
       "subtitle": "To share your availability for {{title}}",
+      "authHint": "Signed in as {{email}}. Your name is remembered for your next joins.",
       "nameLabel": "Your Name",
       "namePlaceholder": "e.g. Alice",
+      "rememberedAs": "Saved name: {{name}}",
+      "editRememberedName": "Edit",
+      "saveRememberedName": "Save name",
+      "saveSuccess": "Name saved for next time.",
       "submitButton": "Continue to Availability",
       "submittingButton": "Joining...",
       "errorGeneric": "Failed to join. Please try again."

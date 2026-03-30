@@ -1,13 +1,13 @@
 import clsx from 'clsx'
 
 const variants = {
-  default: 'bg-gray-100 text-gray-700',
-  primary: 'bg-indigo-100 text-indigo-700',
-  success: 'bg-emerald-100 text-emerald-700',
-  warning: 'bg-amber-100 text-amber-700',
-  danger: 'bg-red-100 text-red-700',
-  teal: 'bg-teal-100 text-teal-700',
-  purple: 'bg-purple-100 text-purple-700',
+  default: 'bg-gray-100 text-gray-700 border border-gray-300',
+  primary: 'bg-indigo-100 text-indigo-700 border border-indigo-200',
+  success: 'bg-emerald-100 text-emerald-700 border border-emerald-300',
+  warning: 'bg-amber-100 text-amber-700 border border-amber-300',
+  danger: 'bg-red-100 text-red-700 border border-red-300',
+  teal: 'bg-teal-100 text-teal-700 border border-teal-300',
+  purple: 'bg-purple-100 text-purple-700 border border-purple-300',
 }
 
 const sizes = {

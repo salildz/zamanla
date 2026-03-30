@@ -40,13 +40,13 @@ const Input = forwardRef(function Input(
           id={inputId}
           type={type}
           className={clsx(
-            'w-full rounded-md border text-sm transition-colors',
+            'w-full rounded-md border text-sm transition-colors backdrop-blur-sm',
             'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
             'placeholder:text-gray-400',
             error
-              ? 'border-red-400 bg-red-50 focus:ring-red-400'
-              : 'border-gray-300 bg-white hover:border-gray-400',
-            'disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed',
+              ? 'border-red-400 bg-red-50/70 focus:ring-red-400'
+              : 'border-gray-300 bg-gray-50 hover:border-gray-400',
+            'disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed',
             leftAddon ? 'pl-9' : 'pl-3',
             rightAddon ? 'pr-9' : 'pr-3',
             'py-2',

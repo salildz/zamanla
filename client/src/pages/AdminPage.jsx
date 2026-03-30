@@ -23,6 +23,7 @@ import { PageLoader, InlineLoader } from '../components/common/LoadingSpinner.js
 import ErrorMessage, { PageError } from '../components/common/ErrorMessage.jsx'
 import { ToastProvider, useToast } from '../components/common/Toast.jsx'
 import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
+import ThemeSwitcher from '../components/common/ThemeSwitcher.jsx'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -391,7 +392,7 @@ function AdminContent({ session, adminToken }) {
       )}
 
       {/* Nav */}
-      <nav className="border-b border-gray-100 bg-white sticky top-0 z-40">
+      <nav className="border-b border-gray-100 bg-white/85 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2">
@@ -407,6 +408,7 @@ function AdminContent({ session, adminToken }) {
             <span className="text-sm text-gray-500 hidden sm:inline">{t('admin.breadcrumb')}</span>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeSwitcher compact />
             <LanguageSwitcher />
             <Badge variant="warning" size="sm">{t('admin.badge')}</Badge>
           </div>
@@ -414,7 +416,7 @@ function AdminContent({ session, adminToken }) {
       </nav>
 
       {/* Session Header */}
-      <div className="bg-white border-b border-gray-100">
+      <div className="bg-white/85 backdrop-blur-xl border-b border-gray-100">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div className="flex-1 min-w-0">
@@ -502,7 +504,7 @@ function AdminContent({ session, adminToken }) {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white border-b border-gray-100 sticky top-14 z-30">
+      <div className="bg-white/85 backdrop-blur-xl border-b border-gray-100 sticky top-14 z-30">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-3 gap-2 py-1">
             {tabs.map((tab) => (

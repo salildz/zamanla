@@ -34,7 +34,7 @@ function loadTurnstileScript(onLoad) {
   document.head.appendChild(script)
 }
 
-export default function TurnstileWidget({ onVerify, onExpire, theme = 'light' }) {
+export default function TurnstileWidget({ onVerify, onExpire, theme = 'dark' }) {
   const containerRef = useRef(null)
   const widgetIdRef = useRef(null)
 

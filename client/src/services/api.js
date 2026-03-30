@@ -22,11 +22,18 @@ api.interceptors.response.use(
   (error) => {
     if (error.response) {
       const errBody = error.response.data
+      const status = error.response.status
       error.serverCode = errBody?.error?.code || null
       error.userMessage =
+        (status === 502
+          ? 'Service is temporarily unavailable. Please retry in a few seconds.'
+          : null) ||
+        (status >= 500
+          ? 'Server error occurred. Please try again shortly.'
+          : null) ||
         errBody?.error?.message ||
         errBody?.message ||
-        `Request failed with status ${error.response.status}`
+        `Request failed with status ${status}`
     } else if (error.request) {
       error.serverCode = 'NETWORK_ERROR'
       error.userMessage = 'Network error — please check your connection.'

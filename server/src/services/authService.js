@@ -1,20 +1,33 @@
 'use strict';
 
+const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const userRepo = require('../repositories/userRepository');
 const { AppError } = require('../middleware/errorHandler');
+const logger = require('../utils/logger');
 
 const DEV_FALLBACK_SECRET = 'dev-only-change-me';
 
-function ensureSecretConfigured() {
+const configuredSecret = process.env.AUTH_JWT_SECRET?.trim() || '';
+const useEphemeralProdSecret = config.nodeEnv === 'production' && !configuredSecret;
+const runtimeJwtSecret = useEphemeralProdSecret
+  ? crypto.randomBytes(48).toString('hex')
+  : config.auth.jwtSecret;
+
+function warnIfSecretIsRisky() {
+  if (useEphemeralProdSecret) {
+    logger.error('AUTH_JWT_SECRET is missing in production. Using an ephemeral in-memory fallback secret. Existing auth sessions will be invalidated on every restart. Set AUTH_JWT_SECRET to a strong persistent value.');
+    return;
+  }
+
   if (config.nodeEnv === 'production' && config.auth.jwtSecret === DEV_FALLBACK_SECRET) {
-    throw new Error('AUTH_JWT_SECRET must be set in production');
+    logger.warn('AUTH_JWT_SECRET is using the development default in production. Please set a strong secret.');
   }
 }
 
-ensureSecretConfigured();
+warnIfSecretIsRisky();
 
 function toSafeUser(user) {
   return {
@@ -55,14 +68,14 @@ function issueAccessToken(user) {
       sub: user.id,
       email: user.email,
     },
-    config.auth.jwtSecret,
+    runtimeJwtSecret,
     { expiresIn: config.auth.jwtExpiresIn }
   );
 }
 
 function verifyAccessToken(token) {
   try {
-    const decoded = jwt.verify(token, config.auth.jwtSecret);
+    const decoded = jwt.verify(token, runtimeJwtSecret);
     return {
       id: decoded.sub,
       email: decoded.email,

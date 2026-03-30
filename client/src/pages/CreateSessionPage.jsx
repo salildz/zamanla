@@ -11,6 +11,7 @@ import Select from '../components/common/Select.jsx'
 import TimezoneCombobox from '../components/common/TimezoneCombobox.jsx'
 import TurnstileWidget, { isTurnstileEnabled } from '../components/common/TurnstileWidget.jsx'
 import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
+import ThemeSwitcher from '../components/common/ThemeSwitcher.jsx'
 import { createSession } from '../services/api.js'
 import { getBrowserTimezone } from '../utils/timezoneUtils.js'
 import { useCreateSessionSchema } from '../hooks/useSchemas.js'
@@ -101,7 +102,7 @@ export default function CreateSessionPage() {
     mutation.mutate({
       ...values,
       slotMinutes: Number(values.slotMinutes),
-      ...(isTurnstileEnabled() && turnstileToken ? { turnstileToken } : {}),
+      ...(isTurnstileEnabled() && turnstileToken ? { cfTurnstileResponse: turnstileToken } : {}),
     })
   }
 
@@ -155,7 +156,7 @@ export default function CreateSessionPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         {/* Nav */}
-        <nav className="border-b border-gray-100 bg-white sticky top-0 z-40">
+        <nav className="border-b border-gray-100 bg-white/85 backdrop-blur-xl sticky top-0 z-40">
           <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2 group">
               <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
@@ -166,7 +167,10 @@ export default function CreateSessionPage() {
               </div>
               <span className="font-bold text-gray-900 text-lg">Zamanla</span>
             </Link>
-            <LanguageSwitcher />
+            <div className="flex items-center gap-2">
+              <ThemeSwitcher compact />
+              <LanguageSwitcher />
+            </div>
           </div>
         </nav>
 
@@ -186,7 +190,7 @@ export default function CreateSessionPage() {
             </div>
 
             {/* Public share link — primary action */}
-            <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4 shadow-sm">
+            <div className="surface-card border border-gray-200 rounded-xl p-4 mb-4 shadow-sm">
               <p className="text-sm font-semibold text-gray-700 mb-2">
                 {t('create.success.shareTitle')}
               </p>
@@ -219,7 +223,7 @@ export default function CreateSessionPage() {
             </div>
 
             {/* Admin link warning — secondary */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 backdrop-blur-sm">
               <div className="flex gap-3">
                 <svg className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -256,7 +260,7 @@ export default function CreateSessionPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Nav */}
-      <nav className="border-b border-gray-100 bg-white sticky top-0 z-40">
+      <nav className="border-b border-gray-100 bg-white/85 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2">
@@ -271,18 +275,21 @@ export default function CreateSessionPage() {
             <span className="text-gray-300">/</span>
             <span className="text-sm text-gray-500">{t('nav.newSessionPage')}</span>
           </div>
-          <LanguageSwitcher />
+          <div className="flex items-center gap-2">
+            <ThemeSwitcher compact />
+            <LanguageSwitcher />
+          </div>
         </div>
       </nav>
 
-      <div className="max-w-2xl mx-auto px-4 py-6 sm:py-10">
+      <div className="max-w-3xl mx-auto px-4 py-6 sm:py-10">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('create.pageTitle')}</h1>
           <p className="text-gray-500 mt-1 text-sm sm:text-base">{t('create.pageSubtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100 overflow-hidden">
+          <div className="surface-card border border-gray-200 rounded-xl divide-y divide-gray-100 overflow-hidden">
             {/* Basic Info */}
             <div className="px-4 sm:px-6 py-4 sm:py-5">
               <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
@@ -299,7 +306,7 @@ export default function CreateSessionPage() {
                 <div className="flex flex-col gap-1">
                   <label className="text-sm font-medium text-gray-700">{t('create.descriptionLabel')}</label>
                   <textarea
-                    className="w-full rounded-md border border-gray-300 bg-white text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-gray-400 resize-none"
+                    className="w-full rounded-md border border-gray-300 bg-gray-50 text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-gray-400 resize-none"
                     rows={3}
                     placeholder={t('create.descriptionPlaceholder')}
                     {...register('description')}
@@ -380,21 +387,21 @@ export default function CreateSessionPage() {
                     <button
                       type="button"
                       onClick={() => applyTimePreset('workday')}
-                      className="text-xs font-medium px-3 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                      className="text-xs font-medium px-3 py-1.5 rounded-full border border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors"
                     >
                       {t('create.timePresets.workday')}
                     </button>
                     <button
                       type="button"
                       onClick={() => applyTimePreset('evening')}
-                      className="text-xs font-medium px-3 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                      className="text-xs font-medium px-3 py-1.5 rounded-full border border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors"
                     >
                       {t('create.timePresets.evening')}
                     </button>
                     <button
                       type="button"
                       onClick={() => applyTimePreset('fullDay')}
-                      className="text-xs font-medium px-3 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                      className="text-xs font-medium px-3 py-1.5 rounded-full border border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors"
                     >
                       {t('create.timePresets.fullDay')}
                     </button>
@@ -437,8 +444,8 @@ export default function CreateSessionPage() {
             )}
 
             {/* Submit */}
-            <div className="px-4 sm:px-6 py-4 sm:py-5 bg-gray-50 flex flex-col gap-3">
-              <div className="bg-white border border-indigo-100 rounded-lg px-3 py-2.5">
+            <div className="px-4 sm:px-6 py-4 sm:py-5 bg-gray-50/70 flex flex-col gap-3">
+              <div className="bg-gray-50 border border-indigo-100 rounded-lg px-3 py-2.5">
                 <p className="text-xs font-semibold text-indigo-700 uppercase tracking-wide mb-1.5">
                   {t('create.preview.title')}
                 </p>
