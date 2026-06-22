@@ -40,7 +40,7 @@ const Input = forwardRef(function Input(
           id={inputId}
           type={type}
           className={clsx(
-            'w-full rounded-md border text-sm transition-colors backdrop-blur-sm',
+            'w-full rounded-lg border text-sm transition-colors',
             'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
             'placeholder:text-gray-400',
             error

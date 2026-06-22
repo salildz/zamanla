@@ -114,12 +114,10 @@ function attachSystemListener() {
 }
 
 export function initializeTheme() {
-  const preference = getStoredThemePreference() || DEFAULT_THEME_PREFERENCE
-  const resolvedTheme = resolveTheme(preference)
+  // Zamanla ships a single, signature "warm organic" theme. Dark mode and the
+  // system listener are intentionally disabled — always resolve to light.
+  applyResolvedTheme('light')
+  dispatchThemeChange('light', 'light')
 
-  applyResolvedTheme(resolvedTheme)
-  dispatchThemeChange(preference, resolvedTheme)
-  attachSystemListener()
-
-  return { preference, resolvedTheme }
+  return { preference: 'light', resolvedTheme: 'light' }
 }

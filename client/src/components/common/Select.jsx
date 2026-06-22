@@ -21,7 +21,7 @@ const Select = forwardRef(function Select(
           ref={ref}
           id={selectId}
           className={clsx(
-            'w-full rounded-md border text-sm transition-colors appearance-none backdrop-blur-sm',
+            'w-full rounded-lg border text-sm transition-colors appearance-none',
             'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
             'pl-3 pr-8 py-2',
             error

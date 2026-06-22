@@ -22,8 +22,8 @@ import Badge from '../components/common/Badge.jsx'
 import { PageLoader, InlineLoader } from '../components/common/LoadingSpinner.jsx'
 import ErrorMessage, { PageError } from '../components/common/ErrorMessage.jsx'
 import { ToastProvider, useToast } from '../components/common/Toast.jsx'
+import Brand from '../components/common/Brand.jsx'
 import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
-import ThemeSwitcher from '../components/common/ThemeSwitcher.jsx'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -99,7 +99,7 @@ function InlineEditField({ value, onSave, label, multiline = false }) {
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={handleKeyDown}
             rows={3}
-            className="w-full rounded-md border border-indigo-400 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            className="w-full rounded-lg border border-clay-400 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
           />
         ) : (
           <input
@@ -108,13 +108,13 @@ function InlineEditField({ value, onSave, label, multiline = false }) {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="w-full rounded-md border border-indigo-400 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full rounded-lg border border-clay-400 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         )}
         <div className="flex gap-2">
           <button
             onClick={handleSave}
-            className="text-xs text-white bg-emerald-600 hover:bg-emerald-700 font-medium px-3 py-1.5 rounded-md"
+            className="text-xs text-white bg-pine-600 hover:bg-pine-700 font-medium px-3 py-1.5 rounded-md"
           >
             {t('common.save')}
           </button>
@@ -368,7 +368,7 @@ function AdminContent({ session, adminToken }) {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Confirm dialogs */}
       {confirmDialog === 'close' && (
         <ConfirmDialog
@@ -392,23 +392,16 @@ function AdminContent({ session, adminToken }) {
       )}
 
       {/* Nav */}
-      <nav className="border-b border-gray-100 bg-white/85 backdrop-blur-xl sticky top-0 z-40">
+      <nav className="border-b border-sand-200 bg-sand-50/80 sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <circle cx="12" cy="12" r="9" />
-                  <polyline points="12 7 12 12 15 15" />
-                </svg>
-              </div>
-              <span className="font-bold text-gray-900 text-lg">Zamanla</span>
+            <Link to="/" aria-label="Zamanla home">
+              <Brand size="sm" />
             </Link>
-            <span className="text-gray-300 hidden sm:inline">/</span>
-            <span className="text-sm text-gray-500 hidden sm:inline">{t('admin.breadcrumb')}</span>
+            <span className="text-sand-300 hidden sm:inline">/</span>
+            <span className="text-sm text-sand-500 hidden sm:inline">{t('admin.breadcrumb')}</span>
           </div>
           <div className="flex items-center gap-2">
-            <ThemeSwitcher compact />
             <LanguageSwitcher />
             <Badge variant="warning" size="sm">{t('admin.badge')}</Badge>
           </div>
@@ -416,7 +409,7 @@ function AdminContent({ session, adminToken }) {
       </nav>
 
       {/* Session Header */}
-      <div className="bg-white/85 backdrop-blur-xl border-b border-gray-100">
+      <div className="bg-white border-b border-gray-100">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div className="flex-1 min-w-0">

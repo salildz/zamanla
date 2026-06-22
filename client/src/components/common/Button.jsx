@@ -1,19 +1,19 @@
 import clsx from 'clsx'
 
 const variants = {
-  primary: 'bg-indigo-600 text-white border border-indigo-300 hover:bg-indigo-700 active:bg-indigo-800 focus-visible:ring-indigo-500 disabled:opacity-60',
-  secondary: 'bg-gray-100 text-gray-100 border border-gray-300 hover:bg-gray-200 active:bg-gray-300 focus-visible:ring-gray-400 disabled:opacity-60',
-  danger: 'bg-red-600 text-white border border-red-500 hover:bg-red-700 active:bg-red-800 focus-visible:ring-red-500 disabled:opacity-60',
-  ghost: 'bg-transparent text-gray-300 hover:bg-gray-100 active:bg-gray-200 focus-visible:ring-gray-400 disabled:text-gray-400',
-  success: 'bg-emerald-600 text-white border border-emerald-500 hover:bg-emerald-700 active:bg-emerald-800 focus-visible:ring-emerald-500 disabled:opacity-60',
+  primary: 'bg-clay-500 text-white border border-clay-600 hover:bg-clay-600 active:bg-clay-700 focus-visible:ring-clay-400 disabled:opacity-60',
+  secondary: 'bg-sand-50 text-sand-800 border border-sand-300 hover:bg-sand-100 active:bg-sand-200 focus-visible:ring-clay-400 disabled:opacity-60',
+  danger: 'bg-brick-500 text-white border border-brick-600 hover:bg-brick-600 active:bg-brick-700 focus-visible:ring-brick-500 disabled:opacity-60',
+  ghost: 'bg-transparent text-sand-700 hover:bg-sand-200 active:bg-sand-300 focus-visible:ring-clay-400 disabled:text-sand-400',
+  success: 'bg-pine-600 text-white border border-pine-700 hover:bg-pine-700 active:bg-pine-800 focus-visible:ring-pine-500 disabled:opacity-60',
 }
 
 const sizes = {
-  xs: 'px-2.5 py-1 text-xs rounded',
-  sm: 'px-3 py-1.5 text-sm rounded-md',
-  md: 'px-4 py-2 text-sm rounded-md',
-  lg: 'px-5 py-2.5 text-base rounded-lg',
-  xl: 'px-6 py-3 text-base rounded-lg',
+  xs: 'px-2.5 py-1 text-xs rounded-lg',
+  sm: 'px-3 py-1.5 text-sm rounded-lg',
+  md: 'px-4 py-2 text-sm rounded-lg',
+  lg: 'px-5 py-2.5 text-base rounded-xl',
+  xl: 'px-6 py-3.5 text-base rounded-xl',
 }
 
 export default function Button({
@@ -34,9 +34,9 @@ export default function Button({
       type={type}
       disabled={disabled || loading}
       className={clsx(
-        'inline-flex items-center justify-center gap-2 font-medium transition-all',
+        'inline-flex items-center justify-center gap-2 font-semibold transition-all',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-        'disabled:cursor-not-allowed backdrop-blur-sm',
+        'disabled:cursor-not-allowed',
         variants[variant],
         sizes[size],
         fullWidth && 'w-full',

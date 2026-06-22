@@ -8,6 +8,7 @@ import {
   formatSlotDate,
   formatSlotTime,
   heatmapColor,
+  heatmapTextColor,
 } from '../../utils/slotUtils.js'
 
 // Desktop hover tooltip — hidden on small screens, shown only on sm+
@@ -26,7 +27,7 @@ function CellTooltip({ slot, tz }) {
         <div className="text-gray-300 mb-1.5">
           {t('results.tooltip.available', { available: availableCount, total: totalParticipants })}
           {totalParticipants > 0 && (
-            <span className="ml-1 text-emerald-400">({Math.round(ratio * 100)}%)</span>
+            <span className="ml-1 text-pine-200">({Math.round(ratio * 100)}%)</span>
           )}
         </div>
         {participants && participants.length > 0 && (
@@ -93,7 +94,7 @@ function SlotDetailCard({ slot, tz, onClose }) {
               key={i}
               className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded-full font-medium border border-emerald-100"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-pine-500 shrink-0" />
               {p.name}
             </span>
           ))}
@@ -126,8 +127,8 @@ const HeatmapCell = memo(function HeatmapCell({ resultSlot, tz, isHighlighted, i
       className={clsx(
         'heatmap-cell border relative',
         ratio > 0 ? 'heatmap-cell-active' : 'heatmap-cell-idle',
-        isHighlighted && 'ring-2 ring-inset ring-indigo-500',
-        isSelected && 'ring-2 ring-inset ring-indigo-600 brightness-90'
+        isHighlighted && 'ring-2 ring-inset ring-clay-500',
+        isSelected && 'ring-2 ring-inset ring-clay-600 brightness-95'
       )}
       style={{ backgroundColor: bgColor }}
       onMouseEnter={() => setShowTooltip(true)}
@@ -135,7 +136,10 @@ const HeatmapCell = memo(function HeatmapCell({ resultSlot, tz, isHighlighted, i
       onClick={onClick}
     >
       {ratio > 0 && (
-        <span className="absolute inset-0 flex items-center justify-center text-[11px] sm:text-xs font-semibold text-emerald-800 opacity-85 pointer-events-none select-none">
+        <span
+          className="absolute inset-0 flex items-center justify-center text-[11px] sm:text-xs font-semibold opacity-90 pointer-events-none select-none"
+          style={{ color: heatmapTextColor(ratio) }}
+        >
           {availableCount}
         </span>
       )}

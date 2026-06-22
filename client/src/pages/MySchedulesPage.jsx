@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from '../components/common/Button.jsx'
 import Badge from '../components/common/Badge.jsx'
+import Brand from '../components/common/Brand.jsx'
 import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
-import ThemeSwitcher from '../components/common/ThemeSwitcher.jsx'
 import { PageLoader } from '../components/common/LoadingSpinner.jsx'
 import ErrorMessage from '../components/common/ErrorMessage.jsx'
 import { useApiError } from '../hooks/useApiError.js'
@@ -172,25 +172,18 @@ export default function MySchedulesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="border-b border-gray-100 bg-white/85 backdrop-blur-xl sticky top-0 z-40">
+    <div className="min-h-screen">
+      <nav className="border-b border-sand-200 bg-sand-50/80 sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <Link to="/" className="flex items-center gap-2 shrink-0">
-              <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <circle cx="12" cy="12" r="9" />
-                  <polyline points="12 7 12 12 15 15" />
-                </svg>
-              </div>
-              <span className="font-bold text-gray-900 text-lg">Zamanla</span>
+            <Link to="/" className="shrink-0" aria-label="Zamanla home">
+              <Brand size="sm" />
             </Link>
-            <span className="text-gray-300 hidden sm:inline">/</span>
-            <span className="text-sm text-gray-500 hidden sm:inline">{t('dashboard.title')}</span>
+            <span className="text-sand-300 hidden sm:inline">/</span>
+            <span className="text-sm text-sand-500 hidden sm:inline">{t('dashboard.title')}</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <ThemeSwitcher compact />
             <LanguageSwitcher />
             {user && (
               <Button

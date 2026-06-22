@@ -10,8 +10,8 @@ import Input from '../components/common/Input.jsx'
 import Select from '../components/common/Select.jsx'
 import TimezoneCombobox from '../components/common/TimezoneCombobox.jsx'
 import TurnstileWidget, { isTurnstileEnabled } from '../components/common/TurnstileWidget.jsx'
+import Brand from '../components/common/Brand.jsx'
 import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
-import ThemeSwitcher from '../components/common/ThemeSwitcher.jsx'
 import { createSession } from '../services/api.js'
 import { getBrowserTimezone } from '../utils/timezoneUtils.js'
 import { useCreateSessionSchema } from '../hooks/useSchemas.js'
@@ -154,21 +154,14 @@ export default function CreateSessionPage() {
     }
 
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="min-h-screen flex flex-col">
         {/* Nav */}
-        <nav className="border-b border-gray-100 bg-white/85 backdrop-blur-xl sticky top-0 z-40">
+        <nav className="border-b border-sand-200 bg-sand-50/80 sticky top-0 z-40">
           <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <circle cx="12" cy="12" r="9" />
-                  <polyline points="12 7 12 12 15 15" />
-                </svg>
-              </div>
-              <span className="font-bold text-gray-900 text-lg">Zamanla</span>
+            <Link to="/" aria-label="Zamanla home">
+              <Brand size="sm" />
             </Link>
             <div className="flex items-center gap-2">
-              <ThemeSwitcher compact />
               <LanguageSwitcher />
             </div>
           </div>
@@ -223,7 +216,7 @@ export default function CreateSessionPage() {
             </div>
 
             {/* Admin link warning — secondary */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 backdrop-blur-sm">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
               <div className="flex gap-3">
                 <svg className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -258,25 +251,18 @@ export default function CreateSessionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Nav */}
-      <nav className="border-b border-gray-100 bg-white/85 backdrop-blur-xl sticky top-0 z-40">
+      <nav className="border-b border-sand-200 bg-sand-50/80 sticky top-0 z-40">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <circle cx="12" cy="12" r="9" />
-                  <polyline points="12 7 12 12 15 15" />
-                </svg>
-              </div>
-              <span className="font-bold text-gray-900 text-lg">Zamanla</span>
+            <Link to="/" aria-label="Zamanla home">
+              <Brand size="sm" />
             </Link>
-            <span className="text-gray-300">/</span>
-            <span className="text-sm text-gray-500">{t('nav.newSessionPage')}</span>
+            <span className="text-sand-300">/</span>
+            <span className="text-sm text-sand-500">{t('nav.newSessionPage')}</span>
           </div>
           <div className="flex items-center gap-2">
-            <ThemeSwitcher compact />
             <LanguageSwitcher />
           </div>
         </div>

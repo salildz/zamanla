@@ -71,12 +71,12 @@ function ToastItem({ toast, onClose }) {
   return (
     <div
       className={clsx(
-        'flex items-start gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-medium pointer-events-auto animate-slide-up',
+        'flex items-start gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium pointer-events-auto animate-slide-up',
         {
-          'bg-emerald-600 text-white': toast.type === 'success',
-          'bg-red-600 text-white': toast.type === 'error',
-          'bg-amber-500 text-white': toast.type === 'warning',
-          'bg-gray-800 text-white': toast.type === 'info',
+          'bg-pine-600 text-white': toast.type === 'success',
+          'bg-brick-600 text-white': toast.type === 'error',
+          'bg-honey-600 text-white': toast.type === 'warning',
+          'bg-sand-800 text-white': toast.type === 'info',
         }
       )}
     >

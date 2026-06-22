@@ -138,27 +138,28 @@ export function formatDateRange(dateStart, dateEnd, tz) {
   return `${start.format('D MMM YYYY')} – ${end.format('D MMM YYYY')}`
 }
 
-// Compute heatmap color (returns a CSS color string) based on ratio 0..1
+// Compute heatmap color (returns a CSS color string) based on ratio 0..1.
+// Single "warm organic" theme: warm-sand empty cell, ramping from pale sage
+// (pine-100) up to deep pine green (pine-600) as more people are available.
 export function heatmapColor(ratio) {
   const safeRatio = Math.max(0, Math.min(1, ratio || 0))
-  const isDarkTheme =
-    typeof document !== 'undefined' &&
-    document.documentElement.dataset.theme === 'dark'
 
   if (safeRatio <= 0) {
-    return isDarkTheme ? 'rgb(18, 28, 46)' : '#f9fafb'
+    return '#fbf6ec'
   }
 
-  // Interpolate from soft -> strong green scale depending on active theme.
-  const start = isDarkTheme
-    ? { r: 45, g: 102, b: 88 }
-    : { r: 209, g: 250, b: 229 }
-  const end = isDarkTheme
-    ? { r: 56, g: 224, b: 167 }
-    : { r: 5, g: 150, b: 105 }
+  // Interpolate pine-100 -> pine-600.
+  const start = { r: 214, g: 226, b: 218 }
+  const end = { r: 47, g: 80, b: 67 }
 
   const r = Math.round(start.r + (end.r - start.r) * safeRatio)
   const g = Math.round(start.g + (end.g - start.g) * safeRatio)
   const b = Math.round(start.b + (end.b - start.b) * safeRatio)
   return `rgb(${r},${g},${b})`
+}
+
+// Readable text color for a heatmap count overlaid on heatmapColor(ratio).
+export function heatmapTextColor(ratio) {
+  const safeRatio = Math.max(0, Math.min(1, ratio || 0))
+  return safeRatio >= 0.5 ? '#fcf9f3' : '#1e3229'
 }

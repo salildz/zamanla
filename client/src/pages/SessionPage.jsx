@@ -25,8 +25,8 @@ import ErrorMessage, { PageError } from '../components/common/ErrorMessage.jsx'
 import Badge from '../components/common/Badge.jsx'
 import TurnstileWidget, { isTurnstileEnabled } from '../components/common/TurnstileWidget.jsx'
 import { ToastProvider } from '../components/common/Toast.jsx'
+import Brand from '../components/common/Brand.jsx'
 import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
-import ThemeSwitcher from '../components/common/ThemeSwitcher.jsx'
 import { formatDateRange } from '../utils/slotUtils.js'
 import { useJoinSessionSchema } from '../hooks/useSchemas.js'
 import { getStoredProfileName, setStoredProfileName } from '../utils/profileNameStorage.js'
@@ -475,21 +475,14 @@ export default function SessionPage() {
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen">
         {/* Nav */}
-        <nav className="border-b border-gray-100 bg-white/85 backdrop-blur-xl sticky top-0 z-40">
+        <nav className="border-b border-sand-200 bg-sand-50/80 sticky top-0 z-40">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <circle cx="12" cy="12" r="9" />
-                  <polyline points="12 7 12 12 15 15" />
-                </svg>
-              </div>
-              <span className="font-bold text-gray-900 text-lg">Zamanla</span>
+            <Link to="/" aria-label="Zamanla home">
+              <Brand size="sm" />
             </Link>
             <div className="flex items-center gap-2">
-              <ThemeSwitcher compact />
               <LanguageSwitcher />
             </div>
           </div>
