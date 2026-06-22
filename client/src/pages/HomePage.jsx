@@ -60,7 +60,7 @@ export default function HomePage() {
     <div className="min-h-screen pb-20 sm:pb-0">
       <nav className="border-b border-sand-200/80 bg-sand-50/80 sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link to="/" aria-label="Zamanla home">
+          <Link to="/" aria-label="Zamanla">
             <Brand size="md" />
           </Link>
           <div className="flex items-center gap-2">
@@ -137,7 +137,7 @@ export default function HomePage() {
                   <span className="w-2 h-2 rounded-full bg-clay-500" />
                   <p className="font-display text-base font-semibold text-sand-900">{t('home.features.groupTitle')}</p>
                 </div>
-                <span className="text-[11px] font-mono uppercase tracking-wider text-sand-500">Mon–Sun</span>
+                <span className="text-[11px] font-mono uppercase tracking-wider text-sand-500">{t('home.heroCard.week')}</span>
               </div>
 
               <div className="grid grid-cols-7 gap-1.5">
@@ -154,7 +154,7 @@ export default function HomePage() {
                 <div className="flex items-center gap-2.5">
                   <span className="flex items-center justify-center w-7 h-7 rounded-full bg-pine-600 text-white text-xs font-bold">✓</span>
                   <div className="leading-tight">
-                    <p className="text-sm font-semibold text-pine-700">Thu · 18:00</p>
+                    <p className="text-sm font-semibold text-pine-700">{t('home.heroCard.bestSlot')}</p>
                     <p className="text-[11px] text-pine-600">{t('results.bestTimes.title')}</p>
                   </div>
                 </div>
@@ -162,16 +162,16 @@ export default function HomePage() {
               </div>
 
               <div className="mt-3 flex items-center gap-3 text-[11px] text-sand-500">
-                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: 'rgba(90,132,112,0.16)' }} /> 0</span>
-                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: '#5a8470' }} /> few</span>
-                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: '#2f5043' }} /> all</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: 'rgba(90,132,112,0.16)' }} /> {t('home.heroCard.legendNone')}</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: '#5a8470' }} /> {t('home.heroCard.legendFew')}</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: '#2f5043' }} /> {t('home.heroCard.legendAll')}</span>
               </div>
             </div>
 
             <div className="hidden sm:flex items-center gap-2 absolute -bottom-4 -left-4 rounded-2xl border border-sand-200 bg-sand-50 px-4 py-2.5 shadow-[var(--shadow-soft)]">
-              <span className="font-mono text-xs text-sand-500">no signup</span>
+              <span className="font-mono text-xs text-sand-500">{t('home.heroCard.perkNoSignup')}</span>
               <span className="w-1 h-1 rounded-full bg-clay-400" />
-              <span className="font-mono text-xs text-sand-500">just a link</span>
+              <span className="font-mono text-xs text-sand-500">{t('home.heroCard.perkJustLink')}</span>
             </div>
           </div>
         </section>

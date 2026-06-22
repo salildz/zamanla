@@ -13,7 +13,7 @@ export default function NotFoundPage() {
       {/* Nav */}
       <nav className="border-b border-sand-200 bg-sand-50/80">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
-          <Link to="/" aria-label="Zamanla home">
+          <Link to="/" aria-label="Zamanla">
             <Brand size="sm" />
           </Link>
           <div className="flex items-center gap-2">

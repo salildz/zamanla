@@ -18,7 +18,7 @@ export default function App() {
         <Suspense
           fallback={(
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
-              <p className="text-sm text-gray-500">Loading...</p>
+              <p className="text-sm text-gray-500">{i18n.t('common.loading')}</p>
             </div>
           )}
         >

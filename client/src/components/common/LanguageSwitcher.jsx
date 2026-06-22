@@ -20,7 +20,7 @@ export default function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => setLanguage('tr')}
-        aria-label="Switch language to Turkish"
+        aria-label="Türkçe"
         className={`px-2.5 py-1 text-[11px] font-semibold rounded-full transition-colors ${
           currentLang === 'tr'
             ? 'bg-clay-500 text-white shadow-sm'
@@ -32,7 +32,7 @@ export default function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => setLanguage('en')}
-        aria-label="Switch language to English"
+        aria-label="English"
         className={`px-2.5 py-1 text-[11px] font-semibold rounded-full transition-colors ${
           currentLang === 'en'
             ? 'bg-clay-500 text-white shadow-sm'

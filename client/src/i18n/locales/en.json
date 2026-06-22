@@ -36,6 +36,15 @@
     "heroSubtitle": "Zamanla makes scheduling easy. Create a session, share a link, and see when your group is available — all in one heatmap view.",
     "ctaButton": "Create a Scheduling Session",
     "ctaFooter": "No registration. Free forever.",
+    "heroCard": {
+      "week": "Mon–Sun",
+      "bestSlot": "Thu · 18:00",
+      "legendNone": "none",
+      "legendFew": "few",
+      "legendAll": "all",
+      "perkNoSignup": "no signup",
+      "perkJustLink": "just a link"
+    },
     "howItWorksTitle": "How it works",
     "howItWorks": {
       "step1Title": "Create a session",

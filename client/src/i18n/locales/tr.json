@@ -36,6 +36,15 @@
     "heroSubtitle": "Zamanla ile planlama çok kolay. Bir oturum oluşturun, linki paylaşın ve grubunuzun müsaitlik durumunu tek bir ısı haritasında görün.",
     "ctaButton": "Planlama Oturumu Oluştur",
     "ctaFooter": "Kayıt yok. Sonsuza kadar ücretsiz.",
+    "heroCard": {
+      "week": "Pzt–Paz",
+      "bestSlot": "Per · 18:00",
+      "legendNone": "yok",
+      "legendFew": "az",
+      "legendAll": "hepsi",
+      "perkNoSignup": "kayıt yok",
+      "perkJustLink": "tek link"
+    },
     "howItWorksTitle": "Nasıl çalışır?",
     "howItWorks": {
       "step1Title": "Oturum oluştur",

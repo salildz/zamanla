@@ -479,7 +479,7 @@ export default function SessionPage() {
         {/* Nav */}
         <nav className="border-b border-sand-200 bg-sand-50/80 sticky top-0 z-40">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-            <Link to="/" aria-label="Zamanla home">
+            <Link to="/" aria-label="Zamanla">
               <Brand size="sm" />
             </Link>
             <div className="flex items-center gap-2">
