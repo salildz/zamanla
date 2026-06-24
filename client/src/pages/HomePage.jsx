@@ -38,11 +38,11 @@ const heatmapPattern = [
 ]
 
 function heatTone(level) {
-  if (level >= 0.8) return '#2f5043'
-  if (level >= 0.55) return '#3e6453'
-  if (level >= 0.35) return '#5a8470'
-  if (level >= 0.2) return '#82a593'
-  return 'rgba(90, 132, 112, 0.16)'
+  if (level >= 0.8) return '#8a5a12'
+  if (level >= 0.55) return '#a86c14'
+  if (level >= 0.35) return '#c2902f'
+  if (level >= 0.2) return '#dcb56a'
+  return 'rgba(185, 125, 28, 0.16)'
 }
 
 export default function HomePage() {
@@ -95,15 +95,15 @@ export default function HomePage() {
         {/* ── Hero ─────────────────────────────────────────────────────────── */}
         <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 pb-14 sm:pb-20 grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-center">
           <div className="reveal-up" style={{ '--reveal-delay': '40ms' }}>
-            <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-clay-700 mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-clay-500" />
+            <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-forest-700 mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-forest-500" />
               {t('home.badge')}
             </div>
 
             <h1 className="font-display text-[2rem] leading-[1.1] sm:text-5xl lg:text-[4.4rem] sm:leading-[1.04] font-semibold text-sand-900 tracking-tight mb-6 text-balance break-words">
               {t('home.heroTitle')}
               <br />
-              <span className="italic font-medium text-clay-600">{t('home.heroTitleHighlight')}</span>
+              <span className="italic font-medium text-forest-600">{t('home.heroTitleHighlight')}</span>
             </h1>
 
             <p className="text-lg sm:text-xl text-sand-700 max-w-xl mb-9 leading-relaxed">
@@ -134,7 +134,7 @@ export default function HomePage() {
             <div className="panel-raised p-5 sm:p-6">
               <div className="flex items-center justify-between pb-3 mb-4 border-b border-sand-200">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-clay-500" />
+                  <span className="w-2 h-2 rounded-full bg-forest-500" />
                   <p className="font-display text-base font-semibold text-sand-900">{t('home.features.groupTitle')}</p>
                 </div>
                 <span className="text-[11px] font-mono uppercase tracking-wider text-sand-500">{t('home.heroCard.week')}</span>
@@ -150,27 +150,27 @@ export default function HomePage() {
                 ))}
               </div>
 
-              <div className="mt-4 flex items-center justify-between rounded-xl bg-pine-50 border border-pine-200 px-3.5 py-2.5">
+              <div className="mt-4 flex items-center justify-between rounded-xl bg-amber-50 border border-amber-200 px-3.5 py-2.5">
                 <div className="flex items-center gap-2.5">
-                  <span className="flex items-center justify-center w-7 h-7 rounded-full bg-pine-600 text-white text-xs font-bold">✓</span>
+                  <span className="flex items-center justify-center w-7 h-7 rounded-full bg-amber-600 text-white text-xs font-bold">✓</span>
                   <div className="leading-tight">
-                    <p className="text-sm font-semibold text-pine-700">{t('home.heroCard.bestSlot')}</p>
-                    <p className="text-[11px] text-pine-600">{t('results.bestTimes.title')}</p>
+                    <p className="text-sm font-semibold text-amber-700">{t('home.heroCard.bestSlot')}</p>
+                    <p className="text-[11px] text-amber-600">{t('results.bestTimes.title')}</p>
                   </div>
                 </div>
-                <span className="font-display text-lg font-semibold text-pine-700">92%</span>
+                <span className="font-display text-lg font-semibold text-amber-700">92%</span>
               </div>
 
               <div className="mt-3 flex items-center gap-3 text-[11px] text-sand-500">
-                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: 'rgba(90,132,112,0.16)' }} /> {t('home.heroCard.legendNone')}</span>
-                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: '#5a8470' }} /> {t('home.heroCard.legendFew')}</span>
-                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: '#2f5043' }} /> {t('home.heroCard.legendAll')}</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: 'rgba(185,125,28,0.16)' }} /> {t('home.heroCard.legendNone')}</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: '#c2902f' }} /> {t('home.heroCard.legendFew')}</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: '#8a5a12' }} /> {t('home.heroCard.legendAll')}</span>
               </div>
             </div>
 
             <div className="hidden sm:flex items-center gap-2 absolute -bottom-4 -left-4 rounded-2xl border border-sand-200 bg-sand-50 px-4 py-2.5 shadow-[var(--shadow-soft)]">
               <span className="font-mono text-xs text-sand-500">{t('home.heroCard.perkNoSignup')}</span>
-              <span className="w-1 h-1 rounded-full bg-clay-400" />
+              <span className="w-1 h-1 rounded-full bg-forest-400" />
               <span className="font-mono text-xs text-sand-500">{t('home.heroCard.perkJustLink')}</span>
             </div>
           </div>
@@ -191,7 +191,7 @@ export default function HomePage() {
                   className="bg-sand-50 p-6 sm:p-8 reveal-up"
                   style={{ '--reveal-delay': `${80 + index * 90}ms` }}
                 >
-                  <span className="font-display text-5xl font-medium text-clay-300 leading-none">{item.step}</span>
+                  <span className="font-display text-5xl font-medium text-forest-300 leading-none">{item.step}</span>
                   <h3 className="font-display text-xl font-semibold text-sand-900 mt-5 mb-2">{item.title}</h3>
                   <p className="text-sm text-sand-600 leading-relaxed">{item.desc}</p>
                 </article>
@@ -215,7 +215,7 @@ export default function HomePage() {
                   className="surface-card rounded-2xl p-6 hover-lift-soft reveal-up"
                   style={{ '--reveal-delay': `${90 + i * 70}ms` }}
                 >
-                  <div className="w-11 h-11 bg-clay-100 text-clay-600 rounded-xl flex items-center justify-center mb-4 ring-1 ring-clay-200/60">
+                  <div className="w-11 h-11 bg-forest-100 text-forest-600 rounded-xl flex items-center justify-center mb-4 ring-1 ring-forest-200/60">
                     {featureIcons[i]}
                   </div>
                   <h3 className="font-display text-lg font-semibold text-sand-900 mb-1.5">{t(`home.features.${key}Title`)}</h3>
@@ -229,16 +229,16 @@ export default function HomePage() {
         {/* ── Closing CTA ──────────────────────────────────────────────────── */}
         <section className="pb-20 sm:pb-28">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <div className="relative overflow-hidden rounded-3xl bg-pine-600 px-6 sm:px-12 py-14 sm:py-16 text-center reveal-up">
+            <div className="relative overflow-hidden rounded-3xl bg-forest-600 px-6 sm:px-12 py-14 sm:py-16 text-center reveal-up">
               <div
-                className="absolute inset-0 opacity-[0.5] pointer-events-none"
-                style={{ backgroundImage: 'radial-gradient(circle at 18% 12%, rgba(255,255,255,0.10), transparent 38%), radial-gradient(circle at 86% 84%, rgba(194,96,47,0.30), transparent 42%)' }}
+                className="absolute inset-0 opacity-[0.55] pointer-events-none"
+                style={{ backgroundImage: 'radial-gradient(circle at 18% 12%, rgba(255,255,255,0.10), transparent 38%), radial-gradient(circle at 86% 84%, rgba(185,125,28,0.38), transparent 44%)' }}
               />
               <div className="relative">
                 <h2 className="font-display text-3xl sm:text-4xl font-semibold text-sand-50 mb-4 text-balance">{t('home.ctaSectionTitle')}</h2>
-                <p className="text-pine-100 mb-8 max-w-xl mx-auto text-lg">{t('home.ctaSectionSubtitle')}</p>
+                <p className="text-forest-100 mb-8 max-w-xl mx-auto text-lg">{t('home.ctaSectionSubtitle')}</p>
                 <Link to="/create">
-                  <Button variant="primary" size="xl" className="!bg-clay-500 hover:!bg-clay-400 !border-clay-400">
+                  <Button variant="primary" size="xl" className="!bg-amber-500 !text-forest-900 hover:!bg-amber-400 !border-amber-400">
                     {t('home.ctaSectionButton')}
                   </Button>
                 </Link>

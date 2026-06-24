@@ -73,7 +73,7 @@ function ToastItem({ toast, onClose }) {
       className={clsx(
         'flex items-start gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium pointer-events-auto animate-slide-up',
         {
-          'bg-pine-600 text-white': toast.type === 'success',
+          'bg-forest-600 text-white': toast.type === 'success',
           'bg-brick-600 text-white': toast.type === 'error',
           'bg-honey-600 text-white': toast.type === 'warning',
           'bg-sand-800 text-white': toast.type === 'info',

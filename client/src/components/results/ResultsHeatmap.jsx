@@ -27,7 +27,7 @@ function CellTooltip({ slot, tz }) {
         <div className="text-gray-300 mb-1.5">
           {t('results.tooltip.available', { available: availableCount, total: totalParticipants })}
           {totalParticipants > 0 && (
-            <span className="ml-1 text-pine-200">({Math.round(ratio * 100)}%)</span>
+            <span className="ml-1 text-amber-200">({Math.round(ratio * 100)}%)</span>
           )}
         </div>
         {participants && participants.length > 0 && (
@@ -70,7 +70,7 @@ function SlotDetailCard({ slot, tz, onClose }) {
           <p className="text-xs text-gray-500 mt-0.5">
             {t('results.tooltip.available', { available: availableCount, total: totalParticipants })}
             {totalParticipants > 0 && availableCount > 0 && (
-              <span className="ml-1 text-emerald-600 font-medium">
+              <span className="ml-1 text-amber-700 font-medium">
                 ({Math.round((availableCount / totalParticipants) * 100)}%)
               </span>
             )}
@@ -92,9 +92,9 @@ function SlotDetailCard({ slot, tz, onClose }) {
           {participants.slice(0, 14).map((p, i) => (
             <span
               key={i}
-              className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded-full font-medium border border-emerald-100"
+              className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs px-2 py-1 rounded-full font-medium border border-amber-100"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-pine-500 shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
               {p.name}
             </span>
           ))}
@@ -127,8 +127,8 @@ const HeatmapCell = memo(function HeatmapCell({ resultSlot, tz, isHighlighted, i
       className={clsx(
         'heatmap-cell border relative',
         ratio > 0 ? 'heatmap-cell-active' : 'heatmap-cell-idle',
-        isHighlighted && 'ring-2 ring-inset ring-clay-500',
-        isSelected && 'ring-2 ring-inset ring-clay-600 brightness-95'
+        isHighlighted && 'ring-2 ring-inset ring-forest-500',
+        isSelected && 'ring-2 ring-inset ring-forest-600 brightness-95'
       )}
       style={{ backgroundColor: bgColor }}
       onMouseEnter={() => setShowTooltip(true)}

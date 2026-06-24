@@ -357,18 +357,18 @@ function BestTimeBanner({ results, session }) {
     : 0
 
   return (
-    <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-2.5 mb-3">
-      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-bold shrink-0">
+    <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5 mb-3">
+      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-600 text-white text-xs font-bold shrink-0">
         1
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-emerald-800 truncate">{time}</p>
-        <p className="text-xs text-emerald-600">
+        <p className="text-xs font-medium text-amber-800 truncate">{time}</p>
+        <p className="text-xs text-amber-700">
           {t('admin.overview.availableSlots', { count: top.availableCount })}
           {' · '}{pct}%
         </p>
       </div>
-      <span className="shrink-0 text-xs text-emerald-700 font-semibold">{t('results.bestTimes.title')}</span>
+      <span className="shrink-0 text-xs text-amber-700 font-semibold">{t('results.bestTimes.title')}</span>
     </div>
   )
 }

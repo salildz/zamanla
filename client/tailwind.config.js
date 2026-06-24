@@ -24,21 +24,8 @@ export default {
           800: '#3A342B',
           900: '#2B2620',
         },
-        // Clay / terracotta — primary action
-        clay: {
-          50: '#FBF1EA',
-          100: '#F6DFCF',
-          200: '#ECBFA0',
-          300: '#E09E72',
-          400: '#D17C49',
-          500: '#C2602F',
-          600: '#A64E27',
-          700: '#883E20',
-          800: '#6B311B',
-          900: '#4F2616',
-        },
-        // Deep pine green — positive / availability
-        pine: {
+        // Deep forest green — primary action / brand
+        forest: {
           50: '#EEF3F0',
           100: '#D6E2DA',
           200: '#ADC5B7',
@@ -50,13 +37,26 @@ export default {
           800: '#1E3229',
           900: '#16241E',
         },
+        // Amber / harvest — availability & density (heatmap)
+        amber: {
+          50: '#FBF3E2',
+          100: '#F5E3BC',
+          200: '#EBCB85',
+          300: '#DEAF50',
+          400: '#CF9530',
+          500: '#B97D1C',
+          600: '#9A6614',
+          700: '#7C5210',
+          800: '#5E3D0C',
+          900: '#422B08',
+        },
         // Honey — warnings
         honey: {
           50: '#FAF3E4',
           100: '#F3E4C4',
-          500: '#B07A22',
-          600: '#8A5E16',
-          700: '#6E4A11',
+          500: '#9A6614',
+          600: '#7C5210',
+          700: '#5E3D0C',
         },
         // Brick — danger
         brick: {
@@ -66,18 +66,18 @@ export default {
           600: '#9A3A31',
           700: '#7E2E27',
         },
-        // Brand alias kept for any legacy references — mapped to clay
+        // Brand alias — mapped to forest
         brand: {
-          50: '#FBF1EA',
-          100: '#F6DFCF',
-          200: '#ECBFA0',
-          300: '#E09E72',
-          400: '#D17C49',
-          500: '#C2602F',
-          600: '#A64E27',
-          700: '#883E20',
-          800: '#6B311B',
-          900: '#4F2616',
+          50: '#EEF3F0',
+          100: '#D6E2DA',
+          200: '#ADC5B7',
+          300: '#82A593',
+          400: '#5A8470',
+          500: '#3E6453',
+          600: '#2F5043',
+          700: '#264035',
+          800: '#1E3229',
+          900: '#16241E',
         },
       },
       animation: {

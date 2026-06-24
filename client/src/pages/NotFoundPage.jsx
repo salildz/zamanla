@@ -29,9 +29,9 @@ export default function NotFoundPage() {
           <div className="relative mb-8">
             <div className="font-display text-8xl font-semibold text-sand-300 select-none">404</div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 bg-clay-100 rounded-full flex items-center justify-center shadow-lg">
+              <div className="w-16 h-16 bg-forest-100 rounded-full flex items-center justify-center shadow-lg">
                 <svg
-                  className="w-8 h-8 text-clay-500"
+                  className="w-8 h-8 text-forest-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

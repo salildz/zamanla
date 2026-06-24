@@ -465,11 +465,11 @@ export default function ParticipantEditor({ session, participant, publicToken })
 
       <div className="flex items-center gap-2 text-[11px] sm:text-xs overflow-x-auto sm:overflow-visible whitespace-nowrap pb-1 -mb-1">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-gray-600">
-          <span className="h-2.5 w-2.5 rounded-sm bg-pine-300" />
+          <span className="h-2.5 w-2.5 rounded-sm bg-amber-300" />
           {t('availability.legend.fromRule')}
         </span>
         <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-gray-600">
-          <span className="h-2.5 w-2.5 rounded-sm bg-clay-500" />
+          <span className="h-2.5 w-2.5 rounded-sm bg-amber-500" />
           {t('availability.legend.manual')}
         </span>
         <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-gray-600">

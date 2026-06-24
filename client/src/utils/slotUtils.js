@@ -139,8 +139,8 @@ export function formatDateRange(dateStart, dateEnd, tz) {
 }
 
 // Compute heatmap color (returns a CSS color string) based on ratio 0..1.
-// Single "warm organic" theme: warm-sand empty cell, ramping from pale sage
-// (pine-100) up to deep pine green (pine-600) as more people are available.
+// "Forest + harvest" theme: warm-sand empty cell, ramping from pale amber up to
+// deep harvest amber as more people are available.
 export function heatmapColor(ratio) {
   const safeRatio = Math.max(0, Math.min(1, ratio || 0))
 
@@ -148,9 +148,9 @@ export function heatmapColor(ratio) {
     return '#fbf6ec'
   }
 
-  // Interpolate pine-100 -> pine-600.
-  const start = { r: 214, g: 226, b: 218 }
-  const end = { r: 47, g: 80, b: 67 }
+  // Interpolate pale amber (#F2E1B6) -> deep amber (#8A5A12).
+  const start = { r: 242, g: 225, b: 182 }
+  const end = { r: 138, g: 90, b: 18 }
 
   const r = Math.round(start.r + (end.r - start.r) * safeRatio)
   const g = Math.round(start.g + (end.g - start.g) * safeRatio)
@@ -161,5 +161,5 @@ export function heatmapColor(ratio) {
 // Readable text color for a heatmap count overlaid on heatmapColor(ratio).
 export function heatmapTextColor(ratio) {
   const safeRatio = Math.max(0, Math.min(1, ratio || 0))
-  return safeRatio >= 0.5 ? '#fcf9f3' : '#1e3229'
+  return safeRatio >= 0.5 ? '#fcf9f3' : '#4a3206'
 }

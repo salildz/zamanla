@@ -21,8 +21,8 @@ export default function Brand({ size = 'md', wordmark = true, className }) {
     <span className={clsx('inline-flex items-center gap-2.5 select-none', className)}>
       <span
         className={clsx(
-          'inline-flex items-center justify-center bg-clay-500 text-white shrink-0',
-          'shadow-[0_6px_14px_-6px_rgba(166,78,39,0.7)] ring-1 ring-clay-600/40',
+          'inline-flex items-center justify-center bg-forest-500 text-white shrink-0',
+          'shadow-[0_6px_14px_-6px_rgba(38,64,53,0.7)] ring-1 ring-forest-600/40',
           markSizes[size]
         )}
         aria-hidden="true"

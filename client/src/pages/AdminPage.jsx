@@ -99,7 +99,7 @@ function InlineEditField({ value, onSave, label, multiline = false }) {
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={handleKeyDown}
             rows={3}
-            className="w-full rounded-lg border border-clay-400 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            className="w-full rounded-lg border border-forest-400 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
           />
         ) : (
           <input
@@ -108,13 +108,13 @@ function InlineEditField({ value, onSave, label, multiline = false }) {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="w-full rounded-lg border border-clay-400 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full rounded-lg border border-forest-400 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         )}
         <div className="flex gap-2">
           <button
             onClick={handleSave}
-            className="text-xs text-white bg-pine-600 hover:bg-pine-700 font-medium px-3 py-1.5 rounded-md"
+            className="text-xs text-white bg-forest-600 hover:bg-forest-700 font-medium px-3 py-1.5 rounded-md"
           >
             {t('common.save')}
           </button>

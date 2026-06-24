@@ -220,15 +220,15 @@ export default function RecurringRuleForm({ rules, onRulesChange, session }) {
             {rules.map((rule) => (
               <li
                 key={rule.id}
-                className="flex items-center justify-between gap-2 bg-pine-50 border border-pine-200 rounded-lg px-2.5 py-1.5"
+                className="flex items-center justify-between gap-2 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5"
               >
-                <span className="text-xs text-pine-700 font-medium flex-1 min-w-0 truncate">
+                <span className="text-xs text-amber-700 font-medium flex-1 min-w-0 truncate">
                   {formatRuleLabel(rule, fullDays)}
                 </span>
                 <button
                   type="button"
                   onClick={() => handleDelete(rule.id)}
-                  className="shrink-0 text-pine-400 hover:text-brick-500 transition-colors"
+                  className="shrink-0 text-amber-400 hover:text-brick-500 transition-colors"
                   title={t('availability.rules.deleteRule')}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -252,11 +252,11 @@ export default function RecurringRuleForm({ rules, onRulesChange, session }) {
         <p className="text-xs font-medium text-gray-500 mb-2">{t('availability.legend.title')}</p>
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-2">
-            <span className="w-4 h-4 rounded bg-pine-300 border border-pine-400 shrink-0" />
+            <span className="w-4 h-4 rounded bg-amber-300 border border-amber-400 shrink-0" />
             <span className="text-xs text-gray-500">{t('availability.legend.fromRule')}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-4 h-4 rounded bg-clay-500 border border-clay-600 shrink-0" />
+            <span className="w-4 h-4 rounded bg-amber-500 border border-amber-600 shrink-0" />
             <span className="text-xs text-gray-500">{t('availability.legend.manual')}</span>
           </div>
           <div className="flex items-center gap-2">

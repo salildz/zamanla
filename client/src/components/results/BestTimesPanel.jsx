@@ -96,7 +96,7 @@ export default function BestTimesPanel({ results, session, onHighlight, highligh
                   }}
                   className={clsx(
                     'w-full text-left px-4 py-3 transition-colors hover:bg-gray-50',
-                    isExpanded && 'bg-pine-50'
+                    isExpanded && 'bg-amber-50'
                   )}
                 >
                   <div className="flex items-start gap-3">
@@ -105,11 +105,11 @@ export default function BestTimesPanel({ results, session, onHighlight, highligh
                       className={clsx(
                         'shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold',
                         idx === 0
-                          ? 'bg-pine-600 text-white'
+                          ? 'bg-amber-600 text-white'
                           : idx === 1
-                          ? 'bg-pine-500 text-white'
+                          ? 'bg-amber-500 text-white'
                           : idx === 2
-                          ? 'bg-pine-400 text-white'
+                          ? 'bg-amber-400 text-white'
                           : 'bg-sand-200 text-sand-700'
                       )}
                     >
@@ -127,7 +127,7 @@ export default function BestTimesPanel({ results, session, onHighlight, highligh
                           </p>
                         </div>
                         <div className="text-right shrink-0">
-                          <span className="text-sm font-bold text-emerald-700">
+                          <span className="text-sm font-bold text-amber-700">
                             {slot.availableCount}
                           </span>
                           <span className="text-xs text-gray-400">
@@ -139,7 +139,7 @@ export default function BestTimesPanel({ results, session, onHighlight, highligh
                       {/* Progress bar */}
                       <div className="mt-1.5 h-1.5 bg-sand-200 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-pine-500 rounded-full transition-all"
+                          className="h-full bg-amber-500 rounded-full transition-all"
                           style={{ width: `${Math.round(ratio * 100)}%` }}
                         />
                       </div>
@@ -156,9 +156,9 @@ export default function BestTimesPanel({ results, session, onHighlight, highligh
                         {slot.participants.map((p, i) => (
                           <span
                             key={i}
-                            className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs px-2 py-0.5 rounded-full font-medium border border-emerald-100"
+                            className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs px-2 py-0.5 rounded-full font-medium border border-amber-100"
                           >
-                            <span className="w-1.5 h-1.5 rounded-full bg-pine-500 shrink-0" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
                             {p.name}
                           </span>
                         ))}

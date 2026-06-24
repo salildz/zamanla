@@ -1,11 +1,11 @@
 import clsx from 'clsx'
 
 const variants = {
-  primary: 'bg-clay-500 text-white border border-clay-600 hover:bg-clay-600 active:bg-clay-700 focus-visible:ring-clay-400 disabled:opacity-60',
-  secondary: 'bg-sand-50 text-sand-800 border border-sand-300 hover:bg-sand-100 active:bg-sand-200 focus-visible:ring-clay-400 disabled:opacity-60',
+  primary: 'bg-forest-500 text-white border border-forest-600 hover:bg-forest-600 active:bg-forest-700 focus-visible:ring-forest-400 disabled:opacity-60',
+  secondary: 'bg-sand-50 text-sand-800 border border-sand-300 hover:bg-sand-100 active:bg-sand-200 focus-visible:ring-forest-400 disabled:opacity-60',
   danger: 'bg-brick-500 text-white border border-brick-600 hover:bg-brick-600 active:bg-brick-700 focus-visible:ring-brick-500 disabled:opacity-60',
-  ghost: 'bg-transparent text-sand-700 hover:bg-sand-200 active:bg-sand-300 focus-visible:ring-clay-400 disabled:text-sand-400',
-  success: 'bg-pine-600 text-white border border-pine-700 hover:bg-pine-700 active:bg-pine-800 focus-visible:ring-pine-500 disabled:opacity-60',
+  ghost: 'bg-transparent text-sand-700 hover:bg-sand-200 active:bg-sand-300 focus-visible:ring-forest-400 disabled:text-sand-400',
+  success: 'bg-forest-600 text-white border border-forest-700 hover:bg-forest-700 active:bg-forest-800 focus-visible:ring-forest-500 disabled:opacity-60',
 }
 
 const sizes = {

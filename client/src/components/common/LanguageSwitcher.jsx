@@ -23,7 +23,7 @@ export default function LanguageSwitcher() {
         aria-label="Türkçe"
         className={`px-2.5 py-1 text-[11px] font-semibold rounded-full transition-colors ${
           currentLang === 'tr'
-            ? 'bg-clay-500 text-white shadow-sm'
+            ? 'bg-forest-500 text-white shadow-sm'
             : 'text-sand-600 hover:text-sand-900 hover:bg-sand-200'
         }`}
       >
@@ -35,7 +35,7 @@ export default function LanguageSwitcher() {
         aria-label="English"
         className={`px-2.5 py-1 text-[11px] font-semibold rounded-full transition-colors ${
           currentLang === 'en'
-            ? 'bg-clay-500 text-white shadow-sm'
+            ? 'bg-forest-500 text-white shadow-sm'
             : 'text-sand-600 hover:text-sand-900 hover:bg-sand-200'
         }`}
       >
