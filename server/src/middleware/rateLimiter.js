@@ -1,6 +1,12 @@
 'use strict';
 
-const rateLimit = require('express-rate-limit');
+const rateLimitFactory = require('express-rate-limit');
+
+// In the test environment rate limiting is disabled so the integration suite
+// can run (and re-run) deterministically without tripping 429s.
+const IS_TEST = process.env.NODE_ENV === 'test';
+const passthrough = (req, res, next) => next();
+const rateLimit = (options) => (IS_TEST ? passthrough : rateLimitFactory(options));
 
 /**
  * General API rate limiter.

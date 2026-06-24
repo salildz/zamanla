@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "migrate": "node migrations/migrate.js",
-    "test": "node --test tests"
+    "test": "NODE_ENV=test node --test tests"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

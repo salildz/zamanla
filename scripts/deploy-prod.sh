@@ -59,8 +59,15 @@ source .env
 if [ "$SKIP_FRONTEND" = false ]; then
   echo "[3/5] Building frontend..."
 
-  # Load frontend env vars (VITE_* only)
-  VITE_API_URL="${VITE_API_URL:-/api}"
+  # Frontend env vars (VITE_*).
+  # The production frontend is always served same-origin behind nginx, which
+  # proxies /api/ to the server container — so it MUST use a relative /api.
+  # We force it here instead of inheriting from `source .env` above, because
+  # .env carries the LOCAL-DEV value (http://localhost:9051/api); baking that
+  # into the prod bundle makes every visitor's browser call their own
+  # localhost and silently fail (e.g. "can't create a session").
+  # Override only by exporting PROD_VITE_API_URL before running this script.
+  VITE_API_URL="${PROD_VITE_API_URL:-/api}"
   VITE_TURNSTILE_SITE_KEY="${VITE_TURNSTILE_SITE_KEY:-}"
 
   cd client
