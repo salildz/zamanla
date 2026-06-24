@@ -120,6 +120,17 @@ async function closeSession(id) {
 }
 
 /**
+ * Re-open a previously closed session.
+ */
+async function reopenSession(id) {
+  const { rows } = await db.query(
+    'UPDATE sessions SET is_closed = FALSE, updated_at = NOW() WHERE id = $1 RETURNING *',
+    [id]
+  );
+  return rows[0] || null;
+}
+
+/**
  * Delete a session by ID (cascades to participants/slots).
  */
 async function deleteSession(id) {
@@ -152,6 +163,7 @@ module.exports = {
   findByAdminToken,
   updateSession,
   closeSession,
+  reopenSession,
   deleteSession,
   claimByAdminToken,
   findByOwnerId,

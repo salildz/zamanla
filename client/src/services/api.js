@@ -76,6 +76,11 @@ export async function closeSession(adminToken) {
   return res.data.session
 }
 
+export async function reopenSession(adminToken) {
+  const res = await api.post(`/sessions/admin/${adminToken}/reopen`)
+  return res.data.session
+}
+
 export async function claimSession(adminToken) {
   const res = await api.post(`/sessions/admin/${adminToken}/claim`)
   return res.data.session
@@ -130,6 +135,16 @@ export async function logoutUser() {
 export async function getCurrentUser() {
   const res = await api.get('/auth/me')
   return res.data.user
+}
+
+export async function changePassword(data) {
+  const res = await api.post('/auth/change-password', data)
+  return res.data
+}
+
+export async function deleteAccount(data) {
+  const res = await api.post('/auth/delete-account', data)
+  return res.data
 }
 
 export async function getMySchedules() {

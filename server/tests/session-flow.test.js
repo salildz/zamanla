@@ -206,6 +206,41 @@ test('admin lifecycle: export (csv + json), close, then delete', async () => {
   assert.equal(gone.body.error.code, 'SESSION_NOT_FOUND');
 });
 
+test('closed session blocks participant edits; reopening restores them', async () => {
+  const session = await createSession('CloseEdit')
+  const { adminToken, publicToken } = session
+  const editToken = await join(publicToken, 'Eve')
+  const slots = await getResults(publicToken)
+
+  // Editing works while open.
+  await saveAvailability(publicToken, editToken, { slots: [manualAvailable(slots[0])] })
+
+  // Close it.
+  const closeRes = await request(app).post(`/api/sessions/admin/${adminToken}/close`)
+  assert.equal(closeRes.status, 200)
+  assert.equal(closeRes.body.data.session.isClosed, true)
+
+  // An EXISTING participant can no longer save (this is the bug that was fixed).
+  const blocked = await request(app)
+    .put(`/api/sessions/${publicToken}/participants/${editToken}`)
+    .send({ slots: [] })
+  assert.equal(blocked.status, 422)
+  assert.equal(blocked.body.error.code, 'SESSION_CLOSED')
+
+  // Reopen.
+  const reopenRes = await request(app).post(`/api/sessions/admin/${adminToken}/reopen`)
+  assert.equal(reopenRes.status, 200)
+  assert.equal(reopenRes.body.data.session.isClosed, false)
+
+  // Editing works again.
+  await saveAvailability(publicToken, editToken, { slots: [manualAvailable(slots[1])] })
+
+  // Reopening an already-open session is rejected.
+  const doubleReopen = await request(app).post(`/api/sessions/admin/${adminToken}/reopen`)
+  assert.equal(doubleReopen.status, 422)
+  assert.equal(doubleReopen.body.error.code, 'SESSION_ALREADY_OPEN')
+})
+
 test('admin can update session settings', async () => {
   const session = await createSession('Update');
   const patch = await request(app)

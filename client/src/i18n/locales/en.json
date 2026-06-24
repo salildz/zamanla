@@ -184,6 +184,7 @@
       "exportCsv": "Export CSV",
       "exportJson": "Export JSON",
       "closeSession": "Close Session",
+      "reopenSession": "Reopen Session",
       "delete": "Delete"
     },
     "dialogs": {
@@ -234,6 +235,8 @@
       "descriptionUpdateFailed": "Failed to update description.",
       "sessionClosed": "Session closed. No more responses will be accepted.",
       "sessionCloseFailed": "Failed to close session.",
+      "sessionReopened": "Session reopened. Participants can respond again.",
+      "sessionReopenFailed": "Failed to reopen session.",
       "sessionDeleted": "Session deleted.",
       "sessionDeleteFailed": "Failed to delete session.",
       "sessionClaimed": "Schedule saved to your account.",
@@ -301,6 +304,27 @@
       "saved": "Default name updated.",
       "helper": "You can still edit your name before joining any session.",
       "current": "Current: {{name}}"
+    },
+    "account": {
+      "title": "Account",
+      "subtitle": "Manage your sign-in credentials.",
+      "password": {
+        "title": "Change password",
+        "current": "Current password",
+        "new": "New password",
+        "confirm": "Confirm new password",
+        "tooShort": "New password must be at least 8 characters.",
+        "mismatch": "New passwords do not match.",
+        "success": "Password updated.",
+        "submit": "Update password"
+      },
+      "danger": {
+        "title": "Delete account",
+        "desc": "Permanently delete your account. Schedules you created stay reachable via their admin links.",
+        "passwordLabel": "Password",
+        "confirmLabel": "I understand this cannot be undone.",
+        "submit": "Delete account"
+      }
     },
     "status": {
       "open": "Open",

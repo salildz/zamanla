@@ -1,6 +1,11 @@
 'use strict';
 
-const { registerSchema, loginSchema } = require('../validators/authValidator');
+const {
+  registerSchema,
+  loginSchema,
+  changePasswordSchema,
+  deleteAccountSchema,
+} = require('../validators/authValidator');
 const authService = require('../services/authService');
 const userRepo = require('../repositories/userRepository');
 const { setAuthCookie, clearAuthCookie } = require('../utils/authCookies');
@@ -34,6 +39,29 @@ async function logout(req, res) {
   return sendSuccess(res, { message: 'Logged out successfully' });
 }
 
+async function changePassword(req, res) {
+  const parsed = changePasswordSchema.parse(req.body);
+  await authService.changePassword(req.authUser.id, parsed.currentPassword, parsed.newPassword);
+
+  // Re-issue the cookie so the session stays valid after the change.
+  const user = await userRepo.findById(req.authUser.id);
+  if (user) {
+    setAuthCookie(res, authService.issueAccessToken(user));
+  }
+
+  logger.info('User changed password', { userId: req.authUser.id });
+  return sendSuccess(res, { message: 'Password updated successfully' });
+}
+
+async function deleteAccount(req, res) {
+  const parsed = deleteAccountSchema.parse(req.body);
+  await authService.deleteAccount(req.authUser.id, parsed.password);
+
+  clearAuthCookie(res);
+  logger.info('User deleted account', { userId: req.authUser.id });
+  return sendSuccess(res, { message: 'Account deleted successfully' });
+}
+
 async function getCurrentUser(req, res) {
   if (!req.authUser?.id) {
     return sendSuccess(res, { user: null });
@@ -52,5 +80,7 @@ module.exports = {
   register,
   login,
   logout,
+  changePassword,
+  deleteAccount,
   getCurrentUser,
 };

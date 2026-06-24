@@ -5,6 +5,7 @@ import {
   updateAdminSession,
   deleteSession,
   closeSession,
+  reopenSession,
   claimSession,
   getResults,
   getMySchedules,
@@ -46,6 +47,16 @@ export function useCloseSession(adminToken) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: () => closeSession(adminToken),
+    onSuccess: (updated) => {
+      queryClient.setQueryData(['adminSession', adminToken], updated)
+    },
+  })
+}
+
+export function useReopenSession(adminToken) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => reopenSession(adminToken),
     onSuccess: (updated) => {
       queryClient.setQueryData(['adminSession', adminToken], updated)
     },

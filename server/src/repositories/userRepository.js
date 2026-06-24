@@ -25,8 +25,22 @@ async function findById(id) {
   return rows[0] || null;
 }
 
+async function updatePassword(id, passwordHash) {
+  const { rows } = await db.query(
+    `UPDATE users SET password_hash = $2, updated_at = NOW() WHERE id = $1 RETURNING *`,
+    [id, passwordHash]
+  );
+  return rows[0] || null;
+}
+
+async function deleteUser(id) {
+  await db.query('DELETE FROM users WHERE id = $1', [id]);
+}
+
 module.exports = {
   createUser,
   findByEmail,
   findById,
+  updatePassword,
+  deleteUser,
 };

@@ -62,6 +62,9 @@ async function updateParticipant(publicToken, editToken, data) {
   if (!session) {
     throw new AppError('Session not found', 404, 'SESSION_NOT_FOUND');
   }
+  if (session.is_closed) {
+    throw new AppError('This session is closed and no longer accepts changes', 422, 'SESSION_CLOSED');
+  }
 
   const participant = await participantRepo.findByEditTokenAndSession(editToken, session.id);
   if (!participant) {

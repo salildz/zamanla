@@ -28,6 +28,9 @@ router.delete('/admin/:adminToken', adminLimiter, sessionCtrl.deleteSession);
 // POST /api/sessions/admin/:adminToken/close
 router.post('/admin/:adminToken/close', adminLimiter, sessionCtrl.closeSession);
 
+// POST /api/sessions/admin/:adminToken/reopen
+router.post('/admin/:adminToken/reopen', adminLimiter, sessionCtrl.reopenSession);
+
 // GET /api/sessions/admin/:adminToken/export
 router.get('/admin/:adminToken/export', exportLimiter, sessionCtrl.exportSession);
 

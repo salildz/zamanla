@@ -62,6 +62,42 @@ async function loginUser({ email, password }) {
   return user;
 }
 
+async function changePassword(userId, currentPassword, newPassword) {
+  const user = await userRepo.findById(userId);
+  if (!user) {
+    throw new AppError('Account not found', 404, 'USER_NOT_FOUND');
+  }
+
+  const isValid = await bcrypt.compare(currentPassword, user.password_hash);
+  if (!isValid) {
+    throw new AppError('Current password is incorrect', 401, 'INVALID_CREDENTIALS');
+  }
+
+  const sameAsOld = await bcrypt.compare(newPassword, user.password_hash);
+  if (sameAsOld) {
+    throw new AppError('New password must be different from the current one', 422, 'PASSWORD_UNCHANGED');
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+  return userRepo.updatePassword(userId, passwordHash);
+}
+
+async function deleteAccount(userId, password) {
+  const user = await userRepo.findById(userId);
+  if (!user) {
+    throw new AppError('Account not found', 404, 'USER_NOT_FOUND');
+  }
+
+  const isValid = await bcrypt.compare(password, user.password_hash);
+  if (!isValid) {
+    throw new AppError('Password is incorrect', 401, 'INVALID_CREDENTIALS');
+  }
+
+  // Owned sessions are preserved (owner_id is set NULL via FK ON DELETE SET NULL);
+  // they remain reachable via their admin tokens.
+  await userRepo.deleteUser(userId);
+}
+
 function issueAccessToken(user) {
   return jwt.sign(
     {
@@ -89,6 +125,8 @@ module.exports = {
   toSafeUser,
   registerUser,
   loginUser,
+  changePassword,
+  deleteAccount,
   issueAccessToken,
   verifyAccessToken,
 };

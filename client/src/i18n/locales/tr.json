@@ -184,6 +184,7 @@
       "exportCsv": "CSV Olarak Dışa Aktar",
       "exportJson": "JSON Olarak Dışa Aktar",
       "closeSession": "Oturumu Kapat",
+      "reopenSession": "Oturumu Yeniden Aç",
       "delete": "Sil"
     },
     "dialogs": {
@@ -234,6 +235,8 @@
       "descriptionUpdateFailed": "Açıklama güncellenemedi.",
       "sessionClosed": "Oturum kapatıldı. Artık yanıt kabul edilmeyecek.",
       "sessionCloseFailed": "Oturum kapatılamadı.",
+      "sessionReopened": "Oturum yeniden açıldı. Katılımcılar tekrar yanıtlayabilir.",
+      "sessionReopenFailed": "Oturum yeniden açılamadı.",
       "sessionDeleted": "Oturum silindi.",
       "sessionDeleteFailed": "Oturum silinemedi.",
       "sessionClaimed": "Plan hesabına kaydedildi.",
@@ -301,6 +304,27 @@
       "saved": "Varsayılan isim güncellendi.",
       "helper": "İstersen her oturumda katılmadan önce adını değiştirebilirsin.",
       "current": "Geçerli: {{name}}"
+    },
+    "account": {
+      "title": "Hesap",
+      "subtitle": "Giriş bilgilerini yönet.",
+      "password": {
+        "title": "Şifre değiştir",
+        "current": "Mevcut şifre",
+        "new": "Yeni şifre",
+        "confirm": "Yeni şifre (tekrar)",
+        "tooShort": "Yeni şifre en az 8 karakter olmalı.",
+        "mismatch": "Yeni şifreler eşleşmiyor.",
+        "success": "Şifre güncellendi.",
+        "submit": "Şifreyi güncelle"
+      },
+      "danger": {
+        "title": "Hesabı sil",
+        "desc": "Hesabını kalıcı olarak siler. Oluşturduğun oturumlar admin linkleriyle erişilebilir kalır.",
+        "passwordLabel": "Şifre",
+        "confirmLabel": "Bunun geri alınamayacağını anlıyorum.",
+        "submit": "Hesabı sil"
+      }
     },
     "status": {
       "open": "Açık",

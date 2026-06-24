@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next'
 import Button from '../components/common/Button.jsx'
 import Badge from '../components/common/Badge.jsx'
 import Brand from '../components/common/Brand.jsx'
+import Input from '../components/common/Input.jsx'
 import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
 import { PageLoader } from '../components/common/LoadingSpinner.jsx'
 import ErrorMessage from '../components/common/ErrorMessage.jsx'
 import { useApiError } from '../hooks/useApiError.js'
-import { useCurrentUser, useLogout } from '../hooks/useAuth.js'
+import { useCurrentUser, useLogout, useChangePassword, useDeleteAccount } from '../hooks/useAuth.js'
 import { useMySchedules } from '../hooks/useSession.js'
 import { formatDateRange } from '../utils/slotUtils.js'
 import { getStoredProfileName, setStoredProfileName } from '../utils/profileNameStorage.js'
@@ -143,6 +144,137 @@ function ProfileNameSettings({ user }) {
   )
 }
 
+function AccountSettings() {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const changePasswordMutation = useChangePassword()
+  const deleteAccountMutation = useDeleteAccount()
+  const changeError = useApiError(changePasswordMutation.error)
+  const deleteError = useApiError(deleteAccountMutation.error)
+
+  const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' })
+  const [pwNotice, setPwNotice] = useState(false)
+  const [localPwError, setLocalPwError] = useState('')
+  const [deletePw, setDeletePw] = useState('')
+  const [deleteAck, setDeleteAck] = useState(false)
+
+  const handleChangePassword = (event) => {
+    event.preventDefault()
+    setLocalPwError('')
+    setPwNotice(false)
+    if (pwForm.next.length < 8) {
+      setLocalPwError(t('dashboard.account.password.tooShort'))
+      return
+    }
+    if (pwForm.next !== pwForm.confirm) {
+      setLocalPwError(t('dashboard.account.password.mismatch'))
+      return
+    }
+    changePasswordMutation.mutate(
+      { currentPassword: pwForm.current, newPassword: pwForm.next },
+      {
+        onSuccess: () => {
+          setPwForm({ current: '', next: '', confirm: '' })
+          setPwNotice(true)
+        },
+      }
+    )
+  }
+
+  const handleDelete = (event) => {
+    event.preventDefault()
+    deleteAccountMutation.mutate(
+      { password: deletePw },
+      { onSuccess: () => navigate('/') }
+    )
+  }
+
+  return (
+    <section className="surface-card border border-gray-200 rounded-2xl p-4 sm:p-5">
+      <h2 className="text-base sm:text-lg font-semibold text-gray-900">{t('dashboard.account.title')}</h2>
+      <p className="text-sm text-gray-500 mt-1 mb-4">{t('dashboard.account.subtitle')}</p>
+
+      <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
+        <h3 className="text-sm font-semibold text-gray-700">{t('dashboard.account.password.title')}</h3>
+        <Input
+          type="password"
+          label={t('dashboard.account.password.current')}
+          autoComplete="current-password"
+          value={pwForm.current}
+          onChange={(e) => setPwForm((f) => ({ ...f, current: e.target.value }))}
+          required
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Input
+            type="password"
+            label={t('dashboard.account.password.new')}
+            autoComplete="new-password"
+            value={pwForm.next}
+            onChange={(e) => setPwForm((f) => ({ ...f, next: e.target.value }))}
+            required
+          />
+          <Input
+            type="password"
+            label={t('dashboard.account.password.confirm')}
+            autoComplete="new-password"
+            value={pwForm.confirm}
+            onChange={(e) => setPwForm((f) => ({ ...f, confirm: e.target.value }))}
+            required
+          />
+        </div>
+        {(localPwError || changeError) && <ErrorMessage message={localPwError || changeError} />}
+        {pwNotice && <p className="text-xs text-emerald-700">{t('dashboard.account.password.success')}</p>}
+        <div>
+          <Button
+            type="submit"
+            variant="primary"
+            size="sm"
+            loading={changePasswordMutation.isPending}
+            disabled={!pwForm.current || !pwForm.next || !pwForm.confirm}
+          >
+            {t('dashboard.account.password.submit')}
+          </Button>
+        </div>
+      </form>
+
+      <div className="rule-ink my-5" />
+
+      <form onSubmit={handleDelete} className="flex flex-col gap-3">
+        <h3 className="text-sm font-semibold text-red-700">{t('dashboard.account.danger.title')}</h3>
+        <p className="text-xs text-gray-500">{t('dashboard.account.danger.desc')}</p>
+        <Input
+          type="password"
+          label={t('dashboard.account.danger.passwordLabel')}
+          autoComplete="current-password"
+          value={deletePw}
+          onChange={(e) => setDeletePw(e.target.value)}
+        />
+        <label className="flex items-center gap-2 text-sm text-gray-700">
+          <input
+            type="checkbox"
+            className="h-4 w-4 rounded border-gray-300"
+            checked={deleteAck}
+            onChange={(e) => setDeleteAck(e.target.checked)}
+          />
+          {t('dashboard.account.danger.confirmLabel')}
+        </label>
+        {deleteError && <ErrorMessage message={deleteError} />}
+        <div>
+          <Button
+            type="submit"
+            variant="danger"
+            size="sm"
+            loading={deleteAccountMutation.isPending}
+            disabled={!deletePw || !deleteAck}
+          >
+            {t('dashboard.account.danger.submit')}
+          </Button>
+        </div>
+      </form>
+    </section>
+  )
+}
+
 export default function MySchedulesPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -217,6 +349,8 @@ export default function MySchedulesPage() {
             </div>
 
             <ProfileNameSettings user={user} />
+
+            <AccountSettings />
 
             {isLoading && (
               <div className="surface-card border border-gray-200 rounded-xl p-6">

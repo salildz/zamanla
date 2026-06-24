@@ -129,6 +129,17 @@ async function closeSession(req, res) {
 }
 
 /**
+ * POST /api/sessions/admin/:adminToken/reopen
+ * Re-open a closed session.
+ */
+async function reopenSession(req, res) {
+  const { adminToken } = req.params;
+  const session = await sessionService.reopenSession(adminToken);
+
+  return sendSuccess(res, { session: formatSession(session, true) });
+}
+
+/**
  * GET /api/sessions/admin/:adminToken/export
  * Export session results as JSON or CSV.
  */
@@ -218,6 +229,7 @@ module.exports = {
   updateSession,
   deleteSession,
   closeSession,
+  reopenSession,
   exportSession,
   getResults,
   getMySchedules,

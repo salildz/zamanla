@@ -121,6 +121,22 @@ async function closeSession(adminToken) {
 }
 
 /**
+ * Re-open a closed session so participants can edit availability again.
+ */
+async function reopenSession(adminToken) {
+  const session = await sessionRepo.findByAdminToken(adminToken);
+  if (!session) {
+    throw new AppError('Session not found', 404, 'SESSION_NOT_FOUND');
+  }
+  if (!session.is_closed) {
+    throw new AppError('Session is already open', 422, 'SESSION_ALREADY_OPEN');
+  }
+
+  const updated = await sessionRepo.reopenSession(session.id);
+  return updated;
+}
+
+/**
  * Delete a session permanently.
  */
 async function deleteSession(adminToken) {
@@ -165,6 +181,7 @@ module.exports = {
   getSessionByAdminToken,
   updateSession,
   closeSession,
+  reopenSession,
   deleteSession,
   claimSession,
   getOwnedSessions,

@@ -9,6 +9,7 @@ import {
   useUpdateSession,
   useDeleteSession,
   useCloseSession,
+  useReopenSession,
   useClaimSession,
   useResults,
 } from '../hooks/useSession.js'
@@ -185,6 +186,7 @@ function AdminContent({ session, adminToken }) {
 
   const updateMutation = useUpdateSession(adminToken)
   const closeMutation = useCloseSession(adminToken)
+  const reopenMutation = useReopenSession(adminToken)
   const deleteMutation = useDeleteSession(adminToken)
   const claimMutation = useClaimSession(adminToken)
 
@@ -244,6 +246,15 @@ function AdminContent({ session, adminToken }) {
       toast.success(t('admin.toast.sessionClosed'))
     } catch (err) {
       toast.error(err.userMessage || t('admin.toast.sessionCloseFailed'))
+    }
+  }
+
+  const handleReopenSession = async () => {
+    try {
+      await reopenMutation.mutateAsync()
+      toast.success(t('admin.toast.sessionReopened'))
+    } catch (err) {
+      toast.error(err.userMessage || t('admin.toast.sessionReopenFailed'))
     }
   }
 
@@ -471,7 +482,17 @@ function AdminContent({ session, adminToken }) {
                 </button>
               </div>
               <div className="flex gap-2">
-                {!session.isClosed && (
+                {session.isClosed ? (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="text-forest-700 border-forest-300 hover:bg-forest-50"
+                    onClick={handleReopenSession}
+                    loading={reopenMutation.isPending}
+                  >
+                    {t('admin.actions.reopenSession')}
+                  </Button>
+                ) : (
                   <Button
                     variant="secondary"
                     size="sm"
