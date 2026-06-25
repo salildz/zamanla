@@ -1,5 +1,6 @@
 'use strict';
 
+const config = require('../config');
 const participantRepo = require('../repositories/participantRepository');
 const sessionRepo = require('../repositories/sessionRepository');
 const slotRepo = require('../repositories/slotRepository');
@@ -21,6 +22,16 @@ async function createParticipant(publicToken, data, turnstileToken) {
   }
   if (session.is_closed) {
     throw new AppError('This session is closed and no longer accepting participants', 422, 'SESSION_CLOSED');
+  }
+
+  // Cap participants per session to limit ballot-stuffing / runaway result sets.
+  const participantCount = await participantRepo.countBySessionId(session.id);
+  if (participantCount >= config.limits.maxParticipantsPerSession) {
+    throw new AppError(
+      'This session has reached its participant limit',
+      422,
+      'SESSION_PARTICIPANT_LIMIT'
+    );
   }
 
   const editToken = generateEditToken();

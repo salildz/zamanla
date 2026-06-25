@@ -470,6 +470,7 @@
     "PARTICIPANT_NOT_FOUND": "Participant not found.",
     "SESSION_CLOSED": "This session is closed.",
     "SESSION_RANGE_TOO_LARGE": "This configuration generates too many time slots. Use a shorter range, a larger slot size, or a narrower daily window.",
+    "SESSION_PARTICIPANT_LIMIT": "This session has reached its participant limit.",
     "SESSION_ALREADY_CLAIMED": "This schedule is already claimed by another account.",
     "AUTH_REQUIRED": "Please log in to continue.",
     "INVALID_CREDENTIALS": "Invalid email or password.",

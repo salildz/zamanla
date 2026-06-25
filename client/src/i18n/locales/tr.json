@@ -470,6 +470,7 @@
     "PARTICIPANT_NOT_FOUND": "Katılımcı bulunamadı.",
     "SESSION_CLOSED": "Bu oturum kapatılmış.",
     "SESSION_RANGE_TOO_LARGE": "Bu ayarlar çok fazla zaman dilimi üretiyor. Daha kısa bir aralık, daha büyük dilim boyutu veya daha dar bir günlük pencere seç.",
+    "SESSION_PARTICIPANT_LIMIT": "Bu oturum katılımcı sınırına ulaştı.",
     "SESSION_ALREADY_CLAIMED": "Bu plan başka bir hesap tarafından sahiplenilmiş.",
     "AUTH_REQUIRED": "Devam etmek için giriş yapmalısın.",
     "INVALID_CREDENTIALS": "E-posta veya şifre hatalı.",
