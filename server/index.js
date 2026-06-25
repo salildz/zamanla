@@ -16,8 +16,18 @@ const routes = require('./src/routes');
 
 const app = express();
 
-// Trust the first proxy (nginx) so express-rate-limit can read the real client IP
-app.set('trust proxy', 1);
+// Trust proxy so express-rate-limit / secure cookies see the real client IP.
+// Configurable via TRUST_PROXY: a hop count (e.g. "1" for nginx, "2" for
+// Cloudflare+nginx), "true"/"false", or a subnet/IP list.
+function resolveTrustProxy(value) {
+  if (value === undefined || value === null || value === '') return false;
+  const raw = String(value).trim();
+  if (raw === 'true') return true;
+  if (raw === 'false') return false;
+  if (/^\d+$/.test(raw)) return parseInt(raw, 10);
+  return raw;
+}
+app.set('trust proxy', resolveTrustProxy(config.trustProxy));
 
 // Security middleware
 app.use(helmet());

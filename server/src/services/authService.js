@@ -48,14 +48,18 @@ async function registerUser({ email, password }) {
   return userRepo.createUser({ email, passwordHash });
 }
 
+// A real bcrypt hash used to equalize timing when the email isn't registered,
+// so login latency doesn't reveal whether an account exists.
+const DUMMY_PASSWORD_HASH = bcrypt.hashSync('zamanla-timing-equalizer', 12);
+
 async function loginUser({ email, password }) {
   const user = await userRepo.findByEmail(email);
-  if (!user) {
-    throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
-  }
 
-  const isValid = await bcrypt.compare(password, user.password_hash);
-  if (!isValid) {
+  // Always run a bcrypt comparison (against a dummy hash when the user is absent)
+  // to keep the response time independent of account existence.
+  const isValid = await bcrypt.compare(password, user ? user.password_hash : DUMMY_PASSWORD_HASH);
+
+  if (!user || !isValid) {
     throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
   }
 

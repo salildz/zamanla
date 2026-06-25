@@ -14,7 +14,9 @@ const ruleSchema = z.object({
   weekdays: z
     .array(z.number().int().min(0).max(6))
     .min(1, 'At least one weekday required')
-    .max(7),
+    .max(7)
+    // Dedupe and sort defensively so duplicate weekdays can't bloat expansion.
+    .transform((days) => [...new Set(days)].sort((a, b) => a - b)),
   startTime: z
     .string()
     .regex(/^\d{2}:\d{2}$/, 'startTime must be HH:MM'),
