@@ -3,6 +3,7 @@
 const config = require('../config');
 const sessionRepo = require('../repositories/sessionRepository');
 const { generatePublicToken, generateAdminToken } = require('../utils/tokens');
+const { assertWithinLimits } = require('../utils/sessionLimits');
 const { AppError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
 
@@ -44,6 +45,14 @@ async function verifyTurnstile(token) {
  */
 async function createSession(data, turnstileToken) {
   await verifyTurnstile(turnstileToken);
+
+  assertWithinLimits({
+    dateStart: data.dateStart,
+    dateEnd: data.dateEnd,
+    slotMinutes: data.slotMinutes,
+    dayStartTime: data.dayStartTime,
+    dayEndTime: data.dayEndTime,
+  });
 
   const publicToken = generatePublicToken();
   const adminToken = generateAdminToken();
@@ -99,6 +108,16 @@ async function updateSession(adminToken, updates) {
   if (session.is_closed) {
     throw new AppError('Cannot update a closed session', 422, 'SESSION_CLOSED');
   }
+
+  // Validate the resulting window (merge the patch over the current values) so a
+  // partial update can't push the session past the slot guardrails.
+  assertWithinLimits({
+    dateStart: updates.dateStart ?? session.date_start,
+    dateEnd: updates.dateEnd ?? session.date_end,
+    slotMinutes: updates.slotMinutes ?? session.slot_minutes,
+    dayStartTime: updates.dayStartTime ?? session.day_start_time,
+    dayEndTime: updates.dayEndTime ?? session.day_end_time,
+  });
 
   const updated = await sessionRepo.updateSession(session.id, updates);
   return updated;

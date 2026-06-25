@@ -461,6 +461,7 @@
     "dayEndRequired": "Gün bitiş saati gereklidir",
     "dateEndBeforeStart": "Bitiş tarihi başlangıç tarihinde veya sonrasında olmalıdır",
     "dayEndBeforeStart": "Gün bitiş saati başlangıç saatinden sonra olmalıdır",
+    "rangeTooLarge": "Tarih aralığı çok geniş (en fazla {{days}} gün) ya da çok fazla zaman dilimi üretiyor. Daha kısa bir aralık, daha büyük dilim boyutu veya daha dar bir günlük pencere dene.",
     "nameRequired": "İsim gereklidir",
     "nameTooLong": "İsim çok uzun"
   },
@@ -468,6 +469,7 @@
     "SESSION_NOT_FOUND": "Oturum bulunamadı.",
     "PARTICIPANT_NOT_FOUND": "Katılımcı bulunamadı.",
     "SESSION_CLOSED": "Bu oturum kapatılmış.",
+    "SESSION_RANGE_TOO_LARGE": "Bu ayarlar çok fazla zaman dilimi üretiyor. Daha kısa bir aralık, daha büyük dilim boyutu veya daha dar bir günlük pencere seç.",
     "SESSION_ALREADY_CLAIMED": "Bu plan başka bir hesap tarafından sahiplenilmiş.",
     "AUTH_REQUIRED": "Devam etmek için giriş yapmalısın.",
     "INVALID_CREDENTIALS": "E-posta veya şifre hatalı.",

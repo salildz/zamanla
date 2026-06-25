@@ -461,6 +461,7 @@
     "dayEndRequired": "Day end time is required",
     "dateEndBeforeStart": "End date must be on or after start date",
     "dayEndBeforeStart": "Day end time must be after start time",
+    "rangeTooLarge": "That date range is too large (max {{days}} days) or generates too many time slots. Try a shorter range, a larger slot size, or a narrower daily window.",
     "nameRequired": "Name is required",
     "nameTooLong": "Name too long"
   },
@@ -468,6 +469,7 @@
     "SESSION_NOT_FOUND": "Session not found.",
     "PARTICIPANT_NOT_FOUND": "Participant not found.",
     "SESSION_CLOSED": "This session is closed.",
+    "SESSION_RANGE_TOO_LARGE": "This configuration generates too many time slots. Use a shorter range, a larger slot size, or a narrower daily window.",
     "SESSION_ALREADY_CLAIMED": "This schedule is already claimed by another account.",
     "AUTH_REQUIRED": "Please log in to continue.",
     "INVALID_CREDENTIALS": "Invalid email or password.",

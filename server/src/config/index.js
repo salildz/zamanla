@@ -32,6 +32,19 @@ const config = {
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100,
   },
+
+  // Guardrails to keep a single session from generating an unbounded number of
+  // slots (which would blow up /results generation and the client grid).
+  limits: {
+    maxSpanDays: parseInt(process.env.MAX_SESSION_SPAN_DAYS || '92', 10),
+    maxTotalSlots: parseInt(process.env.MAX_SESSION_SLOTS || '5000', 10),
+    maxParticipantsPerSession: parseInt(process.env.MAX_PARTICIPANTS_PER_SESSION || '300', 10),
+  },
+
+  // Express `trust proxy` setting. Behind a single nginx hop use 1; behind
+  // Cloudflare + nginx you may need 2 (or a CIDR list). Configurable so rate
+  // limiting reads the real client IP in each deployment.
+  trustProxy: process.env.TRUST_PROXY || '1',
 };
 
 module.exports = config;
