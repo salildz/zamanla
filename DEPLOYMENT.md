@@ -331,9 +331,32 @@ docker compose -f docker-compose.prod.yml exec postgres \
 | `VITE_API_URL` | `http://localhost:9051/api` | `/api` | `/api` |
 | `AUTH_JWT_SECRET` | `change_me_auth_jwt_secret` | `change_me_auth_jwt_secret` | *(required)* |
 | `AUTH_JWT_EXPIRES_IN` | `7d` | `7d` | `7d` |
+| `TRUST_PROXY` | `1` | `1` | `1` (Cloudflare+nginx: `2`) |
+| `MAX_SESSION_SPAN_DAYS` | `92` | `92` | `92` |
+| `MAX_SESSION_SLOTS` | `5000` | `5000` | `5000` |
+| `MAX_PARTICIPANTS_PER_SESSION` | `300` | `300` | `300` |
 | `HMR_HOST` | *(not set)* | `zamanla-dev.yildizsalih.com` | *(not set)* |
 | `HMR_CLIENT_PORT` | *(not set)* | `443` | *(not set)* |
 | `HMR_PROTOCOL` | *(not set)* | `wss` | *(not set)* |
+
+### Security model & limits
+
+- **Token = capability.** A session's **admin token** grants full control (edit,
+  close, delete). It is a URL secret with no extra auth, so anyone holding the
+  link can administer the session. "Claiming" a session to a user account only
+  adds it to that user's dashboard and ownership listing — **it does not restrict
+  the admin token**. Treat the admin link like a password; share only the public
+  `/s/<token>` link with participants. (This is a deliberate anonymous-first
+  design choice, not a bug.)
+- **Stateless auth.** Account sessions are JWTs in an HttpOnly, SameSite=Lax,
+  Secure-in-prod cookie. They are not server-revocable before expiry: changing
+  `AUTH_JWT_SECRET` invalidates *all* sessions, but there is no per-token denylist.
+  Keep `AUTH_JWT_EXPIRES_IN` modest if this matters for your threat model.
+- **Guardrails.** `MAX_SESSION_SPAN_DAYS` / `MAX_SESSION_SLOTS` bound how many
+  time slots one session can generate; `MAX_PARTICIPANTS_PER_SESSION` caps
+  result-set size and limits ballot-stuffing. Tune via env vars above.
+- **Behind a proxy.** Set `TRUST_PROXY` to the number of proxy hops so rate
+  limiting and Secure cookies see the real client IP (Cloudflare + nginx = `2`).
 
 ---
 
