@@ -66,9 +66,7 @@
       "timezoneTitle": "Saat Dilimi Farkındalığı",
       "timezoneDesc": "Her katılımcı saatleri oturum saat diliminde görür. Bölgeler arası karışıklık olmaz.",
       "sharingTitle": "Kolay Paylaşım",
-      "sharingDesc": "Tek bir link paylaş. Hesap gerekmez. Katılımcılar sadece isimlerini girer ve başlar.",
-      "exportTitle": "Sonuçları Dışa Aktar",
-      "exportDesc": "Müsaitlik verilerini JSON veya CSV olarak indir ve diğer araçlarda kullan."
+      "sharingDesc": "Tek bir link paylaş. Hesap gerekmez. Katılımcılar sadece isimlerini girer ve başlar."
     },
     "ctaSectionTitle": "Daha akıllı planlamaya hazır mısın?",
     "ctaSectionSubtitle": "İlk oturumunu bir dakikadan kısa sürede oluştur. Ücretsiz, kayıt gerektirmez.",
@@ -181,8 +179,6 @@
       "share": "Paylaşım Linkleri"
     },
     "actions": {
-      "exportCsv": "CSV Olarak Dışa Aktar",
-      "exportJson": "JSON Olarak Dışa Aktar",
       "closeSession": "Oturumu Kapat",
       "reopenSession": "Oturumu Yeniden Aç",
       "delete": "Sil"
@@ -240,10 +236,7 @@
       "sessionDeleted": "Oturum silindi.",
       "sessionDeleteFailed": "Oturum silinemedi.",
       "sessionClaimed": "Plan hesabına kaydedildi.",
-      "sessionClaimFailed": "Plan hesabına kaydedilemedi.",
-      "exportedCsv": "CSV olarak dışa aktarıldı.",
-      "exportedJson": "JSON olarak dışa aktarıldı.",
-      "exportFailed": "Dışa aktarma başarısız."
+      "sessionClaimFailed": "Plan hesabına kaydedilemedi."
     },
     "loading": "Yönetici paneli yükleniyor...",
     "errors": {
@@ -360,7 +353,7 @@
     "clearUndoAction": "Geri al",
     "unsaved": "Kaydedilmedi",
     "unsavedLeaveWarning": "Kaydedilmemiş değişikliklerin var.",
-    "instructions": "Müsait olduğun saatleri işaretlemek için dokun ya da sürükle. Haftalık kalıpları otomatik doldurmak için tekrarlayan kuralları kullan.",
+    "instructions": "Müsait olduğun saatlere dokun ya da parmağını sürükle; tekrar dokununca kalkar. Haftalık programını otomatik doldurmak için sağdaki tekrarlayan kuralları kullanabilirsin.",
       "tour": {
         "title": "Hızlı kullanım",
         "step1Title": "Doğal şekilde kaydır",
@@ -414,10 +407,13 @@
       }
     },
     "legend": {
-      "title": "Gösterge",
-      "fromRule": "Tekrarlayan kuraldan",
-      "manual": "Manuel onaylandı",
-      "unavailable": "Müsait değil"
+      "title": "Nasıl işaretlenir?",
+      "fromRule": "Müsait — kuraldan",
+      "fromRuleHow": "tekrarlayan kuralın doldurdu",
+      "manual": "Müsait — manuel",
+      "manualHow": "boş bir saate dokun",
+      "unavailable": "Müsait değilim",
+      "unavailableHow": "kuraldan gelen bir saate tekrar dokun"
     },
     "days": {
       "short": ["P", "Pt", "S", "Ç", "Pe", "C", "Ct"],

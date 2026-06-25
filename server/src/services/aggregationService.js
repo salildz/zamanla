@@ -79,26 +79,4 @@ async function getResults(publicToken) {
   return { session, slots: results };
 }
 
-/**
- * Build export data for JSON/CSV export.
- *
- * @param {string} adminToken
- * @param {string} format - 'json' | 'csv'
- */
-async function getExportData(adminToken, format) {
-  const sessionRepoModule = require('../repositories/sessionRepository');
-  const session = await sessionRepoModule.findByAdminToken(adminToken);
-  if (!session) {
-    throw new AppError('Session not found', 404, 'SESSION_NOT_FOUND');
-  }
-
-  const { slots } = await getResults(session.public_token);
-
-  if (format === 'csv') {
-    return { session, slots, format: 'csv' };
-  }
-
-  return { session, slots, format: 'json' };
-}
-
-module.exports = { getResults, getExportData };
+module.exports = { getResults };

@@ -161,7 +161,7 @@ test('a recurring rule expands into per-slot availability', async () => {
   }
 });
 
-test('admin lifecycle: export (csv + json), close, then delete', async () => {
+test('admin lifecycle: close, then delete', async () => {
   const session = await createSession('Admin');
   const { adminToken, publicToken } = session;
 
@@ -173,18 +173,6 @@ test('admin lifecycle: export (csv + json), close, then delete', async () => {
   const adminRes = await request(app).get(`/api/sessions/admin/${adminToken}`);
   assert.equal(adminRes.status, 200);
   assert.equal(adminRes.body.data.session.adminToken, adminToken);
-
-  // CSV export
-  const csvRes = await request(app).get(`/api/sessions/admin/${adminToken}/export?format=csv`);
-  assert.equal(csvRes.status, 200);
-  assert.match(csvRes.headers['content-type'], /text\/csv/);
-  assert.match(csvRes.text, /Slot Start/);
-  assert.match(csvRes.text, /Dora/);
-
-  // JSON export
-  const jsonRes = await request(app).get(`/api/sessions/admin/${adminToken}/export?format=json`);
-  assert.equal(jsonRes.status, 200);
-  assert.ok(Array.isArray(jsonRes.body.data.slots));
 
   // Close
   const closeRes = await request(app).post(`/api/sessions/admin/${adminToken}/close`);

@@ -66,9 +66,7 @@
       "timezoneTitle": "Timezone Aware",
       "timezoneDesc": "Every participant sees times in the session timezone. No confusion across regions.",
       "sharingTitle": "Simple Sharing",
-      "sharingDesc": "Share a single link. No accounts needed. Participants just enter their name and go.",
-      "exportTitle": "Export Results",
-      "exportDesc": "Download availability data as JSON or CSV for use in other tools."
+      "sharingDesc": "Share a single link. No accounts needed. Participants just enter their name and go."
     },
     "ctaSectionTitle": "Ready to schedule smarter?",
     "ctaSectionSubtitle": "Create your first session in under a minute. Free, no signup required.",
@@ -181,8 +179,6 @@
       "share": "Share Links"
     },
     "actions": {
-      "exportCsv": "Export CSV",
-      "exportJson": "Export JSON",
       "closeSession": "Close Session",
       "reopenSession": "Reopen Session",
       "delete": "Delete"
@@ -240,10 +236,7 @@
       "sessionDeleted": "Session deleted.",
       "sessionDeleteFailed": "Failed to delete session.",
       "sessionClaimed": "Schedule saved to your account.",
-      "sessionClaimFailed": "Could not save this schedule to your account.",
-      "exportedCsv": "Exported as CSV.",
-      "exportedJson": "Exported as JSON.",
-      "exportFailed": "Export failed."
+      "sessionClaimFailed": "Could not save this schedule to your account."
     },
     "loading": "Loading admin dashboard...",
     "errors": {
@@ -360,7 +353,7 @@
     "clearUndoAction": "Undo",
     "unsaved": "Unsaved",
     "unsavedLeaveWarning": "You have unsaved changes.",
-    "instructions": "Tap or drag to mark your available times. Use recurring rules to auto-fill weekly patterns.",
+    "instructions": "Tap or drag across the times you're free; tap again to clear. Use the recurring rules on the side to auto-fill your weekly pattern.",
       "tour": {
         "title": "Quick guide",
         "step1Title": "Scroll naturally",
@@ -414,10 +407,13 @@
       }
     },
     "legend": {
-      "title": "Legend",
-      "fromRule": "From recurring rule",
-      "manual": "Manually confirmed",
-      "unavailable": "Not available"
+      "title": "How to mark",
+      "fromRule": "Free — from a rule",
+      "fromRuleHow": "auto-filled by your recurring rule",
+      "manual": "Free — manual",
+      "manualHow": "tap an empty time",
+      "unavailable": "Not free",
+      "unavailableHow": "tap a rule-filled time again"
     },
     "days": {
       "short": ["S", "M", "T", "W", "T", "F", "S"],

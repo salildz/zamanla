@@ -7,38 +7,44 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(isSameOrBefore)
 
-// Generate all time slots for a session
+// Generate all time slots for a session.
+// Must stay byte-for-byte in sync with the server generator (timeUtils.js):
+// results are joined on the exact slotStart ISO timestamp, so any divergence
+// (e.g. across a DST transition) silently drops that day's availability.
 export function generateSessionSlots(session) {
   const { dateStart, dateEnd, slotMinutes, dayStartTime, dayEndTime, includeWeekends, timezone: tz } = session
   const slots = []
 
-  let currentDay = dayjs.tz(dateStart, tz).startOf('day')
-  const lastDay = dayjs.tz(dateEnd, tz).startOf('day')
+  // Normalize the daily window to HH:MM (the API may send "HH:MM:SS")
+  const startHM = String(dayStartTime).substring(0, 5)
+  const endHM = String(dayEndTime).substring(0, 5)
 
-  while (currentDay.isSameOrBefore(lastDay, 'day')) {
-    const dow = currentDay.day() // 0=Sun, 6=Sat
-    if (!includeWeekends && (dow === 0 || dow === 6)) {
-      currentDay = currentDay.add(1, 'day')
-      continue
+  // Iterate calendar days in UTC so the day-stepping is never perturbed by DST.
+  // For each date, resolve the wall-clock window *in the session timezone* — this
+  // picks the correct UTC offset even on a DST-transition day, matching the server.
+  const cursor = new Date(`${dateStart}T00:00:00Z`)
+  const lastDate = new Date(`${dateEnd}T00:00:00Z`)
+
+  while (cursor <= lastDate) {
+    const dateStr = cursor.toISOString().substring(0, 10)
+    const dow = new Date(`${dateStr}T12:00:00Z`).getUTCDay() // calendar weekday (0=Sun, 6=Sat)
+
+    if (includeWeekends || (dow !== 0 && dow !== 6)) {
+      let slotStart = dayjs.tz(`${dateStr}T${startHM}`, tz)
+      const dayEnd = dayjs.tz(`${dateStr}T${endHM}`, tz)
+
+      while (slotStart.isBefore(dayEnd)) {
+        const slotEnd = slotStart.add(slotMinutes, 'minute')
+        if (slotEnd.isAfter(dayEnd)) break
+        slots.push({
+          slotStart: slotStart.utc().toISOString(),
+          slotEnd: slotEnd.utc().toISOString(),
+        })
+        slotStart = slotEnd
+      }
     }
 
-    const [sh, sm] = dayStartTime.split(':').map(Number)
-    const [eh, em] = dayEndTime.split(':').map(Number)
-
-    let slotTime = currentDay.hour(sh).minute(sm).second(0).millisecond(0)
-    const dayEndMoment = currentDay.hour(eh).minute(em).second(0).millisecond(0)
-
-    while (slotTime.isBefore(dayEndMoment)) {
-      const slotEnd = slotTime.add(slotMinutes, 'minute')
-      if (slotEnd.isAfter(dayEndMoment)) break
-      slots.push({
-        slotStart: slotTime.utc().toISOString(),
-        slotEnd: slotEnd.utc().toISOString(),
-      })
-      slotTime = slotEnd
-    }
-
-    currentDay = currentDay.add(1, 'day')
+    cursor.setUTCDate(cursor.getUTCDate() + 1)
   }
 
   return slots

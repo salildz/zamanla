@@ -63,5 +63,12 @@ export function useSaveAvailability(publicToken, editToken) {
       // Invalidate results so the group view refreshes
       queryClient.invalidateQueries({ queryKey: ['results', publicToken] })
     },
+    onError: (error) => {
+      // The session was closed while this editor was open — refresh the session
+      // so the view immediately switches to its read-only closed state.
+      if (error?.serverCode === 'SESSION_CLOSED') {
+        queryClient.invalidateQueries({ queryKey: ['session', publicToken] })
+      }
+    },
   })
 }

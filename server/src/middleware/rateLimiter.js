@@ -51,20 +51,6 @@ const adminLimiter = rateLimit({
 });
 
 /**
- * Limiter for export endpoint.
- */
-const exportLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 50,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    success: false,
-    error: { code: 'RATE_LIMIT_EXCEEDED', message: 'Too many export requests, please try again later.' },
-  },
-});
-
-/**
  * Limiter for auth endpoints (login/register).
  */
 const authLimiter = rateLimit({
@@ -78,4 +64,4 @@ const authLimiter = rateLimit({
   },
 });
 
-module.exports = { generalLimiter, createLimiter, adminLimiter, exportLimiter, authLimiter };
+module.exports = { generalLimiter, createLimiter, adminLimiter, authLimiter };

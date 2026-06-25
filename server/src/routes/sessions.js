@@ -5,7 +5,7 @@ const router = express.Router();
 
 const sessionCtrl = require('../controllers/sessionController');
 const participantCtrl = require('../controllers/participantController');
-const { createLimiter, adminLimiter, exportLimiter, generalLimiter } = require('../middleware/rateLimiter');
+const { createLimiter, adminLimiter, generalLimiter } = require('../middleware/rateLimiter');
 const { optionalAuth, requireAuth } = require('../middleware/auth');
 
 // ─── Session creation ───────────────────────────────────────────────────────
@@ -30,9 +30,6 @@ router.post('/admin/:adminToken/close', adminLimiter, sessionCtrl.closeSession);
 
 // POST /api/sessions/admin/:adminToken/reopen
 router.post('/admin/:adminToken/reopen', adminLimiter, sessionCtrl.reopenSession);
-
-// GET /api/sessions/admin/:adminToken/export
-router.get('/admin/:adminToken/export', exportLimiter, sessionCtrl.exportSession);
 
 // ─── Public session view ────────────────────────────────────────────────────
 // GET /api/sessions/:publicToken

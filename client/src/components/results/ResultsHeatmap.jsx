@@ -24,7 +24,7 @@ function CellTooltip({ slot, tz }) {
         <div className="font-semibold mb-1">
           {formatSlotTime(slotStart, tz)} – {formatSlotTime(slotEnd, tz)}
         </div>
-        <div className="text-gray-300 mb-1.5">
+        <div className="text-white/70 mb-1.5">
           {t('results.tooltip.available', { available: availableCount, total: totalParticipants })}
           {totalParticipants > 0 && (
             <span className="ml-1 text-amber-200">({Math.round(ratio * 100)}%)</span>
@@ -33,15 +33,15 @@ function CellTooltip({ slot, tz }) {
         {participants && participants.length > 0 && (
           <div className="flex flex-col gap-0.5">
             {participants.slice(0, 8).map((p, i) => (
-              <span key={i} className="text-gray-200">· {p.name}</span>
+              <span key={i} className="text-white/90">· {p.name}</span>
             ))}
             {participants.length > 8 && (
-              <span className="text-gray-400">{t('results.tooltip.more', { count: participants.length - 8 })}</span>
+              <span className="text-white/50">{t('results.tooltip.more', { count: participants.length - 8 })}</span>
             )}
           </div>
         )}
         {(!participants || participants.length === 0) && availableCount === 0 && (
-          <span className="text-gray-400">{t('results.tooltip.noOneAvailable')}</span>
+          <span className="text-white/60">{t('results.tooltip.noOneAvailable')}</span>
         )}
       </div>
       <div className="flex justify-center">

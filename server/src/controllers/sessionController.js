@@ -3,8 +3,7 @@
 const sessionService = require('../services/sessionService');
 const aggregationService = require('../services/aggregationService');
 const { createSessionSchema, updateSessionSchema } = require('../validators/sessionValidator');
-const { sendSuccess, sendError } = require('../utils/response');
-const { AppError } = require('../middleware/errorHandler');
+const { sendSuccess } = require('../utils/response');
 const logger = require('../utils/logger');
 
 // PostgreSQL TIME fields come back as "HH:MM:SS" — normalize to "HH:MM"
@@ -140,56 +139,6 @@ async function reopenSession(req, res) {
 }
 
 /**
- * GET /api/sessions/admin/:adminToken/export
- * Export session results as JSON or CSV.
- */
-async function exportSession(req, res) {
-  const { adminToken } = req.params;
-  const format = (req.query.format || 'json').toLowerCase();
-
-  if (format !== 'json' && format !== 'csv') {
-    return sendError(res, 'INVALID_FORMAT', 'Format must be json or csv', 400);
-  }
-
-  const { session, slots } = await aggregationService.getExportData(adminToken, format);
-
-  if (format === 'csv') {
-    try {
-      const { Parser } = require('json2csv');
-      const fields = [
-        { label: 'Slot Start', value: 'slotStart' },
-        { label: 'Slot End', value: 'slotEnd' },
-        { label: 'Available Count', value: 'availableCount' },
-        { label: 'Participants', value: (row) => row.participants.map((p) => p.name).join(', ') },
-      ];
-      const parser = new Parser({ fields });
-      const csv = parser.parse(slots);
-
-      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-      res.setHeader(
-        'Content-Disposition',
-        `attachment; filename="zamanla-${session.public_token}-results.csv"`
-      );
-      return res.status(200).send(csv);
-    } catch (err) {
-      logger.error('CSV export error', { error: err.message });
-      throw new AppError('Failed to generate CSV export', 500, 'EXPORT_ERROR');
-    }
-  }
-
-  return sendSuccess(res, {
-    session: {
-      id: session.id,
-      title: session.title,
-      timezone: session.timezone,
-      dateStart: session.date_start,
-      dateEnd: session.date_end,
-    },
-    slots,
-  });
-}
-
-/**
  * GET /api/sessions/:publicToken/results
  * Get aggregated availability results for a session.
  */
@@ -230,7 +179,6 @@ module.exports = {
   deleteSession,
   closeSession,
   reopenSession,
-  exportSession,
   getResults,
   getMySchedules,
 };

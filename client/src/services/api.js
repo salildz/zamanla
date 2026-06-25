@@ -86,14 +86,6 @@ export async function claimSession(adminToken) {
   return res.data.session
 }
 
-export async function exportSession(adminToken, format = 'json') {
-  const res = await api.get(`/sessions/admin/${adminToken}/export`, {
-    params: { format },
-    responseType: format === 'csv' ? 'blob' : 'json',
-  })
-  return res.data
-}
-
 // Participants
 export async function joinSession(publicToken, data) {
   const res = await api.post(`/sessions/${publicToken}/participants`, data)

@@ -11,11 +11,12 @@ import {
   getMySchedules,
 } from '../services/api.js'
 
-export function useSession(publicToken) {
+export function useSession(publicToken, options = {}) {
   return useQuery({
     queryKey: ['session', publicToken],
     queryFn: () => getSession(publicToken),
     enabled: !!publicToken,
+    refetchInterval: options.refetchInterval,
   })
 }
 

@@ -14,7 +14,6 @@ import {
   useResults,
 } from '../hooks/useSession.js'
 import { useCurrentUser } from '../hooks/useAuth.js'
-import { exportSession } from '../services/api.js'
 import { generateSessionSlots, formatDateRange } from '../utils/slotUtils.js'
 import ResultsHeatmap from '../components/results/ResultsHeatmap.jsx'
 import BestTimesPanel from '../components/results/BestTimesPanel.jsx'
@@ -280,32 +279,6 @@ function AdminContent({ session, adminToken }) {
     }
   }
 
-  const handleExport = async (format) => {
-    try {
-      const data = await exportSession(adminToken, format)
-      if (format === 'csv') {
-        const blob = new Blob([data], { type: 'text/csv' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `zamanla-export-${session.publicToken}.csv`
-        a.click()
-        URL.revokeObjectURL(url)
-      } else {
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `zamanla-export-${session.publicToken}.json`
-        a.click()
-        URL.revokeObjectURL(url)
-      }
-      toast.success(format === 'csv' ? t('admin.toast.exportedCsv') : t('admin.toast.exportedJson'))
-    } catch (err) {
-      toast.error(err.userMessage || t('admin.toast.exportFailed'))
-    }
-  }
-
   // Derive participant list from results (session API doesn't include participants)
   const participants = useMemo(() => {
     if (!results || results.length === 0) return []
@@ -454,33 +427,6 @@ function AdminContent({ session, adminToken }) {
             </div>
             {/* Actions */}
             <div className="flex items-center gap-2 flex-wrap sm:shrink-0">
-              {/* Export buttons — full label on sm+, icon-only on mobile */}
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleExport('csv')}
-                  title={t('admin.actions.exportCsv')}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100"
-                >
-                  <svg className="w-4 h-4 shrink-0 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                  </svg>
-                  <span className="hidden sm:inline">{t('admin.actions.exportCsv')}</span>
-                  <span className="sm:hidden">CSV</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleExport('json')}
-                  title={t('admin.actions.exportJson')}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100"
-                >
-                  <svg className="w-4 h-4 shrink-0 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                  </svg>
-                  <span className="hidden sm:inline">{t('admin.actions.exportJson')}</span>
-                  <span className="sm:hidden">JSON</span>
-                </button>
-              </div>
               <div className="flex gap-2">
                 {session.isClosed ? (
                   <Button

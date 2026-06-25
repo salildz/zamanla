@@ -463,19 +463,40 @@ export default function ParticipantEditor({ session, participant, publicToken })
         </div>
       )}
 
-      <div className="flex items-center gap-2 text-[11px] sm:text-xs overflow-x-auto sm:overflow-visible whitespace-nowrap pb-1 -mb-1">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-gray-600">
-          <span className="h-2.5 w-2.5 rounded-sm bg-amber-300" />
-          {t('availability.legend.fromRule')}
-        </span>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-gray-600">
-          <span className="h-2.5 w-2.5 rounded-sm bg-amber-500" />
-          {t('availability.legend.manual')}
-        </span>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-gray-600">
-          <span className="h-2.5 w-2.5 rounded-sm bg-brick-500" />
-          {t('availability.legend.unavailable')}
-        </span>
+      {/* Marking guide — color + how each state is produced, so "not free" is discoverable */}
+      <div className="rounded-lg border border-gray-200 bg-gray-50/70 px-3 py-2.5">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">
+          {t('availability.legend.title')}
+        </p>
+        <ul className="flex flex-col gap-1.5 text-xs">
+          <li className="flex items-start gap-2">
+            <span className="mt-0.5 h-3 w-3 rounded-sm bg-amber-300 border border-amber-400/60 shrink-0" />
+            <span className="min-w-0">
+              <span className="font-medium text-gray-700">{t('availability.legend.fromRule')}</span>
+              <span className="text-gray-400"> · {t('availability.legend.fromRuleHow')}</span>
+            </span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-0.5 h-3 w-3 rounded-sm bg-amber-500 border border-amber-600/50 shrink-0" />
+            <span className="min-w-0">
+              <span className="font-medium text-gray-700">{t('availability.legend.manual')}</span>
+              <span className="text-gray-400"> · {t('availability.legend.manualHow')}</span>
+            </span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span
+              className="mt-0.5 h-3 w-3 rounded-sm bg-brick-500 border border-brick-600/50 shrink-0"
+              style={{
+                backgroundImage:
+                  'repeating-linear-gradient(-45deg, rgba(255,255,255,0.55) 0, rgba(255,255,255,0.55) 1px, transparent 1px, transparent 3px)',
+              }}
+            />
+            <span className="min-w-0">
+              <span className="font-medium text-gray-700">{t('availability.legend.unavailable')}</span>
+              <span className="text-gray-400"> · {t('availability.legend.unavailableHow')}</span>
+            </span>
+          </li>
+        </ul>
       </div>
 
       {showUndoClear && (

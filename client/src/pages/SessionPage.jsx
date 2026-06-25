@@ -466,7 +466,11 @@ export default function SessionPage() {
     },
   ]
 
-  const { data: session, isLoading, isError, error, refetch } = useSession(publicToken)
+  // Poll session state so a session closed by the admin flips this view to
+  // read-only without requiring a manual refresh (refetchOnWindowFocus is off).
+  const { data: session, isLoading, isError, error, refetch } = useSession(publicToken, {
+    refetchInterval: 30000,
+  })
 
   if (isLoading) {
     return <PageLoader message={t('session.loading.session')} />
