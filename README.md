@@ -78,8 +78,6 @@ Two links are generated per session:
 
 ## Screenshots
 
-> Drop the images into `docs/screenshots/` using the filenames below and they'll render automatically.
-
 ### Home
 
 | Desktop | Mobile |
