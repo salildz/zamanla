@@ -1,11 +1,9 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
-dayjs.extend(isSameOrBefore)
 
 // Generate all time slots for a session.
 // Must stay byte-for-byte in sync with the server generator (timeUtils.js):

@@ -316,3 +316,25 @@ test('creating a session with an oversized date range is rejected', async () => 
   assert.equal(res.status, 422);
   assert.equal(res.body.error.code, 'SESSION_RANGE_TOO_LARGE');
 });
+
+test('updating a non-window field does not re-validate an oversized window', async () => {
+  const session = await createSession('LegacyOversized');
+  // Simulate a session that predates the limits: force an oversized range in the DB.
+  await db.query('UPDATE sessions SET date_end = $1 WHERE admin_token = $2', [
+    '2030-01-01',
+    session.adminToken,
+  ]);
+
+  // Editing only the title must still work — no date/window field in the patch.
+  const titlePatch = await request(app)
+    .patch(`/api/sessions/admin/${session.adminToken}`)
+    .send({ title: `${TITLE_PREFIX}LegacyRenamed ${Date.now()}` });
+  assert.equal(titlePatch.status, 200, JSON.stringify(titlePatch.body));
+
+  // But changing the window itself is still validated against the limits.
+  const windowPatch = await request(app)
+    .patch(`/api/sessions/admin/${session.adminToken}`)
+    .send({ dateEnd: '2031-01-01' });
+  assert.equal(windowPatch.status, 422);
+  assert.equal(windowPatch.body.error.code, 'SESSION_RANGE_TOO_LARGE');
+});

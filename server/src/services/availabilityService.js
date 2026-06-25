@@ -112,6 +112,10 @@ async function applyManualSlots(participantId, session, slots, client) {
 
   // The set of slot starts this session actually generates. Manual overrides
   // must line up with the grid, otherwise they'd never aggregate into results.
+  // This makes the client/server slot-generation parity a hard requirement:
+  // if the two ever diverge (e.g. a DST regression), saves fail loudly here
+  // rather than silently storing unaggregatable rows. Keep this generator and
+  // client/src/utils/slotUtils.js in sync.
   const validSlotStarts = new Set(
     generateSessionSlots(session).map((s) => s.slotStart.toISOString())
   );

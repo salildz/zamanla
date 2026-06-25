@@ -109,15 +109,27 @@ async function updateSession(adminToken, updates) {
     throw new AppError('Cannot update a closed session', 422, 'SESSION_CLOSED');
   }
 
-  // Validate the resulting window (merge the patch over the current values) so a
-  // partial update can't push the session past the slot guardrails.
-  assertWithinLimits({
-    dateStart: updates.dateStart ?? session.date_start,
-    dateEnd: updates.dateEnd ?? session.date_end,
-    slotMinutes: updates.slotMinutes ?? session.slot_minutes,
-    dayStartTime: updates.dayStartTime ?? session.day_start_time,
-    dayEndTime: updates.dayEndTime ?? session.day_end_time,
-  });
+  // Only re-validate the window when the patch actually changes a date/time
+  // field. Otherwise editing an unrelated field (e.g. the title) of a session
+  // that predates these limits — or was created when they were looser — would be
+  // wrongly rejected. When the window does change, validate the merged result so
+  // a partial update can't push the session past the slot guardrails.
+  const touchesWindow =
+    updates.dateStart !== undefined ||
+    updates.dateEnd !== undefined ||
+    updates.slotMinutes !== undefined ||
+    updates.dayStartTime !== undefined ||
+    updates.dayEndTime !== undefined;
+
+  if (touchesWindow) {
+    assertWithinLimits({
+      dateStart: updates.dateStart ?? session.date_start,
+      dateEnd: updates.dateEnd ?? session.date_end,
+      slotMinutes: updates.slotMinutes ?? session.slot_minutes,
+      dayStartTime: updates.dayStartTime ?? session.day_start_time,
+      dayEndTime: updates.dayEndTime ?? session.day_end_time,
+    });
+  }
 
   const updated = await sessionRepo.updateSession(session.id, updates);
   return updated;

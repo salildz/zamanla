@@ -25,6 +25,9 @@ async function createParticipant(publicToken, data, turnstileToken) {
   }
 
   // Cap participants per session to limit ballot-stuffing / runaway result sets.
+  // This is a soft cap: the count + insert aren't atomic, so a burst of
+  // concurrent joins could land a few over the limit. That's fine — it's an
+  // anti-abuse guardrail, not a hard invariant worth a lock/constraint for.
   const participantCount = await participantRepo.countBySessionId(session.id);
   if (participantCount >= config.limits.maxParticipantsPerSession) {
     throw new AppError(
