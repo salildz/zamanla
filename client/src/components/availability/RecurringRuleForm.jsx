@@ -246,25 +246,6 @@ export default function RecurringRuleForm({ rules, onRulesChange, session }) {
           {t('availability.rules.noRules')}
         </div>
       )}
-
-      {/* Legend */}
-      <div className="border-t border-gray-100 pt-3">
-        <p className="text-xs font-medium text-gray-500 mb-2">{t('availability.legend.title')}</p>
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center gap-2">
-            <span className="w-4 h-4 rounded bg-amber-300 border border-amber-400 shrink-0" />
-            <span className="text-xs text-gray-500">{t('availability.legend.fromRule')}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-4 h-4 rounded bg-amber-500 border border-amber-600 shrink-0" />
-            <span className="text-xs text-gray-500">{t('availability.legend.manual')}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-4 h-4 rounded bg-brick-100 border border-brick-500 shrink-0" />
-            <span className="text-xs text-gray-500">{t('availability.legend.unavailable')}</span>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
