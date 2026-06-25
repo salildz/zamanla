@@ -5,21 +5,27 @@ const db = require('../config/database');
 // ─── Availability Rules ────────────────────────────────────────────────────
 
 /**
- * Insert a batch of rules for a participant.
+ * Insert a batch of rules for a participant in a single multi-row INSERT.
  */
 async function insertRules(rules, client) {
+  if (rules.length === 0) return [];
   const conn = client || db;
-  const inserted = [];
+
+  const valueGroups = [];
+  const params = [];
+  let p = 1;
   for (const rule of rules) {
-    const { rows } = await conn.query(
-      `INSERT INTO availability_rules (participant_id, session_id, weekdays, start_time, end_time)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING *`,
-      [rule.participantId, rule.sessionId, rule.weekdays, rule.startTime, rule.endTime]
-    );
-    inserted.push(rows[0]);
+    valueGroups.push(`($${p++}, $${p++}, $${p++}, $${p++}, $${p++})`);
+    params.push(rule.participantId, rule.sessionId, rule.weekdays, rule.startTime, rule.endTime);
   }
-  return inserted;
+
+  const { rows } = await conn.query(
+    `INSERT INTO availability_rules (participant_id, session_id, weekdays, start_time, end_time)
+     VALUES ${valueGroups.join(', ')}
+     RETURNING *`,
+    params
+  );
+  return rows;
 }
 
 /**
@@ -44,37 +50,63 @@ async function getRulesByParticipant(participantId) {
 // ─── Availability Slots ────────────────────────────────────────────────────
 
 /**
- * Upsert a batch of slots for a participant.
- * On conflict (participant_id, slot_start), update status and source_type.
+ * Upsert a batch of slots for a participant using chunked multi-row INSERTs.
+ * On conflict (participant_id, slot_start) the row is updated.
+ *
+ * @param {Array} slots
+ * @param {import('pg').PoolClient} [client]
+ * @param {Object} [options]
+ * @param {boolean} [options.preserveManual] when true, a conflicting row that is
+ *   already a manual override is left untouched (rule expansion must never clobber
+ *   a participant's manual choice).
  */
-async function upsertSlots(slots, client) {
-  if (slots.length === 0) return [];
+async function upsertSlots(slots, client, options = {}) {
+  if (slots.length === 0) return;
   const conn = client || db;
-  const inserted = [];
+  const { preserveManual = false } = options;
 
-  for (const slot of slots) {
-    const { rows } = await conn.query(
-      `INSERT INTO availability_slots
-         (participant_id, session_id, slot_start, slot_end, status, source_type)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       ON CONFLICT (participant_id, slot_start)
-       DO UPDATE SET
-         status = EXCLUDED.status,
-         source_type = EXCLUDED.source_type,
-         slot_end = EXCLUDED.slot_end
-       RETURNING *`,
-      [
+  // Dedupe within the batch — a multi-row upsert cannot touch the same conflict
+  // target twice. Last occurrence wins, matching the previous row-by-row behavior.
+  const deduped = [
+    ...new Map(
+      slots.map((s) => {
+        const startKey = s.slotStart instanceof Date ? s.slotStart.toISOString() : String(s.slotStart);
+        return [`${s.participantId}|${startKey}`, s];
+      })
+    ).values(),
+  ];
+
+  const conflictClause = preserveManual
+    ? `DO UPDATE SET status = EXCLUDED.status, source_type = EXCLUDED.source_type, slot_end = EXCLUDED.slot_end
+         WHERE availability_slots.source_type <> 'manual'`
+    : `DO UPDATE SET status = EXCLUDED.status, source_type = EXCLUDED.source_type, slot_end = EXCLUDED.slot_end`;
+
+  const CHUNK_SIZE = 500;
+  for (let i = 0; i < deduped.length; i += CHUNK_SIZE) {
+    const chunk = deduped.slice(i, i + CHUNK_SIZE);
+    const valueGroups = [];
+    const params = [];
+    let p = 1;
+    for (const slot of chunk) {
+      valueGroups.push(`($${p++}, $${p++}, $${p++}, $${p++}, $${p++}, $${p++})`);
+      params.push(
         slot.participantId,
         slot.sessionId,
         slot.slotStart,
         slot.slotEnd,
         slot.status || 'available',
-        slot.sourceType || 'manual',
-      ]
+        slot.sourceType || 'manual'
+      );
+    }
+
+    await conn.query(
+      `INSERT INTO availability_slots
+         (participant_id, session_id, slot_start, slot_end, status, source_type)
+       VALUES ${valueGroups.join(', ')}
+       ON CONFLICT (participant_id, slot_start) ${conflictClause}`,
+      params
     );
-    inserted.push(rows[0]);
   }
-  return inserted;
 }
 
 /**

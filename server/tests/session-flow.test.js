@@ -264,3 +264,55 @@ test('unknown tokens return 404 with structured errors', async () => {
   const admin = await request(app).get('/api/sessions/admin/does-not-exist-admin-token');
   assert.equal(admin.status, 404);
 });
+
+test('manual slot outside the session window is rejected', async () => {
+  const session = await createSession('OutOfWindow');
+  const { publicToken } = session;
+  const editToken = await join(publicToken, 'Frank');
+
+  const res = await request(app)
+    .put(`/api/sessions/${publicToken}/participants/${editToken}`)
+    .send({
+      slots: [
+        { slotStart: '2026-01-10T00:00:00.000Z', status: 'available', sourceType: 'manual' },
+      ],
+    });
+  assert.equal(res.status, 422);
+  assert.equal(res.body.error.code, 'SLOT_OUT_OF_WINDOW');
+});
+
+test('a manual override survives a rules-only update (not clobbered by rule expansion)', async () => {
+  const session = await createSession('PreserveManual');
+  const { publicToken } = session;
+  const editToken = await join(publicToken, 'Grace');
+  const slots = await getResults(publicToken);
+  const target = slots[0]; // 2026-01-10 (Sat) 09:00 Istanbul
+
+  // A rule that covers the target slot, plus a manual "unavailable" override on it.
+  const saturdayRule = { weekdays: [6], startTime: '09:00', endTime: '12:00' };
+  await saveAvailability(publicToken, editToken, {
+    rules: [saturdayRule],
+    slots: [{ slotStart: target.slotStart, slotEnd: target.slotEnd, status: 'unavailable', sourceType: 'manual' }],
+  });
+
+  // Re-save with ONLY rules (no slots key) — the rule must not overwrite the manual row.
+  const rulesOnly = await request(app)
+    .put(`/api/sessions/${publicToken}/participants/${editToken}`)
+    .send({ rules: [saturdayRule] });
+  assert.equal(rulesOnly.status, 200, JSON.stringify(rulesOnly.body));
+
+  const view = await request(app).get(`/api/sessions/${publicToken}/participants/${editToken}`);
+  const targetRow = view.body.data.slots.find((s) => new Date(s.slotStart).toISOString() === new Date(target.slotStart).toISOString());
+  assert.ok(targetRow, 'target slot row should exist');
+  assert.equal(targetRow.status, 'unavailable');
+  assert.equal(targetRow.sourceType, 'manual');
+});
+
+test('creating a session with an oversized date range is rejected', async () => {
+  const bad = sessionPayload(uniqueTitle('HugeRange'));
+  bad.dateStart = '2026-01-01';
+  bad.dateEnd = '2027-06-01'; // ~17 months, well past the span cap
+  const res = await request(app).post('/api/sessions').send(bad);
+  assert.equal(res.status, 422);
+  assert.equal(res.body.error.code, 'SESSION_RANGE_TOO_LARGE');
+});

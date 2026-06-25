@@ -84,11 +84,12 @@ async function replaceParticipantRules(participantId, session, rules) {
     // 3. Delete existing rule_derived slots
     await slotRepo.deleteRuleDerivedSlotsByParticipant(participantId, client);
 
-    // 4. Expand rules into slots and upsert
+    // 4. Expand rules into slots and upsert. preserveManual ensures a rule that
+    //    covers a slot the participant manually overrode never overwrites it.
     if (rules.length > 0) {
       const newSlots = expandRulesToSlots(participantId, session.id, session, rules);
       if (newSlots.length > 0) {
-        await slotRepo.upsertSlots(newSlots, client);
+        await slotRepo.upsertSlots(newSlots, client, { preserveManual: true });
       }
     }
   });
@@ -109,10 +110,20 @@ async function applyManualSlots(participantId, session, slots, client) {
     ? slotMinutes * 60 * 1000
     : 30 * 60 * 1000;
 
+  // The set of slot starts this session actually generates. Manual overrides
+  // must line up with the grid, otherwise they'd never aggregate into results.
+  const validSlotStarts = new Set(
+    generateSessionSlots(session).map((s) => s.slotStart.toISOString())
+  );
+
   const slotsForUpsert = slots.map((slot) => {
     const slotStart = new Date(slot.slotStart);
     if (Number.isNaN(slotStart.getTime())) {
       throw new AppError('Invalid manual slot start time', 400, 'INVALID_SLOT_START');
+    }
+
+    if (!validSlotStarts.has(slotStart.toISOString())) {
+      throw new AppError('Manual slot is outside the session window', 422, 'SLOT_OUT_OF_WINDOW');
     }
 
     const slotEnd = slot.slotEnd
