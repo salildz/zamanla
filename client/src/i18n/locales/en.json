@@ -400,6 +400,7 @@
       "activeRules_other": "Active Rules ({{count}})",
       "noRules": "Add a rule above to quickly fill your weekly schedule.",
       "deleteRule": "Delete rule",
+      "hasExceptions": "Has exceptions",
       "errors": {
         "noDays": "Select at least one day.",
         "noTimes": "Enter both start and end time.",
@@ -413,7 +414,7 @@
       "manual": "Free — manual",
       "manualHow": "tap an empty time",
       "unavailable": "Not free",
-      "unavailableHow": "tap a rule-filled time again"
+      "unavailableHow": "leave empty — tap a rule-filled time to clear it"
     },
     "days": {
       "short": ["S", "M", "T", "W", "T", "F", "S"],

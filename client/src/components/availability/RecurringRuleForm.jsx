@@ -30,7 +30,7 @@ function formatRuleLabel(rule, fullDays) {
   return `${dayNames} · ${rule.startTime}–${rule.endTime}`
 }
 
-export default function RecurringRuleForm({ rules, onRulesChange, session }) {
+export default function RecurringRuleForm({ rules, onRulesChange, session, exceptionRuleIds }) {
   const { t } = useTranslation()
   // Normalize to HH:MM — PostgreSQL TIME fields may include seconds ("09:00:00")
   const defaultStart = (session?.dayStartTime || '09:00').substring(0, 5)
@@ -222,8 +222,15 @@ export default function RecurringRuleForm({ rules, onRulesChange, session }) {
                 key={rule.id}
                 className="flex items-center justify-between gap-2 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5"
               >
-                <span className="text-xs text-amber-700 font-medium flex-1 min-w-0 truncate">
-                  {formatRuleLabel(rule, fullDays)}
+                <span className="flex-1 min-w-0 flex flex-col">
+                  <span className="text-xs text-amber-700 font-medium truncate">
+                    {formatRuleLabel(rule, fullDays)}
+                  </span>
+                  {exceptionRuleIds?.has(rule.id) && (
+                    <span className="text-[11px] text-brick-600 font-medium">
+                      {t('availability.rules.hasExceptions')}
+                    </span>
+                  )}
                 </span>
                 <button
                   type="button"

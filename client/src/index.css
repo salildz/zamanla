@@ -68,9 +68,6 @@
     --grid-cell-rule-border: rgba(154, 102, 20, 0.46);
     --grid-cell-manual-bg: rgba(185, 125, 28, 0.88);
     --grid-cell-manual-hover: rgba(154, 102, 20, 0.94);
-    --grid-cell-blocked-bg: rgba(168, 68, 58, 0.16);
-    --grid-cell-blocked-border: rgba(168, 68, 58, 0.5);
-    --grid-cell-blocked-stripe: rgba(168, 68, 58, 0.26);
     --grid-cell-drag-add: rgba(185, 125, 28, 0.74);
     --grid-cell-drag-remove: rgba(222, 210, 189, 0.92);
 
@@ -365,18 +362,6 @@
 
   .grid-cell-manual { background: var(--grid-cell-manual-bg); }
   .grid-cell-manual:hover { background: var(--grid-cell-manual-hover); }
-
-  .grid-cell-manual-unavailable {
-    background: var(--grid-cell-blocked-bg);
-    border-color: var(--grid-cell-blocked-border) !important;
-    background-image: repeating-linear-gradient(
-      -45deg,
-      var(--grid-cell-blocked-stripe),
-      var(--grid-cell-blocked-stripe) 4px,
-      transparent 4px,
-      transparent 8px
-    );
-  }
 
   .grid-cell:focus-visible {
     @apply outline-none;

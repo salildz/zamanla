@@ -4,7 +4,7 @@ import clsx from 'clsx'
 import AvailabilityGrid from './AvailabilityGrid.jsx'
 import RecurringRuleForm from './RecurringRuleForm.jsx'
 import Button from '../common/Button.jsx'
-import { generateSessionSlots, applyRulesToSlots } from '../../utils/slotUtils.js'
+import { generateSessionSlots, applyRulesToSlots, slotMatchesRule } from '../../utils/slotUtils.js'
 import { useSaveAvailability } from '../../hooks/useParticipant.js'
 import { useToast } from '../common/Toast.jsx'
 
@@ -152,6 +152,22 @@ export default function ParticipantEditor({ session, participant, publicToken })
     () => applyRulesToSlots(session, rules),
     [session, rules]
   )
+
+  // Rules that have at least one slot carved out by a manual 'unavailable'
+  // override — surfaced as an "exception" note next to the rule.
+  const ruleExceptionIds = useMemo(() => {
+    const ids = new Set()
+    const unavailableSlots = Object.entries(manualOverrides)
+      .filter(([, status]) => status === 'unavailable')
+      .map(([slotStart]) => slotStart)
+    if (unavailableSlots.length === 0) return ids
+    for (const rule of rules) {
+      if (unavailableSlots.some((slotStart) => slotMatchesRule(slotStart, rule, session.timezone))) {
+        ids.add(rule.id)
+      }
+    }
+    return ids
+  }, [manualOverrides, rules, session.timezone])
 
   // Effective availability: manual overrides take precedence over rules
   const effectiveAvailability = useMemo(() => {
@@ -484,13 +500,7 @@ export default function ParticipantEditor({ session, participant, publicToken })
             </span>
           </li>
           <li className="flex items-start gap-2">
-            <span
-              className="mt-0.5 h-3 w-3 rounded-sm bg-brick-500 border border-brick-600/50 shrink-0"
-              style={{
-                backgroundImage:
-                  'repeating-linear-gradient(-45deg, rgba(255,255,255,0.55) 0, rgba(255,255,255,0.55) 1px, transparent 1px, transparent 3px)',
-              }}
-            />
+            <span className="mt-0.5 h-3 w-3 rounded-sm bg-white border border-gray-300 shrink-0" />
             <span className="min-w-0">
               <span className="font-medium text-gray-700">{t('availability.legend.unavailable')}</span>
               <span className="text-gray-400"> · {t('availability.legend.unavailableHow')}</span>
@@ -551,6 +561,7 @@ export default function ParticipantEditor({ session, participant, publicToken })
               rules={rules}
               onRulesChange={handleRulesChange}
               session={session}
+              exceptionRuleIds={ruleExceptionIds}
             />
           </div>
         </div>

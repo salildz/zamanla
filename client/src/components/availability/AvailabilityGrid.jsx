@@ -30,7 +30,9 @@ const GridCell = memo(function GridCell({
   const draggingAdd = isDragging && dragValue
   const draggingRemove = isDragging && !dragValue
   const isManualAvailable = manualStatus === 'available'
-  const isManualUnavailable = manualStatus === 'unavailable'
+  // A manual 'unavailable' override (a slot carved out of a recurring rule)
+  // renders as an empty cell — "not free" is just the absence of a mark. The
+  // affected rule surfaces an "exception" note instead of a distinct cell color.
 
   return (
     <td
@@ -45,9 +47,8 @@ const GridCell = memo(function GridCell({
         draggingAdd && 'grid-cell-dragging-add',
         draggingRemove && 'grid-cell-dragging-remove',
         !isDragging && isManualAvailable && 'grid-cell-manual',
-        !isDragging && isManualUnavailable && 'grid-cell-manual-unavailable',
-        !isDragging && !isManualAvailable && !isManualUnavailable && isAvailable && 'grid-cell-rule',
-        !isDragging && !isManualAvailable && !isManualUnavailable && !isAvailable && 'grid-cell-empty'
+        !isDragging && !isManualAvailable && isAvailable && 'grid-cell-rule',
+        !isDragging && !isManualAvailable && !isAvailable && 'grid-cell-empty'
       )}
       title={slotStart ? formatSlotTime(slotStart, tz) : ''}
     />

@@ -400,6 +400,7 @@
       "activeRules_other": "Aktif Kurallar ({{count}})",
       "noRules": "Haftalık programını hızlıca doldurmak için yukarıdan bir kural ekle.",
       "deleteRule": "Kuralı sil",
+      "hasExceptions": "İstisna var",
       "errors": {
         "noDays": "En az bir gün seç.",
         "noTimes": "Başlangıç ve bitiş saatini gir.",
@@ -413,7 +414,7 @@
       "manual": "Müsait — manuel",
       "manualHow": "boş bir saate dokun",
       "unavailable": "Müsait değilim",
-      "unavailableHow": "kuraldan gelen bir saate tekrar dokun"
+      "unavailableHow": "boş bırak — kuraldan gelen bir saati boşaltmak için üstüne dokun"
     },
     "days": {
       "short": ["P", "Pt", "S", "Ç", "Pe", "C", "Ct"],
