@@ -34,6 +34,7 @@ What sets it apart is **hybrid availability input**: participants set recurring 
 - [API Reference](#api-reference)
 - [Local Development](#local-development)
 - [Environment Variables](#environment-variables)
+- [Anonymous session retention](#anonymous-session-retention)
 - [Database Migrations](#database-migrations)
 - [Deployment](#deployment)
 - [Design System](#design-system)
@@ -51,6 +52,7 @@ What sets it apart is **hybrid availability input**: participants set recurring 
 - **Timezone aware** — every participant sees times in the session's timezone; data is stored as UTC `TIMESTAMPTZ`.
 - **Optional accounts** — sign in to claim sessions and manage them from a personal **My Schedules** dashboard. Accounts are never mandatory.
 - **Session lifecycle** — creators can close a session to new responses (making it read-only), reopen it, or delete it.
+- **Auto-cleanup of anonymous sessions** — unclaimed sessions are deleted automatically a grace period after their date range ends, so abandoned polls don't pile up. Claiming a session to an account keeps it indefinitely.
 - **Export** — download aggregated results as JSON or CSV.
 - **Mobile-first interaction** — long-press + drag selection, scroll/select mode toggle, sticky save bar, and a guided onboarding tour.
 - **Bilingual** — full English and Turkish localization with automatic browser-language detection.
@@ -174,6 +176,7 @@ server/
 ├── migrations/
 │   ├── 001_initial_schema.sql     Sessions, participants, rules, slots
 │   ├── 002_users_and_ownership.sql Users + optional session ownership
+│   ├── 003_anon_session_expiry.sql Index for anonymous-session cleanup
 │   └── migrate.js                 Migration runner (tracked in schema_migrations)
 └── src/
     ├── config/                    Environment + database pool
@@ -211,7 +214,7 @@ users ──< sessions ──< participants ──< availability_rules
                           └──< availability_slots
 ```
 
-- **`sessions`** — title, description, timezone, date range, daily window, slot size, `include_weekends`, `is_closed`, and an optional `owner_id` (NULL for anonymous sessions). Holds a `public_token` and an `admin_token`.
+- **`sessions`** — title, description, timezone, date range, daily window, slot size, `include_weekends`, `is_closed`, and an optional `owner_id` (NULL for anonymous sessions — these are auto-purged after their date range ends; see [Anonymous session retention](#anonymous-session-retention)). Holds a `public_token` and an `admin_token`.
 - **`participants`** — name + a unique `edit_token`, scoped to a session.
 - **`availability_rules`** — recurring patterns (`weekdays[]`, `start_time`, `end_time`); expanded into slots server-side.
 - **`availability_slots`** — concrete `slot_start`/`slot_end` with a `status` (`available` / `unavailable`) and `source_type` (`rule` / `manual`). Manual entries override rule-derived ones.
@@ -226,7 +229,7 @@ Three input modes compose into a single saved state:
 
 1. **Recurring rules** — e.g. "free Mon/Wed after 18:00" — stored in `availability_rules` and expanded across the session's date range.
 2. **Manual selection** — direct tap/drag on the grid — stored as explicit `availability_slots`.
-3. **Manual overrides** — tapping a rule-filled slot to remove it — stored as `status = 'unavailable'`.
+3. **Manual overrides** — tapping a rule-filled slot carves it back out — stored as `status = 'unavailable'`. In the grid this simply clears the cell (an unmarked cell means "not free"); the affected rule shows an **exception** note so the carve-out stays discoverable.
 
 **Priority:** manual overrides > rule-derived slots.
 
@@ -359,8 +362,22 @@ npm test                     # node:test — session flow, auth, ownership, acco
 | `AUTH_COOKIE_NAME` | `zamanla_auth` | Auth cookie name |
 | `AUTH_COOKIE_MAX_AGE_MS` | `604800000` | Auth cookie max age (ms) |
 | `TURNSTILE_SECRET_KEY` | *(optional)* | Cloudflare Turnstile secret key |
+| `ANON_SESSION_RETENTION_DAYS` | `30` | Days after its date range ends before an unclaimed session is purged |
+| `ANON_SESSION_CLEANUP_INTERVAL_MS` | `21600000` | How often the in-process cleanup job runs (default 6h) |
+| `ANON_SESSION_CLEANUP_ENABLED` | `true` | Set `false` to disable the in-process job (e.g. run purge from external cron) |
 | `VITE_API_URL` | `http://localhost:9051/api` | Frontend API base URL |
 | `VITE_TURNSTILE_SITE_KEY` | *(optional)* | Cloudflare Turnstile site key |
+
+---
+
+## Anonymous session retention
+
+Sessions created without an account (`owner_id IS NULL`) are **ephemeral**. A background job — started with the server and run every `ANON_SESSION_CLEANUP_INTERVAL_MS` — deletes any unclaimed session whose scheduling window (`date_end`) ended more than `ANON_SESSION_RETENTION_DAYS` ago, cascading to its participants, rules, and slots. This keeps abandoned or finished polls from accumulating.
+
+- Expiry is **derived**, not stored: it always tracks the current `date_end`, so editing the date range moves the expiry automatically.
+- **Claiming** a session to an account sets `owner_id` and exempts it permanently.
+- The API exposes a derived `expiresAt` on anonymous sessions (null once claimed); the create-success screen and admin dashboard surface it as a warning.
+- To run the purge from an external scheduler instead, set `ANON_SESSION_CLEANUP_ENABLED=false` and call `sessionService.purgeExpiredAnonymousSessions()` from your own script/cron.
 
 ---
 

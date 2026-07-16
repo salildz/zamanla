@@ -157,6 +157,21 @@ async function findByOwnerId(ownerId) {
   return rows;
 }
 
+/**
+ * Delete anonymous (unclaimed) sessions whose scheduling window ended more than
+ * `retentionDays` ago. Claimed sessions (owner_id set) are never touched.
+ * Cascades to participants/rules/slots. Returns the number of rows deleted.
+ */
+async function deleteExpiredAnonymousSessions(retentionDays) {
+  const { rowCount } = await db.query(
+    `DELETE FROM sessions
+     WHERE owner_id IS NULL
+       AND date_end < CURRENT_DATE - $1::int`,
+    [retentionDays]
+  );
+  return rowCount;
+}
+
 module.exports = {
   createSession,
   findByPublicToken,
@@ -167,4 +182,5 @@ module.exports = {
   deleteSession,
   claimByAdminToken,
   findByOwnerId,
+  deleteExpiredAnonymousSessions,
 };

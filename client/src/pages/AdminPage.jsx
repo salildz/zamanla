@@ -581,6 +581,13 @@ function AdminContent({ session, adminToken }) {
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-gray-800">{t('admin.claim.title')}</p>
 
+                  {/* expiresAt is non-null only for unclaimed sessions (server-derived) */}
+                  {session.expiresAt && (
+                    <p className="text-xs text-brick-600 mt-1 font-medium">
+                      {t('admin.claim.expiryNotice', { date: dayjs(session.expiresAt).format('D MMMM YYYY') })}
+                    </p>
+                  )}
+
                   {currentUserLoading ? (
                     <p className="text-xs text-gray-500 mt-1">{t('admin.claim.loading')}</p>
                   ) : claimStatus === 'anonymous' ? (

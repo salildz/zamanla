@@ -4,12 +4,25 @@ const sessionService = require('../services/sessionService');
 const aggregationService = require('../services/aggregationService');
 const { createSessionSchema, updateSessionSchema } = require('../validators/sessionValidator');
 const { sendSuccess } = require('../utils/response');
+const config = require('../config');
 const logger = require('../utils/logger');
 
 // PostgreSQL TIME fields come back as "HH:MM:SS" — normalize to "HH:MM"
 function normalizeTime(t) {
   if (!t) return t;
   return String(t).substring(0, 5);
+}
+
+// Anonymous sessions are auto-deleted `retentionDays` after their window ends;
+// surface that derived date (YYYY-MM-DD) so clients can warn the owner. Claimed
+// sessions (owner_id set) never expire, so this is null for them.
+function computeExpiresAt(session) {
+  if (session.owner_id) return null;
+  const base = String(session.date_end).substring(0, 10);
+  const d = new Date(`${base}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return null;
+  d.setUTCDate(d.getUTCDate() + config.anonRetention.retentionDays);
+  return d.toISOString().substring(0, 10);
 }
 
 function formatSession(session, includeAdmin = false) {
@@ -26,6 +39,7 @@ function formatSession(session, includeAdmin = false) {
     dayEndTime: normalizeTime(session.day_end_time),
     includeWeekends: session.include_weekends,
     isClosed: session.is_closed,
+    expiresAt: computeExpiresAt(session),
     createdAt: session.created_at,
     updatedAt: session.updated_at,
   };

@@ -129,7 +129,9 @@
       "shareButton": "Share Link",
       "shareNativeText": "Join my scheduling session: {{title}}",
       "viewSessionButton": "View Session Page",
-      "createAnotherLink": "Create another session"
+      "createAnotherLink": "Create another session",
+      "expiryTitle": "This session is temporary",
+      "expiryMessage": "Unless you save it to an account, it will be automatically deleted on {{date}}."
     }
   },
   "session": {
@@ -217,6 +219,7 @@
       "claimableMessage": "Signed in as {{email}}. Claim this schedule to manage it from your dashboard.",
       "ownedByYou": "This schedule is already saved in your account.",
       "ownedByAnother": "This schedule is already claimed by another account.",
+      "expiryNotice": "Heads up: this session will be auto-deleted on {{date}} unless it's saved to an account.",
       "actions": {
         "login": "Log in",
         "register": "Create account",

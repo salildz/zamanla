@@ -129,7 +129,9 @@
       "shareButton": "Linki Paylaş",
       "shareNativeText": "Planlama oturumuma katıl: {{title}}",
       "viewSessionButton": "Oturum Sayfasını Görüntüle",
-      "createAnotherLink": "Başka bir oturum oluştur"
+      "createAnotherLink": "Başka bir oturum oluştur",
+      "expiryTitle": "Bu oturum geçici",
+      "expiryMessage": "Bir hesaba kaydetmezsen {{date}} tarihinde otomatik olarak silinecek."
     }
   },
   "session": {
@@ -217,6 +219,7 @@
       "claimableMessage": "{{email}} ile giriş yaptın. Bu planı panelinden yönetmek için hesabına ekle.",
       "ownedByYou": "Bu plan zaten hesabına kaydedilmiş.",
       "ownedByAnother": "Bu plan başka bir hesap tarafından sahiplenilmiş.",
+      "expiryNotice": "Not: Bir hesaba kaydedilmezse bu oturum {{date}} tarihinde otomatik olarak silinecek.",
       "actions": {
         "login": "Giriş yap",
         "register": "Hesap oluştur",

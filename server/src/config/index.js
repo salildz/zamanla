@@ -41,6 +41,18 @@ const config = {
     maxParticipantsPerSession: parseInt(process.env.MAX_PARTICIPANTS_PER_SESSION || '300', 10),
   },
 
+  // Anonymous (unclaimed, owner_id IS NULL) sessions are ephemeral: a background
+  // job purges them once their scheduling window (date_end) ended more than
+  // `retentionDays` ago, so abandoned/finished polls don't accumulate forever.
+  // Claiming a session (setting owner_id) exempts it permanently.
+  anonRetention: {
+    retentionDays: parseInt(process.env.ANON_SESSION_RETENTION_DAYS || '30', 10),
+    cleanupIntervalMs: parseInt(process.env.ANON_SESSION_CLEANUP_INTERVAL_MS || `${6 * 60 * 60 * 1000}`, 10),
+    // Set ANON_SESSION_CLEANUP_ENABLED=false to disable the in-process purge
+    // (e.g. when running it from an external cron instead).
+    cleanupEnabled: process.env.ANON_SESSION_CLEANUP_ENABLED !== 'false',
+  },
+
   // Express `trust proxy` setting. Behind a single nginx hop use 1; behind
   // Cloudflare + nginx you may need 2 (or a CIDR list). Configurable so rate
   // limiting reads the real client IP in each deployment.

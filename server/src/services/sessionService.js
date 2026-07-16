@@ -205,6 +205,19 @@ async function getOwnedSessions(userId) {
   return sessionRepo.findByOwnerId(userId);
 }
 
+/**
+ * Purge anonymous sessions whose scheduling window ended more than the
+ * configured retention period ago. Returns the number of sessions deleted.
+ */
+async function purgeExpiredAnonymousSessions() {
+  const { retentionDays } = config.anonRetention;
+  const deleted = await sessionRepo.deleteExpiredAnonymousSessions(retentionDays);
+  if (deleted > 0) {
+    logger.info('Purged expired anonymous sessions', { deleted, retentionDays });
+  }
+  return deleted;
+}
+
 module.exports = {
   verifyTurnstile,
   createSession,
@@ -216,4 +229,5 @@ module.exports = {
   deleteSession,
   claimSession,
   getOwnedSessions,
+  purgeExpiredAnonymousSessions,
 };

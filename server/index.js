@@ -13,6 +13,7 @@ const logger = require('./src/utils/logger');
 const requestLogger = require('./src/middleware/requestLogger');
 const errorHandler = require('./src/middleware/errorHandler');
 const routes = require('./src/routes');
+const { startAnonSessionCleanup } = require('./src/services/cleanupScheduler');
 
 const app = express();
 
@@ -77,6 +78,11 @@ if (require.main === module) {
       corsOrigin: config.corsOrigin,
     });
   });
+
+  // Periodically delete abandoned anonymous sessions so the DB doesn't grow
+  // unbounded. Only starts with the real server, never when the app is
+  // imported (e.g. by tests), which call the service directly.
+  startAnonSessionCleanup();
 }
 
 module.exports = app;

@@ -239,6 +239,23 @@ export default function CreateSessionPage() {
               </div>
             </div>
 
+            {/* Ephemeral session notice — only for anonymous (unclaimed) sessions */}
+            {created.expiresAt && (
+              <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 mb-4">
+                <div className="flex gap-3">
+                  <svg className="w-5 h-5 text-sky-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-sky-800">{t('create.success.expiryTitle')}</p>
+                    <p className="text-xs text-sky-700 mt-0.5">
+                      {t('create.success.expiryMessage', { date: dayjs(created.expiresAt).format('D MMMM YYYY') })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="text-center">
               <Link to="/create" className="text-sm text-indigo-600 hover:text-indigo-800">
                 {t('create.success.createAnotherLink')}
