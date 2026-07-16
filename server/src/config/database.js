@@ -1,8 +1,15 @@
 'use strict';
 
-const { Pool } = require('pg');
+const { Pool, types } = require('pg');
 const config = require('./index');
 const logger = require('../utils/logger');
+
+// Return DATE columns (OID 1082) as the raw 'YYYY-MM-DD' string instead of a
+// JS Date. The default parser builds a Date at the server's *local* midnight,
+// which (a) serializes to a full ISO timestamp the client can't parse as a
+// date — breaking slot generation ("No time slots available") — and (b) shifts
+// the calendar day on any non-UTC host. Keeping the raw string avoids both.
+types.setTypeParser(types.builtins.DATE, (value) => value);
 
 const pool = new Pool({
   host: config.db.host,
